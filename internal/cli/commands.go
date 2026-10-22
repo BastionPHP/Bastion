@@ -15,6 +15,7 @@ import (
 	"github.com/larptard/bastion/internal/advisory"
 	"github.com/larptard/bastion/internal/check"
 	"github.com/larptard/bastion/internal/report"
+	"github.com/larptard/bastion/internal/sarif"
 	"github.com/larptard/bastion/internal/scan"
 	"github.com/larptard/bastion/internal/trace"
 	"github.com/larptard/bastion/internal/ui"
@@ -73,7 +74,10 @@ func (e *env) cmdTrace(ctx context.Context, args []string) (int, error) {
 	if err != nil {
 		return 0, err
 	}
-	if c.json {
+	switch {
+	case c.format == "sarif":
+		return traceExit(res), writeJSON(e.stdout, sarif.FromTrace(res))
+	case c.machine():
 		return traceExit(res), writeJSON(e.stdout, res)
 	}
 	RenderTrace(e.stdout, e.style(&c), ui.TerminalWidth(e.outFile), res, c.verbose)
@@ -99,7 +103,7 @@ func (e *env) cmdReport(ctx context.Context, args []string) (int, error) {
 		return 0, err
 	}
 	tf.sysroot, tf.maxSize = sf.sysroot, 4<<20
-	c.quiet = c.quiet || c.json
+	c.quiet = c.quiet || c.machine()
 
 	var sr *scan.Result
 	var tr *trace.Result
@@ -202,7 +206,7 @@ func (e *env) cmdCheck(args []string) (int, error) {
 		}
 	}
 	code := map[advisory.Status]int{advisory.Fixed: ExitOK, advisory.Vulnerable: ExitAffected, advisory.LikelyVulnerable: ExitAffected, advisory.Unknown: ExitUnknown}[worst]
-	if c.json {
+	if c.machine() {
 		return code, writeJSON(e.stdout, map[string]any{"input": parsed, "assessments": results})
 	}
 	s := e.style(&c)
@@ -229,7 +233,7 @@ func (e *env) cmdAdvisories(args []string) (int, error) {
 	if err != nil {
 		return 0, err
 	}
-	if c.json {
+	if c.machine() {
 		return 0, writeJSON(e.stdout, db.Advisories)
 	}
 	s := e.style(&c)

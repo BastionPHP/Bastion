@@ -29,7 +29,11 @@ jobs:
       - run: make build
       - working-directory: site
         run: npm test && BASTION_BIN=$GITHUB_WORKSPACE/bastion node build.mjs
+      # Tries to switch Pages to "GitHub Actions" on first run. If the token
+      # may not do that, enable it once under Settings → Pages.
       - uses: actions/configure-pages@v5
+        with:
+          enablement: true
       - uses: actions/upload-pages-artifact@v3
         with:
           path: site/dist

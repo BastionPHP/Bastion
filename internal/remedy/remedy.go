@@ -74,7 +74,11 @@ func Steps(in Input) []string {
 		}
 	case strings.HasPrefix(env, "System package (dnf/yum)"), strings.HasPrefix(env, "Remi"):
 		steps = append(steps, fmt.Sprintf("sudo dnf upgrade --refresh '%s*'   (yum on older releases)", pkgGlob(pkg, "php")))
-		steps = append(steps, "Confirm with: rpm -q --changelog "+orDefault(in.Package, "php")+" | grep -E 'CVE-2026-10961[89]'")
+		if vf := in.Assessment.VendorFix; vf != nil {
+			steps = append(steps, fmt.Sprintf("Confirm: rpm -q %s  → expect %s or later (%s).", orDefault(in.Package, "php"), vf.Fixed, vf.Advisory))
+		} else {
+			steps = append(steps, "Confirm with: rpm -q --changelog "+orDefault(in.Package, "php")+" | grep -E 'CVE-2026-10961[89]'")
+		}
 	case strings.HasPrefix(env, "System package (apk)"):
 		steps = append(steps, fmt.Sprintf("apk update && apk upgrade %s", pkgGlob(pkg, "php")))
 	case env == "Docker official image":
@@ -88,16 +92,23 @@ func Steps(in Input) []string {
 		}
 		steps = append(steps, fmt.Sprintf("Rebuild on a patched base image: docker pull %s (needs %s or later), then rebuild and redeploy. Running containers keep the old binary until they are replaced.", img, orStr(fixedRelease, "8.4.27")))
 	case env == "BaoTa / aaPanel":
-		steps = append(steps, "BaoTa/aaPanel: App Store → PHP-"+branch+" → Update (or reinstall the newest build). Then restart PHP from the panel.")
 		if noUpstreamFix {
-			steps = append(steps, "PHP "+branch+" has no upstream fix; switch the site to PHP 8.2+ in Website → PHP version.")
+			steps = append(steps, "aaPanel/BaoTa ships fixed builds for PHP 8.2-8.5 only. Move sites on PHP "+branch+" to 8.2 or later (site settings → PHP version) and apply the interim mitigations until then.")
+		} else {
+			steps = append(steps, fmt.Sprintf("aaPanel/BaoTa: App Store → Installed → update PHP-%s to %s or later, then restart PHP from the panel.", branch, fixedRelease))
 		}
 	case env == "cPanel EasyApache 4":
-		steps = append(steps, fmt.Sprintf("sudo dnf upgrade 'ea-php%s*'   (or yum; WHM » EasyApache 4 shows the same packages)", strings.ReplaceAll(branch, ".", "")))
+		steps = append(steps, fmt.Sprintf("sudo dnf upgrade 'ea-php%s*'   (or yum, or WHM » EasyApache 4)", strings.ReplaceAll(branch, ".", "")))
+		if noUpstreamFix {
+			steps = append(steps, fmt.Sprintf("Confirm the backport: rpm -q --changelog ea-php%s-php-cli | grep -E 'CVE-2026-10961[89]'  (no output: not fixed, move to PHP 8.2+)", strings.ReplaceAll(branch, ".", "")))
+		}
 	case env == "CloudLinux alt-php":
 		steps = append(steps, fmt.Sprintf("sudo yum update 'alt-php%s*'   (CloudLinux ships backports for end-of-life alt-php versions)", strings.ReplaceAll(branch, ".", "")))
 	case env == "Plesk":
-		steps = append(steps, "Plesk: Tools & Settings → Updates → update the PHP "+branch+" component, or run `plesk installer --select-release-current --upgrade-installed-components`.")
+		steps = append(steps, "Plesk: Tools & Settings → Updates, or `plesk installer --select-release-current --upgrade-installed-components`.")
+		if branch == "7.4" || branch == "8.0" || branch == "8.1" {
+			steps = append(steps, "Plesk rebuilt PHP "+branch+" without a new version number: confirm `/opt/plesk/php/"+branch+"/bin/php -v` shows \"built: Oct 21 2026\" or later.")
+		}
 	case env == "LiteSpeed":
 		steps = append(steps, fmt.Sprintf("Upgrade the lsphp%s packages from the LiteSpeed repository (apt/dnf), then restart lsws.", strings.ReplaceAll(branch, ".", "")))
 	case env == "Homebrew":

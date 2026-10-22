@@ -12,6 +12,7 @@ import (
 	"strings"
 
 	"github.com/larptard/bastion/internal/advisory"
+	"github.com/larptard/bastion/internal/sarif"
 	"github.com/larptard/bastion/internal/scan"
 	"github.com/larptard/bastion/internal/ui"
 )
@@ -98,9 +99,14 @@ type common struct {
 	dbDir   string
 	quiet   bool
 	verbose bool
+	format  string
 }
 
+// machine reports whether output is for programs (JSON or SARIF).
+func (c *common) machine() bool { return c.json || c.format == "json" || c.format == "sarif" }
+
 func (c *common) register(fs *flag.FlagSet) {
+	fs.StringVar(&c.format, "format", "text", "output format: text, json or sarif (scan and trace)")
 	fs.StringVar(&c.color, "color", "auto", "colour output: auto, always, never")
 	fs.BoolVar(&c.json, "json", false, "print machine-readable JSON instead of the terminal view")
 	fs.StringVar(&c.dbDir, "db", "", "directory with extra advisory JSON files (overrides built-ins with the same id)")
@@ -124,7 +130,7 @@ func (c *common) loadDB() (*advisory.DB, error) {
 func (e *env) style(c *common) ui.Style { return ui.NewStyle(c.color, e.outFile) }
 
 func (e *env) progress(c *common) func(string) {
-	if c.quiet || c.json {
+	if c.quiet || c.machine() {
 		return nil
 	}
 	errStyle := ui.NewStyle(c.color, os.Stderr)
@@ -162,6 +168,13 @@ func parse(fs *flag.FlagSet, args []string) error {
 			return err
 		}
 		return usageErr{err}
+	}
+	if f := fs.Lookup("format"); f != nil {
+		switch f.Value.String() {
+		case "text", "json", "sarif":
+		default:
+			return usageErr{fmt.Errorf("--format must be text, json or sarif")}
+		}
 	}
 	return nil
 }
@@ -231,7 +244,10 @@ func (e *env) cmdScan(ctx context.Context, args []string) (int, error) {
 	if err != nil {
 		return 0, err
 	}
-	if c.json {
+	switch {
+	case c.format == "sarif":
+		return scanExit(res), writeJSON(e.stdout, sarif.FromScan(res))
+	case c.machine():
 		return scanExit(res), writeJSON(e.stdout, res)
 	}
 	s := e.style(&c)
