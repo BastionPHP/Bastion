@@ -31,14 +31,22 @@ type Advisory struct {
 	Branches        []Branch        `json:"branches"`
 	// OlderBranches and NewerBranches say how to treat branches that are
 	// older or newer than every branch listed ("affected" or "fixed").
-	OlderBranches    string        `json:"older_branches"`
-	NewerBranches    string        `json:"newer_branches"`
-	VendorFixes      []VendorFix   `json:"vendor_fixes"`
-	ChangelogMarkers []string      `json:"changelog_markers"`
-	Fingerprints     []Fingerprint `json:"fingerprints"`
-	Mitigations      []Text        `json:"mitigations"`
-	References       []Reference   `json:"references"`
-	Notes            Text          `json:"notes"`
+	OlderBranches string      `json:"older_branches"`
+	NewerBranches string      `json:"newer_branches"`
+	VendorFixes   []VendorFix `json:"vendor_fixes"`
+	// VendorPolicies record vendors whose security database was checked and
+	// lists no backport below the upstream fix (e.g. Alpine's secdb).
+	VendorPolicies []VendorPolicy `json:"vendor_policies,omitempty"`
+	// BuildDateFixes cover vendors that rebuilt end-of-life branches without
+	// changing the version string and identify fixed builds by date.
+	BuildDateFixes   []BuildDateFix `json:"build_date_fixes,omitempty"`
+	ChangelogMarkers []string       `json:"changelog_markers"`
+	Fingerprints     []Fingerprint  `json:"fingerprints"`
+	Mitigations      []Text         `json:"mitigations"`
+	// ConfigChecks are interim mitigations Bastion can read from php.ini.
+	ConfigChecks []ConfigCheck `json:"config_checks,omitempty"`
+	References   []Reference   `json:"references"`
+	Notes        Text          `json:"notes"`
 }
 
 type CVSS struct {
@@ -72,15 +80,49 @@ type Branch struct {
 }
 
 // VendorFix is a distribution package that carries a backported fix.
+// Release "9" matches every 9.x VERSION_ID. Branch, when set, limits the
+// entry to packages of that upstream branch (RHEL ships several PHP module
+// streams under the same package name).
 type VendorFix struct {
 	Distro   string `json:"distro"`
 	Release  string `json:"release"`
+	Branch   string `json:"branch,omitempty"`
 	Package  string `json:"package"`
 	Fixed    string `json:"fixed"`
 	Format   string `json:"format"`
 	Advisory string `json:"advisory"`
 	Channel  string `json:"channel,omitempty"`
 	URL      string `json:"url"`
+}
+
+// VendorPolicy states that a vendor's security database was checked on
+// Checked and records no backport below the upstream fixed release.
+type VendorPolicy struct {
+	Distro  string `json:"distro"`
+	Source  string `json:"source"`
+	Checked string `json:"checked"`
+	URL     string `json:"url"`
+}
+
+// BuildDateFix: builds of Branches from Environment built on or after
+// FixedOn (YYYY-MM-DD) contain the fix; earlier builds do not.
+type BuildDateFix struct {
+	Environment string   `json:"environment"`
+	Branches    []string `json:"branches"`
+	FixedOn     string   `json:"fixed_on"`
+	Source      string   `json:"source"`
+	URL         string   `json:"url"`
+}
+
+// ConfigCheck describes one php.ini directive that reduces exposure.
+// Safe is "off" (boolean false), an exact value such as "-1", or a size
+// bound such as "<=32M". Branches limits the check to some PHP branches.
+type ConfigCheck struct {
+	Setting  string   `json:"setting"`
+	Default  string   `json:"default"`
+	Safe     string   `json:"safe"`
+	Branches []string `json:"branches,omitempty"`
+	Text     Text     `json:"text"`
 }
 
 // Fingerprint is a byte string whose presence in a binary is evidence.

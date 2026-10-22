@@ -2,33 +2,476 @@
   "comment": "Shared vectors for the Go engine (internal/advisory) and the browser checker (site/assets/engine.js). Both must agree.",
   "advisory": "PHP2SHELL-2026",
   "cases": [
-    {"name": "upstream fixed 8.3.36", "subject": {"version": "8.3.36"}, "status": "fixed"},
-    {"name": "upstream fixed 8.5.12", "subject": {"version": "8.5.12"}, "status": "fixed"},
-    {"name": "upstream newer patch", "subject": {"version": "8.4.30"}, "status": "fixed"},
-    {"name": "upstream vulnerable 8.3.35", "subject": {"version": "8.3.35"}, "status": "vulnerable"},
-    {"name": "upstream vulnerable 8.2.34", "subject": {"version": "8.2.34"}, "status": "vulnerable"},
-    {"name": "8.6 RC3 vulnerable", "subject": {"version": "8.6.0RC3"}, "status": "vulnerable"},
-    {"name": "8.6 RC4 fixed", "subject": {"version": "8.6.0RC4"}, "status": "fixed"},
-    {"name": "future branch", "subject": {"version": "8.7.0"}, "status": "fixed"},
-    {"name": "eol 8.1 source build", "subject": {"version": "8.1.34"}, "status": "likely-vulnerable"},
-    {"name": "eol 7.4 source build", "subject": {"version": "7.4.33"}, "status": "likely-vulnerable"},
-    {"name": "eol 7.3 source build", "subject": {"version": "7.3.33"}, "status": "vulnerable"},
-    {"name": "eol 5.6 source build", "subject": {"version": "5.6.40"}, "status": "vulnerable"},
-    {"name": "garbage", "subject": {"version": "hello"}, "status": "unknown"},
-    {"name": "ubuntu 24.04 old package", "subject": {"version": "8.3.6", "os": {"id": "ubuntu", "version_id": "24.04"}, "package": {"manager": "dpkg", "name": "php8.3-cli", "source": "php8.3", "version": "8.3.6-0ubuntu0.24.04.12"}}, "status": "vulnerable"},
-    {"name": "ubuntu 24.04 patched package", "subject": {"version": "8.3.6", "os": {"id": "ubuntu", "version_id": "24.04"}, "package": {"manager": "dpkg", "name": "php8.3-cli", "source": "php8.3", "version": "8.3.6-0ubuntu0.24.04.13"}}, "status": "fixed"},
-    {"name": "ubuntu 22.04 patched 8.1", "subject": {"version": "8.1.2-1ubuntu2.28", "os": {"id": "ubuntu", "version_id": "22.04"}, "package": {"manager": "dpkg", "name": "php8.1-fpm", "source": "php8.1", "version": "8.1.2-1ubuntu2.28"}}, "status": "fixed"},
-    {"name": "ubuntu 22.04 old 8.1", "subject": {"version": "8.1.2-1ubuntu2.27", "os": {"id": "ubuntu", "version_id": "22.04"}, "package": {"manager": "dpkg", "name": "php8.1-fpm", "source": "php8.1", "version": "8.1.2-1ubuntu2.27"}}, "status": "vulnerable"},
-    {"name": "ubuntu 20.04 esm", "subject": {"version": "7.4.3-4ubuntu2.29", "os": {"id": "ubuntu", "version_id": "20.04"}, "package": {"manager": "dpkg", "name": "php7.4-cli", "source": "php7.4", "version": "7.4.3-4ubuntu2.29+esm5"}}, "status": "fixed"},
-    {"name": "ubuntu 20.04 without pro", "subject": {"version": "7.4.3-4ubuntu2.29", "os": {"id": "ubuntu", "version_id": "20.04"}, "package": {"manager": "dpkg", "name": "php7.4-cli", "source": "php7.4", "version": "7.4.3-4ubuntu2.29"}}, "status": "vulnerable"},
-    {"name": "debian 12 patched", "subject": {"version": "8.2.35", "os": {"id": "debian", "version_id": "12"}, "package": {"manager": "dpkg", "name": "php8.2-cli", "source": "php8.2", "version": "8.2.35-1~deb12u1"}}, "status": "fixed"},
-    {"name": "debian 12 old", "subject": {"version": "8.2.32", "os": {"id": "debian", "version_id": "12"}, "package": {"manager": "dpkg", "name": "php8.2-cli", "source": "php8.2", "version": "8.2.32-1~deb12u1"}}, "status": "vulnerable"},
-    {"name": "debian 11 7.4 changelog silent", "subject": {"version": "7.4.33", "os": {"id": "debian", "version_id": "11"}, "package": {"manager": "dpkg", "name": "php7.4-cli", "source": "php7.4", "version": "7.4.33-1+deb11u8"}, "changelog_checked": true}, "status": "likely-vulnerable"},
-    {"name": "debian 11 7.4 changelog unreadable", "subject": {"version": "7.4.33", "os": {"id": "debian", "version_id": "11"}, "package": {"manager": "dpkg", "name": "php7.4-cli", "source": "php7.4", "version": "7.4.33-1+deb11u8"}}, "status": "unknown"},
-    {"name": "debian 11 7.4 elts changelog", "subject": {"version": "7.4.33", "os": {"id": "debian", "version_id": "11"}, "package": {"manager": "dpkg", "name": "php7.4-cli", "source": "php7.4", "version": "7.4.33-1+deb11u9"}, "changelog_checked": true, "changelog_hits": ["CVE-2026-109618"]}, "status": "fixed"},
-    {"name": "rhel 9 rpm changelog backport", "subject": {"version": "8.0.30", "os": {"id": "rhel", "version_id": "9.6"}, "package": {"manager": "rpm", "name": "php-cli", "source": "php", "version": "8.0.30-4.el9_6"}, "changelog_checked": true, "changelog_hits": ["CVE-2026-109618", "CVE-2026-109619"]}, "status": "fixed"},
-    {"name": "fingerprint on 8.2 vendor build", "subject": {"version": "8.2.20", "fingerprints": ["Hard memory limit of"]}, "status": "fixed"},
-    {"name": "fingerprint ignored below min branch", "subject": {"version": "8.1.34", "fingerprints": ["Hard memory limit of"]}, "status": "likely-vulnerable"},
-    {"name": "sury ppa upstream fixed", "subject": {"version": "8.3.36", "os": {"id": "ubuntu", "version_id": "24.04"}, "package": {"manager": "dpkg", "name": "php8.3-cli", "source": "php8.3", "version": "8.3.36-1+ubuntu24.04.1+deb.sury.org+1"}}, "status": "fixed"}
+    {
+      "name": "upstream fixed 8.3.36",
+      "subject": {
+        "version": "8.3.36"
+      },
+      "status": "fixed"
+    },
+    {
+      "name": "upstream fixed 8.5.12",
+      "subject": {
+        "version": "8.5.12"
+      },
+      "status": "fixed"
+    },
+    {
+      "name": "upstream newer patch",
+      "subject": {
+        "version": "8.4.30"
+      },
+      "status": "fixed"
+    },
+    {
+      "name": "upstream vulnerable 8.3.35",
+      "subject": {
+        "version": "8.3.35"
+      },
+      "status": "vulnerable"
+    },
+    {
+      "name": "upstream vulnerable 8.2.34",
+      "subject": {
+        "version": "8.2.34"
+      },
+      "status": "vulnerable"
+    },
+    {
+      "name": "8.6 RC3 vulnerable",
+      "subject": {
+        "version": "8.6.0RC3"
+      },
+      "status": "vulnerable"
+    },
+    {
+      "name": "8.6 RC4 fixed",
+      "subject": {
+        "version": "8.6.0RC4"
+      },
+      "status": "fixed"
+    },
+    {
+      "name": "future branch",
+      "subject": {
+        "version": "8.7.0"
+      },
+      "status": "fixed"
+    },
+    {
+      "name": "eol 8.1 source build",
+      "subject": {
+        "version": "8.1.34"
+      },
+      "status": "likely-vulnerable"
+    },
+    {
+      "name": "eol 7.4 source build",
+      "subject": {
+        "version": "7.4.33"
+      },
+      "status": "likely-vulnerable"
+    },
+    {
+      "name": "eol 7.3 source build",
+      "subject": {
+        "version": "7.3.33"
+      },
+      "status": "vulnerable"
+    },
+    {
+      "name": "eol 5.6 source build",
+      "subject": {
+        "version": "5.6.40"
+      },
+      "status": "vulnerable"
+    },
+    {
+      "name": "garbage",
+      "subject": {
+        "version": "hello"
+      },
+      "status": "unknown"
+    },
+    {
+      "name": "ubuntu 24.04 old package",
+      "subject": {
+        "version": "8.3.6",
+        "os": {
+          "id": "ubuntu",
+          "version_id": "24.04"
+        },
+        "package": {
+          "manager": "dpkg",
+          "name": "php8.3-cli",
+          "source": "php8.3",
+          "version": "8.3.6-0ubuntu0.24.04.12"
+        }
+      },
+      "status": "vulnerable"
+    },
+    {
+      "name": "ubuntu 24.04 patched package",
+      "subject": {
+        "version": "8.3.6",
+        "os": {
+          "id": "ubuntu",
+          "version_id": "24.04"
+        },
+        "package": {
+          "manager": "dpkg",
+          "name": "php8.3-cli",
+          "source": "php8.3",
+          "version": "8.3.6-0ubuntu0.24.04.13"
+        }
+      },
+      "status": "fixed"
+    },
+    {
+      "name": "ubuntu 22.04 patched 8.1",
+      "subject": {
+        "version": "8.1.2-1ubuntu2.28",
+        "os": {
+          "id": "ubuntu",
+          "version_id": "22.04"
+        },
+        "package": {
+          "manager": "dpkg",
+          "name": "php8.1-fpm",
+          "source": "php8.1",
+          "version": "8.1.2-1ubuntu2.28"
+        }
+      },
+      "status": "fixed"
+    },
+    {
+      "name": "ubuntu 22.04 old 8.1",
+      "subject": {
+        "version": "8.1.2-1ubuntu2.27",
+        "os": {
+          "id": "ubuntu",
+          "version_id": "22.04"
+        },
+        "package": {
+          "manager": "dpkg",
+          "name": "php8.1-fpm",
+          "source": "php8.1",
+          "version": "8.1.2-1ubuntu2.27"
+        }
+      },
+      "status": "vulnerable"
+    },
+    {
+      "name": "ubuntu 20.04 esm",
+      "subject": {
+        "version": "7.4.3-4ubuntu2.29",
+        "os": {
+          "id": "ubuntu",
+          "version_id": "20.04"
+        },
+        "package": {
+          "manager": "dpkg",
+          "name": "php7.4-cli",
+          "source": "php7.4",
+          "version": "7.4.3-4ubuntu2.29+esm5"
+        }
+      },
+      "status": "fixed"
+    },
+    {
+      "name": "ubuntu 20.04 without pro",
+      "subject": {
+        "version": "7.4.3-4ubuntu2.29",
+        "os": {
+          "id": "ubuntu",
+          "version_id": "20.04"
+        },
+        "package": {
+          "manager": "dpkg",
+          "name": "php7.4-cli",
+          "source": "php7.4",
+          "version": "7.4.3-4ubuntu2.29"
+        }
+      },
+      "status": "vulnerable"
+    },
+    {
+      "name": "debian 12 patched",
+      "subject": {
+        "version": "8.2.35",
+        "os": {
+          "id": "debian",
+          "version_id": "12"
+        },
+        "package": {
+          "manager": "dpkg",
+          "name": "php8.2-cli",
+          "source": "php8.2",
+          "version": "8.2.35-1~deb12u1"
+        }
+      },
+      "status": "fixed"
+    },
+    {
+      "name": "debian 12 old",
+      "subject": {
+        "version": "8.2.32",
+        "os": {
+          "id": "debian",
+          "version_id": "12"
+        },
+        "package": {
+          "manager": "dpkg",
+          "name": "php8.2-cli",
+          "source": "php8.2",
+          "version": "8.2.32-1~deb12u1"
+        }
+      },
+      "status": "vulnerable"
+    },
+    {
+      "name": "debian 11 7.4 changelog silent",
+      "subject": {
+        "version": "7.4.33",
+        "os": {
+          "id": "debian",
+          "version_id": "11"
+        },
+        "package": {
+          "manager": "dpkg",
+          "name": "php7.4-cli",
+          "source": "php7.4",
+          "version": "7.4.33-1+deb11u8"
+        },
+        "changelog_checked": true
+      },
+      "status": "likely-vulnerable"
+    },
+    {
+      "name": "debian 11 7.4 changelog unreadable",
+      "subject": {
+        "version": "7.4.33",
+        "os": {
+          "id": "debian",
+          "version_id": "11"
+        },
+        "package": {
+          "manager": "dpkg",
+          "name": "php7.4-cli",
+          "source": "php7.4",
+          "version": "7.4.33-1+deb11u8"
+        }
+      },
+      "status": "unknown"
+    },
+    {
+      "name": "debian 11 7.4 elts changelog",
+      "subject": {
+        "version": "7.4.33",
+        "os": {
+          "id": "debian",
+          "version_id": "11"
+        },
+        "package": {
+          "manager": "dpkg",
+          "name": "php7.4-cli",
+          "source": "php7.4",
+          "version": "7.4.33-1+deb11u9"
+        },
+        "changelog_checked": true,
+        "changelog_hits": [
+          "CVE-2026-109618"
+        ]
+      },
+      "status": "fixed"
+    },
+    {
+      "name": "almalinux rpm changelog backport",
+      "subject": {
+        "version": "8.0.30",
+        "os": {
+          "id": "almalinux",
+          "version_id": "9.6"
+        },
+        "package": {
+          "manager": "rpm",
+          "name": "php-cli",
+          "source": "php",
+          "version": "8.0.30-4.el9_6"
+        },
+        "changelog_checked": true,
+        "changelog_hits": [
+          "CVE-2026-109618",
+          "CVE-2026-109619"
+        ]
+      },
+      "status": "fixed"
+    },
+    {
+      "name": "fingerprint on 8.2 vendor build",
+      "subject": {
+        "version": "8.2.20",
+        "fingerprints": [
+          "Hard memory limit of"
+        ]
+      },
+      "status": "fixed"
+    },
+    {
+      "name": "fingerprint ignored below min branch",
+      "subject": {
+        "version": "8.1.34",
+        "fingerprints": [
+          "Hard memory limit of"
+        ]
+      },
+      "status": "likely-vulnerable"
+    },
+    {
+      "name": "sury ppa upstream fixed",
+      "subject": {
+        "version": "8.3.36",
+        "os": {
+          "id": "ubuntu",
+          "version_id": "24.04"
+        },
+        "package": {
+          "manager": "dpkg",
+          "name": "php8.3-cli",
+          "source": "php8.3",
+          "version": "8.3.36-1+ubuntu24.04.1+deb.sury.org+1"
+        }
+      },
+      "status": "fixed"
+    },
+    {
+      "name": "rhel 9.8 php 8.0 backport",
+      "subject": {
+        "version": "8.0.30",
+        "os": {
+          "id": "rhel",
+          "version_id": "9.8"
+        },
+        "package": {
+          "manager": "rpm",
+          "name": "php-cli",
+          "source": "php",
+          "version": "8.0.30-8.el9_8.1"
+        }
+      },
+      "status": "fixed"
+    },
+    {
+      "name": "rhel 9.8 php 8.0 old",
+      "subject": {
+        "version": "8.0.30",
+        "os": {
+          "id": "rhel",
+          "version_id": "9.8"
+        },
+        "package": {
+          "manager": "rpm",
+          "name": "php-cli",
+          "source": "php",
+          "version": "8.0.30-6.el9_6"
+        }
+      },
+      "status": "vulnerable"
+    },
+    {
+      "name": "rhel 8 php:7.4 module backport",
+      "subject": {
+        "version": "7.4.33",
+        "os": {
+          "id": "rhel",
+          "version_id": "8.10"
+        },
+        "package": {
+          "manager": "rpm",
+          "name": "php-cli",
+          "source": "php",
+          "version": "7.4.33-8.module+el8.10.0+25117+30337cca"
+        }
+      },
+      "status": "fixed"
+    },
+    {
+      "name": "rhel 8 php:8.2 stream not matched by 7.4 entry",
+      "subject": {
+        "version": "8.2.30",
+        "os": {
+          "id": "rhel",
+          "version_id": "8.10"
+        },
+        "package": {
+          "manager": "rpm",
+          "name": "php-cli",
+          "source": "php",
+          "version": "8.2.30-1.module+el8.10.0+22000+aaaa"
+        }
+      },
+      "status": "vulnerable"
+    },
+    {
+      "name": "rhel 9 php:8.1 stream has no data",
+      "subject": {
+        "version": "8.1.32",
+        "os": {
+          "id": "rhel",
+          "version_id": "9.8"
+        },
+        "package": {
+          "manager": "rpm",
+          "name": "php-cli",
+          "source": "php",
+          "version": "8.1.32-1.module+el9.7.0+1+aaaa"
+        }
+      },
+      "status": "unknown"
+    },
+    {
+      "name": "alpine stable below fix",
+      "subject": {
+        "version": "8.3.35",
+        "os": {
+          "id": "alpine",
+          "version_id": "3.22.2"
+        },
+        "package": {
+          "manager": "apk",
+          "name": "php83",
+          "source": "php83",
+          "version": "8.3.35-r0"
+        }
+      },
+      "status": "likely-vulnerable"
+    },
+    {
+      "name": "plesk 8.1 rebuilt",
+      "subject": {
+        "version": "8.1.34",
+        "environment": "Plesk",
+        "build_date": "2026-10-21"
+      },
+      "status": "fixed"
+    },
+    {
+      "name": "plesk 8.1 old build",
+      "subject": {
+        "version": "8.1.34",
+        "environment": "Plesk",
+        "build_date": "2026-06-02"
+      },
+      "status": "vulnerable"
+    },
+    {
+      "name": "build date ignored outside plesk",
+      "subject": {
+        "version": "8.1.34",
+        "environment": "Source build",
+        "build_date": "2026-10-21"
+      },
+      "status": "likely-vulnerable"
+    }
   ]
 }

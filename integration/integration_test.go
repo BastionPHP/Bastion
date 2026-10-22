@@ -289,3 +289,20 @@ func TestTraceLab(t *testing.T) {
 		}
 	}
 }
+
+func TestImagesAreScannedWithoutRunning(t *testing.T) {
+	r := scan(t, false, "--no-containers", "--image", "php:8.3.35-cli", "--image", "php:8.4-cli")
+	got := map[string]string{}
+	for _, i := range r.Instances {
+		if i.TargetKind == "image" && i.Path == "/usr/local/bin/php" {
+			got[i.Target] = i.Assessments[0].Status
+		}
+	}
+	if got["php:8.3.35-cli"] != "vulnerable" || got["php:8.4-cli"] != "fixed" {
+		t.Fatalf("image verdicts %v", got)
+	}
+	// Reading an image must not create containers.
+	if out, _ := exec.Command("docker", "ps", "-a", "--filter", "ancestor=php:8.3.35-cli", "-q").Output(); len(bytes.TrimSpace(out)) != 0 {
+		t.Fatalf("image scan created containers: %s", out)
+	}
+}

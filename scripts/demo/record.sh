@@ -15,6 +15,12 @@ export COLUMNS=${COLUMNS:-104}
 
 scripts/demo/lab.sh "$LAB" >/dev/null
 
+# Record under a neutral hostname (a private UTS namespace changes only the
+# name the recording shows; nothing on the host is modified).
+if [ -z "${BASTION_RECORD_NS:-}" ] && [ "$(id -u)" = 0 ] && command -v unshare >/dev/null; then
+  exec env BASTION_RECORD_NS=1 unshare --uts sh -c "hostname ${DEMO_HOSTNAME:-web-01} && exec \"\$0\" \"\$@\"" "$0" "$@"
+fi
+
 "$BIN" scan --color always -q > "$OUT/scan.ansi" || true
 "$BIN" scan --json -q > "$OUT/scan.json" || true
 "$BIN" trace --sysroot "$LAB" --since 87600h --color always -q > "$OUT/trace.ansi" || true
@@ -25,7 +31,7 @@ rm -f "$OUT/scan.json" "$OUT/trace.json"
 {
   echo "recorded: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
   echo "bastion: $("$BIN" version)"
-  echo "host: $(. /etc/os-release && echo "$PRETTY_NAME") / $(uname -r)"
+  echo "host: $(hostname) — $(. /etc/os-release && echo "$PRETTY_NAME") / $(uname -r)"
   echo "containers: $(docker ps --format '{{.Image}}' 2>/dev/null | sort | tr '\n' ' ')"
 } > "$OUT/RECORDING.txt"
 echo "wrote $OUT/{scan,trace,check}.ansi, report.html"

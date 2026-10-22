@@ -10,16 +10,21 @@ import (
 	"strings"
 
 	"github.com/larptard/bastion/internal/advisory"
+	"github.com/larptard/bastion/internal/discover"
 	"github.com/larptard/bastion/internal/version"
 )
 
 type Parsed struct {
-	Version  string            `json:"version,omitempty"`
-	SAPI     string            `json:"sapi,omitempty"`
-	Built    string            `json:"built,omitempty"`
-	Package  *advisory.Package `json:"package,omitempty"`
-	OS       advisory.OS       `json:"os"`
-	Inferred []string          `json:"inferred,omitempty"`
+	Version string `json:"version,omitempty"`
+	SAPI    string `json:"sapi,omitempty"`
+	Built   string `json:"built,omitempty"`
+	// BuildDate is Built as YYYY-MM-DD.
+	BuildDate string `json:"build_date,omitempty"`
+	// Environment is set when the text shows a panel-managed path.
+	Environment string            `json:"environment,omitempty"`
+	Package     *advisory.Package `json:"package,omitempty"`
+	OS          advisory.OS       `json:"os"`
+	Inferred    []string          `json:"inferred,omitempty"`
 }
 
 var (
@@ -34,6 +39,7 @@ var (
 	reLSBID  = regexp.MustCompile(`(?m)^Distributor ID:\s+(\S+)\s*$`)
 	reUbuRel = regexp.MustCompile(`ubuntu[0-9.]*?\b(1[4-9]|2[0-9])\.(04|10)\b`)
 	reDebRel = regexp.MustCompile(`~deb([0-9]{2})u`)
+	reBuilt  = regexp.MustCompile(`^([A-Z][a-z]{2}) +([0-9]{1,2}) ([0-9]{4})`)
 )
 
 // cliPreferred orders binary package names when several are pasted.
@@ -67,6 +73,12 @@ func Parse(text string) Parsed {
 	var p Parsed
 	if m := rePHPv.FindStringSubmatch(text); m != nil {
 		p.Version, p.SAPI, p.Built = m[1], m[2], m[3]
+		if d := reBuilt.FindStringSubmatch(p.Built); d != nil {
+			p.BuildDate = discover.BuildDate(d[1], d[2], d[3])
+		}
+	}
+	if strings.Contains(text, "/opt/plesk/php/") {
+		p.Environment = "Plesk"
 	}
 	best := -1
 	consider := func(pkg *advisory.Package) {
@@ -154,7 +166,7 @@ func (p *Parsed) Infer(a *advisory.Advisory) {
 
 // Subject converts the parse into an engine subject.
 func (p Parsed) Subject() advisory.Subject {
-	return advisory.Subject{Version: p.Version, Package: p.Package, OS: p.OS}
+	return advisory.Subject{Version: p.Version, Package: p.Package, OS: p.OS, Environment: p.Environment, BuildDate: p.BuildDate}
 }
 
 // Describe is a one-line summary for the terminal.
@@ -171,6 +183,12 @@ func (p Parsed) Describe() string {
 	}
 	if p.OS.ID != "" {
 		parts = append(parts, "os "+p.OS.ID+" "+p.OS.VersionID)
+	}
+	if p.Environment != "" {
+		parts = append(parts, "environment "+p.Environment)
+	}
+	if p.BuildDate != "" {
+		parts = append(parts, "built "+p.BuildDate)
 	}
 	if len(p.Inferred) > 0 {
 		parts = append(parts, "inferred: "+strings.Join(p.Inferred, ", "))

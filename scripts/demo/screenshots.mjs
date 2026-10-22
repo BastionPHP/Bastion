@@ -17,14 +17,20 @@ async function page(w, h, scheme = "dark") {
 async function el(url, sel, file, w = 1280) {
   const p = await page(w, 900);
   await p.goto(url, { waitUntil: "networkidle" });
-  await p.addStyleTag({ content: ".bx-term pre{max-height:none!important}" });
+  await p.addStyleTag({ content: ".term pre{max-height:none!important}" });
   await (await p.$(sel)).screenshot({ path: `${out}/${file}` });
   await p.close();
   console.log("wrote", file);
 }
 
-await el(base, ".term-stack .bx-term", "scan.png", 1180);
-await el(base, "[data-panel='t-trace'] .bx-term", "trace.png", 1180);
+await el(base, ".hero .term", "scan.png", 1180);
+const tp = await page(1180, 900);
+await tp.goto(base, { waitUntil: "networkidle" });
+await tp.click("[data-tab='r-demo']");
+await tp.addStyleTag({ content: ".term pre{max-height:none!important}" });
+await (await tp.$("[data-panel='r-demo'] .term")).screenshot({ path: `${out}/trace.png` });
+await tp.close();
+console.log("wrote trace.png");
 
 let p = await page(1440, 900);
 await p.goto(base, { waitUntil: "networkidle" });
@@ -51,7 +57,7 @@ await p.close();
 // Social card (1200x630, 1x).
 const og = await browser.newPage({ viewport: { width: 1200, height: 630 }, colorScheme: "dark" });
 await og.goto(base, { waitUntil: "networkidle" });
-await og.addStyleTag({ content: ".hero{padding-top:40px}.hero-cta,.nav,.term-stack{display:none!important}" });
+await og.addStyleTag({ content: ".hero{padding-top:56px}.hero .term,.hero .term-cap,.hdr,.hero-actions,.cmd,.facts-line{display:none!important}" });
 await og.screenshot({ path: `${out}/og.png` });
 await browser.close();
 copyFileSync(`${out}/og.png`, new URL("../../site/assets/og.png", import.meta.url).pathname);

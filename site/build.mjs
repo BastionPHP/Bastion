@@ -20,6 +20,8 @@ const advisory = advisories.find((a) => a.id === "PHP2SHELL-2026");
 if (!advisory) throw new Error("PHP2Shell advisory data missing");
 
 const renderers = { home, how, check, docs };
+const allIcons = JSON.parse(readFileSync(join(repo, "design/icons.json"), "utf8"));
+const iconSet = Object.fromEntries(["shield-check", "shield-x", "shield-alert", "shield-question", "check", "x", "circle-dot", "triangle-alert", "info", "arrow-right", "rotate-ccw"].map((n) => [n, allIcons[n]]));
 
 rmSync(dist, { recursive: true, force: true });
 mkdirSync(dist, { recursive: true });
@@ -27,7 +29,7 @@ mkdirSync(dist, { recursive: true });
 let count = 0;
 for (const page of pages) {
   const ctx = makeCtx(page);
-  const html = renderers[page.id].render(ctx, { advisory, advisories });
+  const html = renderers[page.id].render(ctx, { advisory, advisories, iconSet });
   const dir = join(dist, page.dir);
   mkdirSync(dir, { recursive: true });
   writeFileSync(join(dir, "index.html"), html);
@@ -39,7 +41,7 @@ for (const page of pages) {
   const ctx = makeCtx({ id: "404", dir: "", nav: "" });
   ctx.href = (id, hash = "") => "/bastion/" + (pages.find((p) => p.id === id)?.dir || "") + hash;
   ctx.asset = (p) => "/bastion/assets/" + p;
-  writeFileSync(join(dist, "404.html"), layout(ctx, { title: "Not found", description: "Page not found", body: `<header class="phead"><div class="bx-wrap phead-in"><div class="bx-eyebrow">404</div><h1>Not found</h1><p><a href="/bastion/">← Bastion</a></p></div></header>` }));
+  writeFileSync(join(dist, "404.html"), layout(ctx, { title: "Not found", description: "Page not found", body: `<header class="phead"><div class="bx-wrap"><div class="crumbs">404</div><h1>Page not found</h1><p><a href="/bastion/">Back to the overview</a></p></div></header>` }));
 }
 
 // Assets: shared design system, site assets, advisory data, demo output.

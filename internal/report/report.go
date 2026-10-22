@@ -54,6 +54,7 @@ type assessmentView struct {
 
 type instanceView struct {
 	*scan.Instance
+	KindIcon string
 	Status   string
 	StatusEn string
 	Where    string
@@ -86,6 +87,8 @@ type view struct {
 	Findings           []findingView
 	Days               []dayView
 	VerdictEn          string
+	VerdictIcon        string
+	TargetKinds        map[string]int
 	VerdictTextEn      string
 	DataJSON           template.JS
 }
@@ -106,8 +109,34 @@ var funcs = template.FuncMap{
 		}
 		return n * 100 / total
 	},
-	"add": func(a, b int) int { return a + b },
+	"add":  func(a, b int) int { return a + b },
+	"icon": design.Icon,
+	"statusTag": func(status, text string) template.HTML {
+		return template.HTML(`<span class="tag" data-status="`+template.HTMLEscapeString(status)+`">`) + design.Icon(statusIcon[status]) + template.HTML(template.HTMLEscapeString(text)+`</span>`)
+	},
+	"evIcon": func(v string) string {
+		return map[string]string{"fixed": "check", "vulnerable": "x"}[v] + map[bool]string{true: "circle-dot"}[v != "fixed" && v != "vulnerable"]
+	},
+	"sevIcon": func(s string) string { return sevIcon[s] },
+	"catIcon": func(c string) string {
+		if i, ok := map[string]string{"file": "file-code", "config": "settings-2", "persistence": "key-round", "log": "scroll-text"}[c]; ok {
+			return i
+		}
+		return "circle-dot"
+	},
+	"sapi": func(s string) string {
+		if s == "apache2handler" {
+			return "mod_php"
+		}
+		return s
+	},
 }
+
+var statusIcon = map[string]string{"fixed": "shield-check", "vulnerable": "shield-x", "likely-vulnerable": "shield-alert", "unknown": "shield-question"}
+
+var sevIcon = map[string]string{trace.High: "triangle-alert", trace.Medium: "circle-dot", trace.Low: "circle-dashed", trace.Info: "info"}
+
+var kindIcon = map[string]string{"host": "server", "container": "container", "image": "layers", "namespace": "boxes", "sysroot": "hard-drive"}
 
 // Render builds the report.
 func Render(in Input) ([]byte, error) {
@@ -128,10 +157,23 @@ func Render(in Input) ([]byte, error) {
 	v := view{Version: in.Version, Generated: now.UTC().Format("2006-01-02 15:04 UTC"), CSS: template.CSS(design.CSS + "\n" + string(css)), JS: template.JS(js), Logo: template.HTML(design.Logo), Scan: in.Scan, Trace: in.Trace}
 
 	v.Counts = map[string]int{}
+	v.TargetKinds = map[string]int{}
+	if in.Scan != nil {
+		for _, t := range in.Scan.Targets {
+			k := t.Kind
+			if k != "host" && k != "sysroot" {
+				k += "s"
+				v.TargetKinds[k]++
+			}
+		}
+	}
 	worst := advisory.Fixed
 	if in.Scan != nil {
 		for _, inst := range in.Scan.Instances {
-			iv := instanceView{Instance: inst, Status: string(inst.Worst())}
+			iv := instanceView{Instance: inst, Status: string(inst.Worst()), KindIcon: kindIcon[inst.TargetKind]}
+			if iv.KindIcon == "" {
+				iv.KindIcon = "server"
+			}
 			iv.StatusEn = statusText[inst.Worst()].En
 			iv.Where = inst.Target
 			if inst.TargetKind != "host" {
@@ -178,12 +220,15 @@ func Render(in Input) ([]byte, error) {
 		switch in.Trace.Verdict {
 		case trace.VerdictCompromised:
 			v.VerdictEn = "Compromise indicators found"
+			v.VerdictIcon = "triangle-alert"
 			v.VerdictTextEn = "Strong indicators of compromise. Treat the server as breached: preserve evidence (copy files and logs before changing anything), rotate credentials, and rebuild from a known-good source."
 		case trace.VerdictSuspicious:
 			v.VerdictEn = "Suspicious — review needed"
+			v.VerdictIcon = "circle-dot"
 			v.VerdictTextEn = "Weak or ambiguous indicators. Review each finding; most can be confirmed or ruled out by comparing with the original application files."
 		default:
 			v.VerdictEn = "No indicators found"
+			v.VerdictIcon = "circle-check"
 			v.VerdictTextEn = "Nothing matched Bastion's indicators. This is not proof the system is clean: attackers with root can hide from any on-host check."
 		}
 	}

@@ -12,6 +12,7 @@ import (
 	"strings"
 
 	"github.com/larptard/bastion/internal/advisory"
+	"github.com/larptard/bastion/internal/sarif"
 	"github.com/larptard/bastion/internal/scan"
 	"github.com/larptard/bastion/internal/ui"
 )
@@ -98,9 +99,14 @@ type common struct {
 	dbDir   string
 	quiet   bool
 	verbose bool
+	format  string
 }
 
+// machine reports whether output is for programs (JSON or SARIF).
+func (c *common) machine() bool { return c.json || c.format == "json" || c.format == "sarif" }
+
 func (c *common) register(fs *flag.FlagSet) {
+	fs.StringVar(&c.format, "format", "text", "output format: text, json or sarif (scan and trace)")
 	fs.StringVar(&c.color, "color", "auto", "colour output: auto, always, never")
 	fs.BoolVar(&c.json, "json", false, "print machine-readable JSON instead of the terminal view")
 	fs.StringVar(&c.dbDir, "db", "", "directory with extra advisory JSON files (overrides built-ins with the same id)")
@@ -124,7 +130,7 @@ func (c *common) loadDB() (*advisory.DB, error) {
 func (e *env) style(c *common) ui.Style { return ui.NewStyle(c.color, e.outFile) }
 
 func (e *env) progress(c *common) func(string) {
-	if c.quiet || c.json {
+	if c.quiet || c.machine() {
 		return nil
 	}
 	errStyle := ui.NewStyle(c.color, os.Stderr)
@@ -163,6 +169,13 @@ func parse(fs *flag.FlagSet, args []string) error {
 		}
 		return usageErr{err}
 	}
+	if f := fs.Lookup("format"); f != nil {
+		switch f.Value.String() {
+		case "text", "json", "sarif":
+		default:
+			return usageErr{fmt.Errorf("--format must be text, json or sarif")}
+		}
+	}
 	return nil
 }
 
@@ -174,16 +187,20 @@ func writeJSON(w io.Writer, v any) error {
 }
 
 type scanFlags struct {
-	sysroot  string
-	noDocker bool
-	noExec   bool
-	globs    multiFlag
+	sysroot   string
+	noDocker  bool
+	noExec    bool
+	globs     multiFlag
+	images    multiFlag
+	allImages bool
 }
 
 func (f *scanFlags) register(fs *flag.FlagSet) {
 	fs.StringVar(&f.sysroot, "sysroot", "", "scan a mounted filesystem (image, backup, chroot) instead of the live host")
 	fs.BoolVar(&f.noDocker, "no-containers", false, "skip Docker/Podman containers")
-	fs.BoolVar(&f.noExec, "no-exec", false, "never execute anything (no `php -v`, no `docker exec`); rely on static analysis only")
+	fs.BoolVar(&f.noExec, "no-exec", false, "never execute anything (no php -v, no docker exec); rely on static analysis only")
+	fs.Var(&f.images, "image", "also scan this container image (repeatable); read with docker save, never run")
+	fs.BoolVar(&f.allImages, "images", false, "also scan every local container image (reads each image once; can take a while)")
 	fs.Var(&f.globs, "glob", "extra glob of PHP binaries to inspect (repeatable), e.g. --glob '/srv/*/bin/php'")
 }
 
@@ -192,7 +209,7 @@ func (e *env) runScan(ctx context.Context, c *common, f *scanFlags) (*scan.Resul
 	if err != nil {
 		return nil, err
 	}
-	opt := scan.Options{DB: db, SysRoot: f.sysroot, Containers: !f.noDocker, Exec: !f.noExec, ExtraGlobs: f.globs, Progress: e.progress(c)}
+	opt := scan.Options{DB: db, SysRoot: f.sysroot, Containers: !f.noDocker, Exec: !f.noExec, ExtraGlobs: f.globs, Images: f.images, AllImages: f.allImages, Progress: e.progress(c)}
 	res, err := scan.Run(ctx, opt, Version)
 	e.clearProgress(c)
 	return res, err
@@ -227,7 +244,10 @@ func (e *env) cmdScan(ctx context.Context, args []string) (int, error) {
 	if err != nil {
 		return 0, err
 	}
-	if c.json {
+	switch {
+	case c.format == "sarif":
+		return scanExit(res), writeJSON(e.stdout, sarif.FromScan(res))
+	case c.machine():
 		return scanExit(res), writeJSON(e.stdout, res)
 	}
 	s := e.style(&c)

@@ -17,6 +17,8 @@ type vectorFile struct {
 			ChangelogChecked bool     `json:"changelog_checked"`
 			ChangelogHits    []string `json:"changelog_hits"`
 			Fingerprints     []string `json:"fingerprints"`
+			Environment      string   `json:"environment"`
+			BuildDate        string   `json:"build_date"`
 		} `json:"subject"`
 		Status Status `json:"status"`
 	} `json:"cases"`
@@ -47,7 +49,7 @@ func TestSharedVectors(t *testing.T) {
 		s := Subject{
 			Version: c.Subject.Version, OS: c.Subject.OS, Package: c.Subject.Package,
 			ChangelogChecked: c.Subject.ChangelogChecked, ChangelogHits: c.Subject.ChangelogHits,
-			Fingerprints: c.Subject.Fingerprints,
+			Fingerprints: c.Subject.Fingerprints, Environment: c.Subject.Environment, BuildDate: c.Subject.BuildDate,
 		}
 		got := a.Evaluate(s)
 		if got.Status != c.Status {

@@ -1,5 +1,5 @@
 
-  [38;5;240mparsed[0m PHP 8.3.6 · cli · package php8.3-cli 8.3.6-0ubuntu0.24.04.12 (dpkg) · os ubuntu 24.04 · inferred: os from package version
+  [38;5;240mparsed[0m PHP 8.3.6 · cli · package php8.3-cli 8.3.6-0ubuntu0.24.04.12 (dpkg) · os ubuntu 24.04 · built 2026-10-07 · inferred: os from package version
 
   [1;38;5;232;48;5;203m VULNERABLE [0m  [1mPHP2Shell[0m [38;5;245m— package 8.3.6-0ubuntu0.24.04.12 is older than the vendor fix 8.3.6-0ubuntu0.24.04.13[0m
      [38;5;245m·[0m [38;5;240mversion    [0m PHP 8.3.6 is below the fixed release 8.3.36, but distribution packages often carry backports

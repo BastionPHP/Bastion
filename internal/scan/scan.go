@@ -32,6 +32,10 @@ type Options struct {
 	// Exec allows running `php -v` (on the host or via `docker exec`) when
 	// a binary cannot be identified statically.
 	Exec bool
+	// Images are image references to read with `docker save`; AllImages
+	// adds every local image.
+	Images    []string
+	AllImages bool
 	// ExtraGlobs are additional in-tree globs to inspect.
 	ExtraGlobs []string
 	Progress   func(string)
@@ -52,6 +56,7 @@ type Target struct {
 	procs   []discover.Process  `json:"-"`
 	env     map[string]string   `json:"-"`
 	db      *pkgdb.DB           `json:"-"`
+	tmpDir  string              `json:"-"`
 }
 
 // Instance is one PHP build.
@@ -69,11 +74,15 @@ type Instance struct {
 	Package       *advisory.Package     `json:"package,omitempty"`
 	Changelog     string                `json:"changelog,omitempty"`
 	Fingerprints  []string              `json:"fingerprints,omitempty"`
+	BuildDate     string                `json:"build_date,omitempty"`
 	PIDs          []int                 `json:"pids,omitempty"`
 	Stale         bool                  `json:"stale,omitempty"`
 	Notes         []string              `json:"notes,omitempty"`
 	OS            sysroot.OSRelease     `json:"os"`
 	Assessments   []advisory.Assessment `json:"assessments"`
+	// Mitigations shows interim mitigation settings for builds that are not
+	// fixed.
+	Mitigations []Mitigation `json:"mitigations,omitempty"`
 }
 
 // Worst returns the worst status across advisories.
@@ -136,10 +145,16 @@ func Run(ctx context.Context, opt Options, toolVersion string) (*Result, error) 
 	}
 
 	targets := buildTargets(ctx, opt, res)
+	if opt.SysRoot == "" {
+		targets = append(targets, imageTargets(ctx, opt, res)...)
+	}
 	for _, t := range targets {
 		opt.progress("scanning %s %s", t.Kind, t.Name)
 		res.Targets = append(res.Targets, t)
 		res.Instances = append(res.Instances, scanTarget(ctx, opt, t, res)...)
+		if t.tmpDir != "" {
+			os.RemoveAll(t.tmpDir)
+		}
 	}
 	sort.SliceStable(res.Instances, func(i, j int) bool {
 		a, b := res.Instances[i], res.Instances[j]
@@ -325,7 +340,7 @@ func scanTarget(ctx context.Context, opt Options, t *Target, res *Result) []*Ins
 		if err != nil || !st.IsBinary {
 			continue
 		}
-		inst := &Instance{Path: resolved, SAPI: discover.SAPIFor(path.Base(resolved)), Version: st.Version, VersionSource: "binary", Fingerprints: st.Found, Stale: c.Deleted}
+		inst := &Instance{Path: resolved, SAPI: discover.SAPIFor(path.Base(resolved)), Version: st.Version, VersionSource: "binary", Fingerprints: st.Found, BuildDate: st.BuildDate, Stale: c.Deleted}
 		if c.Env != "" {
 			inst.Environment = c.Env
 		}
@@ -373,6 +388,7 @@ func scanTarget(ctx context.Context, opt Options, t *Target, res *Result) []*Ins
 		}
 		_, imageEnv := t.env["PHP_VERSION"]
 		inst.Environment = discover.Classify(inst.Path, inst.Environment, inst.Package != nil, pkgVer, mgr, imageEnv)
+		subj.Environment, subj.BuildDate = inst.Environment, inst.BuildDate
 		for _, a := range res.Advisories {
 			as := a.Evaluate(subj)
 			if inst.Stale && as.Status != advisory.Fixed && (staleDistro || as.Status != advisory.Vulnerable) {
@@ -380,6 +396,12 @@ func scanTarget(ctx context.Context, opt Options, t *Target, res *Result) []*Ins
 				as.Reason = "process still runs a replaced build that cannot be verified; restart it"
 			}
 			inst.Assessments = append(inst.Assessments, as)
+		}
+		for i, as := range inst.Assessments {
+			if as.Status != advisory.Fixed {
+				inst.Mitigations = t.mitigations(inst, res.Advisories[i])
+				break
+			}
 		}
 		inst.ID = instanceID(t, inst.Path, inst.Stale)
 		out = append(out, inst)
