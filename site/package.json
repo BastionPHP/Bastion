@@ -1,0 +1,11 @@
+{
+  "name": "bastion-site",
+  "private": true,
+  "description": "Static website for Bastion. No dependencies.",
+  "engines": { "node": ">=20" },
+  "scripts": {
+    "build": "node build.mjs",
+    "serve": "node build.mjs --serve",
+    "test": "node --test test/*.test.mjs"
+  }
+}

@@ -1,0 +1,96 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: unit tests (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - name: gofmt
+        if: runner.os == 'Linux'
+        run: test -z "$(gofmt -l .)" || (gofmt -l . && exit 1)
+      - run: go vet ./...
+      - run: go test -race ./...
+      - name: cross-compile
+        if: runner.os == 'Linux'
+        run: |
+          for t in linux/amd64 linux/arm64 darwin/amd64 darwin/arm64; do
+            GOOS=${t%/*} GOARCH=${t#*/} CGO_ENABLED=0 go build -o /dev/null ./cmd/bastion
+          done
+
+  site:
+    name: website build + engine parity
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: make build
+      - name: JS engine matches Go vectors
+        working-directory: site
+        run: npm test
+      - name: build site (fails on broken links or missing code anchors)
+        working-directory: site
+        run: BASTION_BIN=$GITHUB_WORKSPACE/bastion node build.mjs
+      - name: installer verifies checksums
+        run: sh -n scripts/install.sh && bash -n scripts/demo/lab.sh scripts/demo/record.sh && scripts/test-install.sh ./bastion
+
+  integration:
+    name: integration (real PHP images)
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - name: pull images
+        run: |
+          for i in php:8.3.35-fpm php:8.3.35-cli php:8.4-cli php:7.4-cli php:8.3-apache ubuntu:24.04 debian:bookworm alpine:3.20; do
+            docker pull -q "$i"
+          done
+      # The runner user is not root: scans are run through passwordless sudo
+      # and the unprivileged docker-exec path is exercised as well.
+      - run: go test -tags integration -count=1 -v -timeout 35m ./integration/
+
+  false-positives:
+    name: trace false-positive corpus
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - run: make build
+      - name: fetch legitimate PHP code
+        run: |
+          mkdir -p /tmp/corpus && cd /tmp/corpus
+          curl -fsSL https://wordpress.org/latest.tar.gz | tar xz
+          curl -fsSL https://ftp.drupal.org/files/projects/drupal-11.2.5.tar.gz | tar xz
+          git clone -q --depth 1 https://github.com/laravel/framework.git
+          git clone -q --depth 1 https://github.com/phpseclib/phpseclib.git
+      - name: no high or medium findings on legitimate code
+        run: |
+          ./bastion trace --no-auto --no-persistence --no-logs --json -q /tmp/corpus > fp.json || true
+          jq -r '.stats.php_files as $n | "scanned \($n) PHP files"' fp.json
+          bad=$(jq '[.findings[] | select(.severity=="high" or .severity=="medium")] | length' fp.json)
+          jq -r '.findings[] | select(.severity=="high" or .severity=="medium") | "\(.severity) \(.rule) \(.path):\(.line)"' fp.json
+          test "$bad" -eq 0

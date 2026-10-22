@@ -1,0 +1,43 @@
+name: demo
+
+# Re-records the terminal demos, sample report and screenshots on a clean
+# runner with real PHP containers, and uploads them as an artifact. Run it
+# manually and commit the results if the UI changed.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  record:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: make build
+      - name: start sample containers
+        run: |
+          docker run -d --name shop-legacy php:8.3.35-fpm
+          docker run -d --name api php:8.4-fpm
+          docker run -d --name blog php:8.3-apache
+          docker run -d --name worker-74 php:7.4-cli sleep infinity
+          sleep 5
+      - run: sudo BIN=./bastion scripts/demo/record.sh && sudo chown -R "$USER" site/demo
+      - name: screenshots
+        run: |
+          npm i -g playwright@1.56.1 && npx playwright install --with-deps chromium
+          cd site && BASTION_BIN=$GITHUB_WORKSPACE/bastion node build.mjs
+          (node build.mjs --serve &) && sleep 2
+          NODE_PATH=$(npm root -g) node ../scripts/demo/screenshots.mjs http://localhost:4321/bastion/ ../docs/assets
+      - uses: actions/upload-artifact@v4
+        with:
+          name: demo
+          path: |
+            site/demo
+            docs/assets
