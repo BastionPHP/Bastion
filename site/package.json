@@ -1,7 +1,6 @@
 {
   "name": "bastion-site",
   "private": true,
-  "type": "module",
   "description": "Static website for Bastion. No dependencies.",
   "engines": { "node": ">=20" },
   "scripts": {
