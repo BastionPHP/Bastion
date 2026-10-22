@@ -349,6 +349,7 @@ func scanTarget(ctx context.Context, opt Options, t *Target, res *Result) []*Ins
 		inst := byPath[k]
 		inst.Target, inst.TargetKind, inst.OS, inst.Image = t.Name, t.Kind, t.OS, t.Image
 		inst.PIDs = dedupInts(pidsByPath[k])
+		staleDistro := false
 		subj := advisory.Subject{Version: inst.Version, OS: advisory.OS{ID: t.OS.ID, VersionID: t.OS.VersionID, Pretty: t.OS.Pretty}, Fingerprints: inst.Fingerprints}
 		if !inst.Stale {
 			info := t.db.Lookup(ctx, inst.Path, markers)
@@ -358,8 +359,13 @@ func scanTarget(ctx context.Context, opt Options, t *Target, res *Result) []*Ins
 			if inst.Version == "" && info.Package != nil {
 				inst.VersionSource = "package"
 			}
-		} else if len(inst.Notes) == 0 {
-			inst.Notes = append(inst.Notes, "binary was replaced on disk; this process still runs the old build — restart it")
+		} else {
+			if len(inst.Notes) == 0 {
+				inst.Notes = append(inst.Notes, "binary was replaced on disk; this process still runs the old build — restart it")
+			}
+			// The package database describes the replacement, not the running
+			// image, so a distro build's old version string proves nothing.
+			staleDistro = t.db.Lookup(ctx, inst.Path, nil).Package != nil
 		}
 		pkgVer, mgr := "", ""
 		if inst.Package != nil {
@@ -369,7 +375,7 @@ func scanTarget(ctx context.Context, opt Options, t *Target, res *Result) []*Ins
 		inst.Environment = discover.Classify(inst.Path, inst.Environment, inst.Package != nil, pkgVer, mgr, imageEnv)
 		for _, a := range res.Advisories {
 			as := a.Evaluate(subj)
-			if inst.Stale && as.Status != advisory.Fixed {
+			if inst.Stale && as.Status != advisory.Fixed && (staleDistro || as.Status != advisory.Vulnerable) {
 				as.Status, as.Confidence = advisory.LikelyVulnerable, "medium"
 				as.Reason = "process still runs a replaced build that cannot be verified; restart it"
 			}
