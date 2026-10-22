@@ -232,7 +232,7 @@ export function render(ctx, { advisory }) {
         ${codebox(`VERSION=v0.1.0   # see ${REPO}/releases\nBASE=${REPO}/releases/download/$VERSION\ncurl -fsSLO $BASE/bastion_linux_amd64.tar.gz -O $BASE/SHA256SUMS -O $BASE/SHA256SUMS.sigstore.json\nsha256sum --ignore-missing -c SHA256SUMS\ncosign verify-blob --bundle SHA256SUMS.sigstore.json \\\n  --certificate-identity-regexp '^https://github.com/BastionPHP/Bastion/.github/workflows/release.yml@refs/tags/v' \\\n  --certificate-oidc-issuer https://token.actions.githubusercontent.com SHA256SUMS\ntar xzf bastion_linux_amd64.tar.gz && sudo install -m 0755 bastion /usr/local/bin/`)}
       </div>
       <div class="tab-panel" data-panel="i-src" hidden>
-        ${codebox("go install github.com/larptard/bastion/cmd/bastion@latest   # Go 1.24+\n# or\ngit clone https://github.com/BastionPHP/Bastion && cd Bastion && make build")}
+        ${codebox("go install github.com/BastionPHP/Bastion/cmd/bastion@latest   # Go 1.24+\n# or\ngit clone https://github.com/BastionPHP/Bastion && cd Bastion && make build")}
       </div>
     </div>
   </div>

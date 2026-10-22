@@ -5,7 +5,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/larptard/bastion/internal/advisory"
+	"github.com/BastionPHP/Bastion/internal/advisory"
 )
 
 func TestPasteVectors(t *testing.T) {

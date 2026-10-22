@@ -17,8 +17,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/larptard/bastion/internal/advisory"
-	"github.com/larptard/bastion/internal/sysroot"
+	"github.com/BastionPHP/Bastion/internal/advisory"
+	"github.com/BastionPHP/Bastion/internal/sysroot"
 )
 
 // Runner executes a command and returns stdout. It lets rpm queries run on

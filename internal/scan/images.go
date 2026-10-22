@@ -7,8 +7,8 @@ import (
 	"os/exec"
 	"strings"
 
-	"github.com/larptard/bastion/internal/imagefs"
-	"github.com/larptard/bastion/internal/sysroot"
+	"github.com/BastionPHP/Bastion/internal/imagefs"
+	"github.com/BastionPHP/Bastion/internal/sysroot"
 )
 
 // imageRuntime returns the first container CLI on PATH.

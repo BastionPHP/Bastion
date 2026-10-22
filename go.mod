@@ -1,3 +1,3 @@
-module github.com/larptard/bastion
+module github.com/BastionPHP/Bastion
 
 go 1.24

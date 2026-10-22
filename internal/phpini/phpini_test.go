@@ -5,7 +5,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/larptard/bastion/internal/sysroot"
+	"github.com/BastionPHP/Bastion/internal/sysroot"
 )
 
 func put(t *testing.T, root, p, s string) {

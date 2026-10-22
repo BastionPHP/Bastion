@@ -12,13 +12,13 @@ import (
 	"strings"
 	"time"
 
-	"github.com/larptard/bastion/internal/advisory"
-	"github.com/larptard/bastion/internal/check"
-	"github.com/larptard/bastion/internal/report"
-	"github.com/larptard/bastion/internal/sarif"
-	"github.com/larptard/bastion/internal/scan"
-	"github.com/larptard/bastion/internal/trace"
-	"github.com/larptard/bastion/internal/ui"
+	"github.com/BastionPHP/Bastion/internal/advisory"
+	"github.com/BastionPHP/Bastion/internal/check"
+	"github.com/BastionPHP/Bastion/internal/report"
+	"github.com/BastionPHP/Bastion/internal/sarif"
+	"github.com/BastionPHP/Bastion/internal/scan"
+	"github.com/BastionPHP/Bastion/internal/trace"
+	"github.com/BastionPHP/Bastion/internal/ui"
 )
 
 type traceFlags struct {

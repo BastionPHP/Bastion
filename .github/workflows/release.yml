@@ -31,7 +31,7 @@ jobs:
           for t in linux/amd64 linux/arm64 darwin/amd64 darwin/arm64; do
             os=${t%/*}; arch=${t#*/}; d=$(mktemp -d)
             GOOS=$os GOARCH=$arch CGO_ENABLED=0 go build -trimpath \
-              -ldflags "-s -w -X github.com/larptard/bastion/internal/cli.Version=$VERSION" \
+              -ldflags "-s -w -X github.com/BastionPHP/Bastion/internal/cli.Version=$VERSION" \
               -o "$d/bastion" ./cmd/bastion
             cp LICENSE README.md "$d/"
             tar -C "$d" --owner=0 --group=0 --mtime='@0' -czf "dist/bastion_${os}_${arch}.tar.gz" bastion LICENSE README.md

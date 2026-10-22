@@ -7,8 +7,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/larptard/bastion/internal/advisory"
-	"github.com/larptard/bastion/internal/version"
+	"github.com/BastionPHP/Bastion/internal/advisory"
+	"github.com/BastionPHP/Bastion/internal/version"
 )
 
 // Input is the subset of an instance remedy needs.

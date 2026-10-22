@@ -11,7 +11,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/larptard/bastion/internal/sysroot"
+	"github.com/BastionPHP/Bastion/internal/sysroot"
 )
 
 // Value is a directive's value and where it came from.

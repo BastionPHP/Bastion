@@ -4,7 +4,7 @@ package main
 import (
 	"os"
 
-	"github.com/larptard/bastion/internal/cli"
+	"github.com/BastionPHP/Bastion/internal/cli"
 )
 
 func main() { os.Exit(cli.Main(os.Args[1:])) }

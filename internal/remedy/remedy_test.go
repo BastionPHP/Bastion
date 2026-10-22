@@ -4,7 +4,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/larptard/bastion/internal/advisory"
+	"github.com/BastionPHP/Bastion/internal/advisory"
 )
 
 func TestSteps(t *testing.T) {

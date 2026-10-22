@@ -6,9 +6,9 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/larptard/bastion/internal/advisory"
-	"github.com/larptard/bastion/internal/scan"
-	"github.com/larptard/bastion/internal/trace"
+	"github.com/BastionPHP/Bastion/internal/advisory"
+	"github.com/BastionPHP/Bastion/internal/scan"
+	"github.com/BastionPHP/Bastion/internal/trace"
 )
 
 const schema = "https://json.schemastore.org/sarif-2.1.0.json"

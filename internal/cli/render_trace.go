@@ -6,8 +6,8 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/larptard/bastion/internal/trace"
-	"github.com/larptard/bastion/internal/ui"
+	"github.com/BastionPHP/Bastion/internal/trace"
+	"github.com/BastionPHP/Bastion/internal/ui"
 )
 
 func sevLabel(s ui.Style, sev string) string {

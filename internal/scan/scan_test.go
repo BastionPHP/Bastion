@@ -8,7 +8,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/larptard/bastion/internal/advisory"
+	"github.com/BastionPHP/Bastion/internal/advisory"
 )
 
 // fakeELF builds a file that looks like a PHP build to the static probe:

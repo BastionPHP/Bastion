@@ -14,10 +14,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/larptard/bastion/internal/advisory"
-	"github.com/larptard/bastion/internal/discover"
-	"github.com/larptard/bastion/internal/pkgdb"
-	"github.com/larptard/bastion/internal/sysroot"
+	"github.com/BastionPHP/Bastion/internal/advisory"
+	"github.com/BastionPHP/Bastion/internal/discover"
+	"github.com/BastionPHP/Bastion/internal/pkgdb"
+	"github.com/BastionPHP/Bastion/internal/sysroot"
 )
 
 const Schema = "bastion.scan/v1"

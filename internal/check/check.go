@@ -9,9 +9,9 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/larptard/bastion/internal/advisory"
-	"github.com/larptard/bastion/internal/discover"
-	"github.com/larptard/bastion/internal/version"
+	"github.com/BastionPHP/Bastion/internal/advisory"
+	"github.com/BastionPHP/Bastion/internal/discover"
+	"github.com/BastionPHP/Bastion/internal/version"
 )
 
 type Parsed struct {

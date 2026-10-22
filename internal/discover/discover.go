@@ -12,7 +12,7 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/larptard/bastion/internal/sysroot"
+	"github.com/BastionPHP/Bastion/internal/sysroot"
 )
 
 // Patterns lists where PHP lives, as globs inside a root. Each entry names

@@ -11,10 +11,10 @@ import (
 	"os"
 	"strings"
 
-	"github.com/larptard/bastion/internal/advisory"
-	"github.com/larptard/bastion/internal/sarif"
-	"github.com/larptard/bastion/internal/scan"
-	"github.com/larptard/bastion/internal/ui"
+	"github.com/BastionPHP/Bastion/internal/advisory"
+	"github.com/BastionPHP/Bastion/internal/sarif"
+	"github.com/BastionPHP/Bastion/internal/scan"
+	"github.com/BastionPHP/Bastion/internal/ui"
 )
 
 // Exit codes are part of the interface so Bastion can gate CI and cron jobs.

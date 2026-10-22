@@ -3,9 +3,9 @@ package scan
 import (
 	"strings"
 
-	"github.com/larptard/bastion/internal/advisory"
-	"github.com/larptard/bastion/internal/phpini"
-	"github.com/larptard/bastion/internal/version"
+	"github.com/BastionPHP/Bastion/internal/advisory"
+	"github.com/BastionPHP/Bastion/internal/phpini"
+	"github.com/BastionPHP/Bastion/internal/version"
 )
 
 // Mitigation is the observed state of one interim mitigation for one

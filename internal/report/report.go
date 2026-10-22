@@ -11,11 +11,11 @@ import (
 	"strings"
 	"time"
 
-	"github.com/larptard/bastion/design"
-	"github.com/larptard/bastion/internal/advisory"
-	"github.com/larptard/bastion/internal/remedy"
-	"github.com/larptard/bastion/internal/scan"
-	"github.com/larptard/bastion/internal/trace"
+	"github.com/BastionPHP/Bastion/design"
+	"github.com/BastionPHP/Bastion/internal/advisory"
+	"github.com/BastionPHP/Bastion/internal/remedy"
+	"github.com/BastionPHP/Bastion/internal/scan"
+	"github.com/BastionPHP/Bastion/internal/trace"
 )
 
 //go:embed report.html.tmpl report.css report.js

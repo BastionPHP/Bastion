@@ -11,7 +11,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/larptard/bastion/internal/sysroot"
+	"github.com/BastionPHP/Bastion/internal/sysroot"
 )
 
 const Schema = "bastion.trace/v1"

@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/larptard/bastion/internal/version"
+	"github.com/BastionPHP/Bastion/internal/version"
 )
 
 // Status is the verdict for one PHP build against one advisory.
