@@ -27,7 +27,7 @@
   });
 
   // Highlight the docs section in view.
-  var toc = document.querySelector(".docs-toc");
+  var toc = document.querySelector(".toc");
   if (toc && "IntersectionObserver" in window) {
     var links = {};
     toc.querySelectorAll("a[href^='#']").forEach(function (a) { links[a.getAttribute("href").slice(1)] = a; });

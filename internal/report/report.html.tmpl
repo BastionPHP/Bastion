@@ -2,65 +2,63 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="color-scheme" content="dark light">
 <meta name="robots" content="noindex">
 <title>Bastion report · {{if .Scan}}{{.Scan.Host.Hostname}}{{else if .Trace}}{{.Trace.Hostname}}{{end}}</title>
 <style>{{.CSS}}</style>
 </head>
 <body>
-<header class="r-top no-print-bg">
+<header class="r-top">
   <div class="bx-wrap r-top-in">
-    <span class="bx-logo">{{.Logo}} Bastion <span class="bx-faint r-sub">report</span></span>
-    <div class="r-top-actions no-print">
-      <div class="bx-seg" role="group" aria-label="Theme"><button type="button" data-set-theme="dark" aria-pressed="false" title="Dark">◐</button><button type="button" data-set-theme="light" aria-pressed="false" title="Light">○</button></div>
-      <button type="button" class="bx-btn is-sm" data-print>Print / PDF</button>
+    <span class="logo">{{.Logo}}<span>Bastion</span><span class="r-sub">security report</span></span>
+    <div class="r-actions no-print">
+      <div class="seg" role="group" aria-label="Theme"><button type="button" data-set-theme="dark" aria-pressed="false" title="Dark theme">{{icon "moon"}}</button><button type="button" data-set-theme="light" aria-pressed="false" title="Light theme">{{icon "sun"}}</button></div>
+      <button type="button" class="btn is-sm" data-print>{{icon "file-text"}}Print or save as PDF</button>
     </div>
   </div>
 </header>
 
 <main class="bx-wrap r-main">
   <section class="r-hero">
-    <div class="bx-eyebrow">Local security report</div>
-    <h1 class="r-host mono">{{if .Scan}}{{.Scan.Host.Hostname}}{{else if .Trace}}{{.Trace.Hostname}}{{end}}</h1>
-    <dl class="bx-kv r-meta">
-      {{with .Scan}}<dt>os</dt><dd>{{.Host.OS.Pretty}}{{if .Host.Kernel}} <span class="bx-faint">· kernel {{.Host.Kernel}}</span>{{end}}</dd>{{end}}
-      <dt>generated</dt><dd class="mono">{{.Generated}} · bastion {{.Version}}</dd>
-      {{with .Scan}}<dt>privileges</dt><dd>{{if .Host.Root}}root{{else}}unprivileged — results may be incomplete{{end}}</dd>{{end}}
+    <div class="label">Local security report</div>
+    <h1 class="r-host">{{if .Scan}}{{.Scan.Host.Hostname}}{{else if .Trace}}{{.Trace.Hostname}}{{end}}</h1>
+    <dl class="rec r-meta">
+      {{with .Scan}}<div><dt>System</dt><dd>{{.Host.OS.Pretty}}{{if .Host.Kernel}} <span class="bx-faint">· kernel {{.Host.Kernel}}</span>{{end}}</dd></div>{{end}}
+      <div><dt>Generated</dt><dd class="mono">{{.Generated}} · bastion {{.Version}}</dd></div>
+      {{with .Scan}}<div><dt>Privileges</dt><dd>{{if .Host.Root}}root{{else}}<span class="st is-amber">{{icon "triangle-alert"}}unprivileged: results may be incomplete</span>{{end}}</dd></div>
+      <div><dt>Scope</dt><dd>{{len .Instances}} PHP builds in {{len .Targets}} targets{{range $k, $v := $.TargetKinds}} · {{$v}} {{$k}}{{end}}</dd></div>{{end}}
     </dl>
   </section>
 
-  <section class="r-verdicts">
+  <section class="r-sum">
     {{if .Scan}}
-    <a class="bx-card r-verdict" data-tone="{{.Worst}}" href="#exposure">
-      <div class="bx-eyebrow">01 · Vulnerability exposure</div>
-      <div class="r-verdict-main"><span class="bx-badge" data-status="{{.Worst}}">{{.WorstEn}}</span></div>
-      <div class="r-bars">
+    <a class="panel r-card" href="#exposure">
+      <div class="panel-head"><span class="title">{{icon "shield"}}Vulnerability exposure</span>{{statusTag .Worst .WorstEn}}</div>
+      <div class="panel-body">
         {{$total := len .Instances}}
-        <div class="r-bar" aria-hidden="true">
-          <i style="--w:{{pct (index .Counts "vulnerable") $total}}%" data-status="vulnerable"></i><i style="--w:{{pct (index .Counts "likely-vulnerable") $total}}%" data-status="likely-vulnerable"></i><i style="--w:{{pct (index .Counts "unknown") $total}}%" data-status="unknown"></i><i style="--w:{{pct (index .Counts "fixed") $total}}%" data-status="fixed"></i>
-        </div>
-        <ul class="r-legend mono">
-          <li data-status="vulnerable"><b>{{index .Counts "vulnerable"}}</b> vulnerable</li>
-          <li data-status="likely-vulnerable"><b>{{index .Counts "likely-vulnerable"}}</b> likely</li>
-          <li data-status="unknown"><b>{{index .Counts "unknown"}}</b> unknown</li>
-          <li data-status="fixed"><b>{{index .Counts "fixed"}}</b> fixed</li>
+        <div class="r-bar" aria-hidden="true"><i style="--w:{{pct (index .Counts "vulnerable") $total}}%" data-status="vulnerable"></i><i style="--w:{{pct (index .Counts "likely-vulnerable") $total}}%" data-status="likely-vulnerable"></i><i style="--w:{{pct (index .Counts "unknown") $total}}%" data-status="unknown"></i><i style="--w:{{pct (index .Counts "fixed") $total}}%" data-status="fixed"></i></div>
+        <ul class="r-counts">
+          <li><span class="st" data-status="vulnerable">{{icon "shield-x"}}vulnerable</span><b class="num">{{index .Counts "vulnerable"}}</b></li>
+          <li><span class="st" data-status="likely-vulnerable">{{icon "shield-alert"}}likely vulnerable</span><b class="num">{{index .Counts "likely-vulnerable"}}</b></li>
+          <li><span class="st" data-status="unknown">{{icon "shield-question"}}unknown</span><b class="num">{{index .Counts "unknown"}}</b></li>
+          <li><span class="st" data-status="fixed">{{icon "shield-check"}}fixed</span><b class="num">{{index .Counts "fixed"}}</b></li>
         </ul>
       </div>
-      <p class="bx-muted r-verdict-note">{{len .Instances}} PHP builds across {{len .Scan.Targets}} targets (host, containers, namespaces).</p>
     </a>
     {{end}}
     {{if .Trace}}
-    <a class="bx-card r-verdict" data-tone="{{.Trace.Verdict}}" href="#trace">
-      <div class="bx-eyebrow">02 · Intrusion trace</div>
-      <div class="r-verdict-main"><span class="bx-badge" data-verdict="{{.Trace.Verdict}}">{{.VerdictEn}}</span></div>
-      <ul class="r-legend mono r-legend-sev">
-        <li data-sev="high"><b>{{index .TraceCounts "high"}}</b> high</li>
-        <li data-sev="medium"><b>{{index .TraceCounts "medium"}}</b> medium</li>
-        <li data-sev="low"><b>{{index .TraceCounts "low"}}</b> low</li>
-        <li data-sev="info"><b>{{index .TraceCounts "info"}}</b> info</li>
-      </ul>
-      <p class="bx-muted r-verdict-note">{{.VerdictTextEn}}</p>
+    <a class="panel r-card" href="#trace">
+      <div class="panel-head"><span class="title">{{icon "radar"}}Intrusion trace</span><span class="tag" data-verdict="{{.Trace.Verdict}}">{{icon .VerdictIcon}}{{.VerdictEn}}</span></div>
+      <div class="panel-body">
+        <ul class="r-counts">
+          <li><span class="st" data-sev="high">{{icon "triangle-alert"}}high</span><b class="num">{{index .TraceCounts "high"}}</b></li>
+          <li><span class="st" data-sev="medium">{{icon "circle-dot"}}medium</span><b class="num">{{index .TraceCounts "medium"}}</b></li>
+          <li><span class="st" data-sev="low">{{icon "circle-dashed"}}low</span><b class="num">{{index .TraceCounts "low"}}</b></li>
+          <li><span class="st" data-sev="info">{{icon "info"}}info</span><b class="num">{{index .TraceCounts "info"}}</b></li>
+        </ul>
+        <p class="r-verdict-note">{{.VerdictTextEn}}</p>
+      </div>
     </a>
     {{end}}
   </section>
@@ -68,69 +66,76 @@
   {{with .Scan}}
   <section class="r-section" id="exposure">
     <div class="r-section-head">
-      <h2>Vulnerability exposure</h2>
-      <div class="r-filters no-print" role="group" aria-label="Filter">
-        <button type="button" class="bx-chip" data-filter="all" aria-pressed="true">all</button>
-        <button type="button" class="bx-chip" data-filter="attention" aria-pressed="false">needs action</button>
-        <button type="button" class="bx-chip" data-filter="fixed" aria-pressed="false">fixed</button>
+      <h2>{{icon "shield"}}Vulnerability exposure</h2>
+      <div class="r-filters no-print" role="group" aria-label="Filter builds">
+        <button type="button" class="chip" data-filter="all" aria-pressed="true">all</button>
+        <button type="button" class="chip" data-filter="attention" aria-pressed="false">needs action</button>
+        <button type="button" class="chip" data-filter="fixed" aria-pressed="false">fixed</button>
       </div>
     </div>
 
     {{range .Advisories}}
-    <div class="bx-card r-adv">
-      <div class="r-adv-head">
-        <span class="bx-badge is-red is-plain">{{.Severity}}</span>
-        <strong class="r-adv-name">{{.Name}}</strong>
-        {{range .Vulnerabilities}}<a class="bx-chip" href="{{.URL}}" rel="noreferrer">{{.CVE}}</a>{{end}}
-        <span class="bx-chip">CVSS {{.CVSS.Version}} · {{printf "%.1f" .CVSS.Score}}</span>
-        <span class="bx-faint mono r-adv-date">published {{.Published}}</span>
-      </div>
-      <p class="r-adv-summary">{{index .Summary "en"}}</p>
-      <div class="r-fixed-grid">
-        {{range .Branches}}<div class="r-fixed"><span class="mono bx-faint">PHP {{.Branch}}</span><span class="mono {{if .Fixed}}r-ok{{else}}r-bad{{end}}">{{if .Fixed}}≥ {{.Fixed}}{{else}}no release{{end}}</span></div>{{end}}
+    <div class="panel r-adv">
+      <div class="panel-head"><span class="title"><span class="tag is-red">{{icon "triangle-alert"}}{{.Severity}}</span>{{.Name}}</span><span class="bx-faint mono r-small">published {{.Published}}</span></div>
+      <div class="panel-body">
+        <dl class="rec">
+          <div><dt>Identifiers</dt><dd class="r-ids">{{range .Vulnerabilities}}<a class="chip" href="{{.URL}}">{{.CVE}}</a><span class="chip">{{.GHSA}}</span>{{end}}</dd></div>
+          <div><dt>Severity</dt><dd>CVSS {{.CVSS.Version}} <b>{{printf "%.1f" .CVSS.Score}}</b> <span class="mono bx-faint r-small">{{.CVSS.Vector}}</span></dd></div>
+          <div><dt>Summary</dt><dd class="bx-muted">{{index .Summary "en"}}</dd></div>
+          <div><dt>Fixed upstream</dt><dd class="r-ids">{{range .Branches}}<span class="chip">{{.Branch}} {{if .Fixed}}<span class="r-ok">≥ {{.Fixed}}</span>{{else}}<span class="r-bad">no release</span>{{end}}</span>{{end}}</dd></div>
+        </dl>
       </div>
     </div>
     {{end}}
 
-    {{if not .Instances}}
-    <div class="bx-card bx-card-body bx-muted">No PHP builds were found on this machine.</div>
-    {{end}}
+    {{if not .Instances}}<div class="note">{{icon "info"}}<p>No PHP builds were found on this machine.</p></div>{{end}}
   </section>
   {{end}}
 
   {{if .Instances}}
-  <div class="bx-card r-instances">
+  <div class="panel r-instances">
+    <div class="r-inst-cols label" aria-hidden="true"><span>Status</span><span>Build</span><span>Target</span><span>Version</span><span>Source</span></div>
     {{range .Instances}}
     <details class="r-inst" data-status="{{.Status}}" {{if ne .Status "fixed"}}open{{end}}>
       <summary>
-        <span class="bx-badge" data-status="{{.Status}}">{{.StatusEn}}</span>
-        <span class="r-inst-path mono">{{.Path}}{{if .Stale}} <em class="r-stale">replaced</em>{{end}}</span>
-        <span class="r-inst-meta mono"><span class="bx-faint">{{.Where}}</span> · {{.SAPI}} · <b>{{if .Version}}{{.Version}}{{else}}?{{end}}</b></span>
-        <span class="r-inst-env">{{.Environment}}</span>
+        {{statusTag .Status .StatusEn}}
+        <span class="r-inst-path mono">{{.Path}}{{if .Stale}} <span class="tag is-amber">{{icon "rotate-ccw"}}replaced</span>{{end}}<span class="r-sapi">{{sapi .SAPI}}</span></span>
+        <span class="r-inst-target">{{icon .KindIcon}}<span>{{.Target}}</span></span>
+        <span class="mono r-inst-ver">{{if .Version}}{{.Version}}{{else}}?{{end}}</span>
+        <span class="r-inst-env bx-muted">{{.Environment}}</span>
       </summary>
       <div class="r-inst-body">
-        <dl class="bx-kv">
-          <dt>target</dt><dd class="mono">{{.TargetKind}} · {{.Target}}{{if .OS.Pretty}} · {{.OS.Pretty}}{{end}}</dd>
-          <dt>version</dt><dd class="mono">{{if .Version}}{{.Version}}{{else}}?{{end}} <span class="bx-faint">({{.VersionSource}})</span></dd>
-          {{with .Package}}<dt>package</dt><dd class="mono">{{.Name}} {{.Version}} <span class="bx-faint">({{.Manager}}{{if .Source}}, source {{.Source}}{{end}})</span></dd>{{end}}
-          {{with .Changelog}}<dt>changelog</dt><dd class="mono">{{.}}</dd>{{end}}
-          {{with .Aliases}}<dt>aliases</dt><dd class="mono">{{join . ", "}}</dd>{{end}}
-          {{with .PIDs}}<dt>running</dt><dd class="mono">pid {{range $i, $p := .}}{{if $i}}, {{end}}{{$p}}{{end}}</dd>{{end}}
-          {{with .Fingerprints}}<dt>fingerprint</dt><dd class="mono">{{join . ", "}}</dd>{{end}}
+        <dl class="rec">
+          <div><dt>Target</dt><dd>{{.TargetKind}} · {{.Target}}{{if .OS.Pretty}} · {{.OS.Pretty}}{{end}}</dd></div>
+          <div><dt>Version</dt><dd class="mono">{{if .Version}}{{.Version}}{{else}}?{{end}} <span class="bx-faint">read from {{.VersionSource}}{{if .BuildDate}} · built {{.BuildDate}}{{end}}</span></dd></div>
+          {{with .Package}}<div><dt>Package</dt><dd class="mono">{{.Name}} {{.Version}} <span class="bx-faint">({{.Manager}}{{if .Source}}, source {{.Source}}{{end}})</span></dd></div>{{end}}
+          {{with .Changelog}}<div><dt>Changelog</dt><dd class="mono">{{.}}</dd></div>{{end}}
+          {{with .Aliases}}<div><dt>Also reachable as</dt><dd class="mono">{{join . ", "}}</dd></div>{{end}}
+          {{with .PIDs}}<div><dt>Running</dt><dd class="mono">pid {{range $i, $p := .}}{{if $i}}, {{end}}{{$p}}{{end}}</dd></div>{{end}}
+          {{with .Fingerprints}}<div><dt>Fix fingerprint</dt><dd class="mono">{{join . ", "}}</dd></div>{{end}}
         </dl>
-        {{range .Notes}}<p class="r-note">! {{.}}</p>{{end}}
+        {{range .Notes}}<div class="note is-warn">{{icon "triangle-alert"}}<p>{{.}}</p></div>{{end}}
         {{range .Views}}
-        <div class="r-assess">
-          <div class="r-assess-head"><strong>{{.Advisory}}</strong> <span class="bx-faint">— {{.Reason}} · confidence {{.Confidence}}</span></div>
+        <div class="panel r-assess">
+          <div class="panel-head"><span class="title">{{icon "workflow"}}{{.Advisory}}</span><span class="bx-faint r-small">{{.Reason}} · confidence {{.Confidence}}</span></div>
           <ul class="r-evidence">
-            {{range .Evidence}}<li data-verdict="{{.Verdict}}"><span class="r-ev-mark"></span><span class="r-ev-kind mono">{{.Kind}}</span><span class="r-ev-detail">{{.Detail}}</span></li>{{end}}
+            {{range .Evidence}}<li data-verdict="{{.Verdict}}"><span class="r-ev-mark">{{icon (evIcon .Verdict)}}</span><span class="r-ev-kind mono">{{.Kind}}</span><span class="r-ev-detail">{{.Detail}}</span></li>{{end}}
           </ul>
           {{if .Steps}}
           <div class="r-steps">
-            <div class="bx-eyebrow">What to do</div>
+            <div class="label">What to do</div>
             <ol>{{range .Steps}}<li>{{.}}</li>{{end}}</ol>
           </div>
           {{end}}
+        </div>
+        {{end}}
+        {{if .Mitigations}}
+        <div class="panel r-mit">
+          <div class="panel-head"><span class="title">{{icon "sliders-horizontal"}}Interim mitigations</span><span class="bx-faint r-small">reduce exposure until the update; not a fix</span></div>
+          <div class="tbl-wrap"><table class="tbl">
+            <thead><tr><th></th><th>Setting</th><th>Scope</th><th>Value</th><th>Wanted</th><th>Source</th></tr></thead>
+            <tbody>{{range .Mitigations}}<tr><td class="ico">{{if .OK}}<span class="st is-green">{{icon "circle-check"}}</span>{{else}}<span class="st is-red">{{icon "circle-x"}}</span>{{end}}</td><td class="mono">{{.Setting}}</td><td class="bx-muted">{{.Scope}}</td><td class="mono">{{.Value}}</td><td class="mono bx-muted">{{.Want}}</td><td class="mono bx-faint r-small">{{if eq .Source "default"}}PHP default{{else}}{{.Source}}{{end}}</td></tr>{{end}}</tbody>
+          </table></div>
         </div>
         {{end}}
       </div>
@@ -139,65 +144,66 @@
   </div>
   {{end}}
 
-  {{with .Scan}}{{if .Warnings}}
-  <div class="r-warnings">{{range .Warnings}}<p>! {{.}}</p>{{end}}</div>
-  {{end}}{{end}}
+  {{with .Scan}}{{range .Warnings}}<div class="note is-warn r-warn">{{icon "triangle-alert"}}<p>{{.}}</p></div>{{end}}{{end}}
 
   {{if .Trace}}
   <section class="r-section" id="trace">
     <div class="r-section-head">
-      <h2>Intrusion trace</h2>
-      <span class="bx-faint mono">{{.Trace.Stats.FilesScanned}} files · {{.Trace.Stats.LogFiles}} logs · {{.Trace.Stats.LogLines}} lines · since {{.Trace.Since.Format "2006-01-02"}}</span>
+      <h2>{{icon "radar"}}Intrusion trace</h2>
+      <span class="bx-faint mono r-small">{{.Trace.Stats.FilesScanned}} files · {{.Trace.Stats.LogFiles}} logs · {{.Trace.Stats.LogLines}} log lines · since {{.Trace.Since.Format "2006-01-02"}}</span>
     </div>
 
     <div class="r-trace-grid">
       <div class="r-findings">
-        {{if not .Findings}}<div class="bx-card bx-card-body bx-muted">No findings.</div>{{end}}
+        {{if not .Findings}}<div class="note is-ok">{{icon "circle-check"}}<p>No findings.</p></div>{{end}}
         {{range .Findings}}
-        <article class="bx-card r-finding" data-sev="{{.Severity}}">
-          <header>
-            <span class="bx-badge" data-sev="{{.Severity}}">{{.SevEn}}</span>
-            <h3>{{index .Title "en"}}</h3>
-            <span class="bx-faint mono r-rule">{{.Rule}}</span>
-          </header>
-          <div class="r-loc mono">{{.Loc}}{{if .Count}} <span class="bx-faint">×{{.Count}}</span>{{end}}{{with .Time}} <span class="bx-faint">· {{fmtTime .}}</span>{{end}}</div>
-          {{with .Snippet}}<pre class="bx-code r-snippet">{{.}}</pre>{{end}}
-          {{if .Why}}<p class="bx-muted r-why">{{index .Why "en"}}</p>{{end}}
-          {{with .Details}}<ul class="r-details mono">{{range .}}<li>{{.}}</li>{{end}}</ul>{{end}}
+        <article class="panel r-finding" data-sev="{{.Severity}}">
+          <div class="panel-head">
+            <span class="title"><span class="tag" data-sev="{{.Severity}}">{{icon (sevIcon .Severity)}}{{.SevEn}}</span>{{index .Title "en"}}</span>
+            <span class="mono bx-faint r-small">{{.Rule}}</span>
+          </div>
+          <div class="panel-body r-finding-body">
+            <div class="r-loc mono">{{icon (catIcon .Category)}}<span>{{.Loc}}{{if .Count}} <span class="bx-faint">×{{.Count}}</span>{{end}}{{with .Time}} <span class="bx-faint">· {{fmtTime .}}</span>{{end}}</span></div>
+            {{with .Snippet}}<pre class="code r-snippet">{{.}}</pre>{{end}}
+            {{if .Why}}<p class="bx-muted r-why">{{index .Why "en"}}</p>{{end}}
+            {{with .Details}}<ul class="r-details mono">{{range .}}<li>{{.}}</li>{{end}}</ul>{{end}}
+          </div>
         </article>
         {{end}}
       </div>
-      <aside class="bx-card r-tl">
-        <div class="bx-card-head"><span class="bx-eyebrow">Timeline</span><span class="bx-faint mono">UTC</span></div>
-        <div class="bx-card-body">
+      <aside class="panel r-tl">
+        <div class="panel-head"><span class="title">{{icon "history"}}Timeline</span><span class="label">UTC</span></div>
+        <div class="panel-body">
           {{if not .Days}}<p class="bx-faint">No timestamped events.</p>{{end}}
-          <ol class="bx-timeline">
-            {{range .Days}}<li class="day">{{.Day}}</li>{{range .Events}}<li class="ev" data-sev="{{.Severity}}"><time>{{clock .Time}}</time><span class="dot"></span><span class="what">{{.Summary}}{{with .Path}}<span class="path">{{.}}</span>{{end}}</span></li>{{end}}{{end}}
+          <ol class="tl">
+            {{range .Days}}<li class="day">{{.Day}}</li>{{range .Events}}<li class="ev" data-sev="{{.Severity}}"><time>{{clock .Time}}</time><span class="mk">{{icon (sevIcon .Severity)}}</span><span class="what">{{.Summary}}{{with .Path}}<span class="path">{{.}}</span>{{end}}</span></li>{{end}}{{end}}
           </ol>
         </div>
       </aside>
     </div>
 
-    <div class="bx-card r-scope">
-      <div class="bx-card-head"><span class="bx-eyebrow">Scope</span></div>
-      <div class="bx-table-wrap"><table class="bx-table">
+    <div class="panel r-scope">
+      <div class="panel-head"><span class="title">{{icon "folder-search"}}Scope</span></div>
+      <div class="tbl-wrap"><table class="tbl">
         <thead><tr><th>Web root</th><th>Files</th><th>Found via</th></tr></thead>
-        <tbody>{{range .Trace.Webroots}}<tr><td class="mono">{{.Path}}</td><td class="mono">{{.Files}}</td><td class="bx-faint">{{.Source}}</td></tr>{{else}}<tr><td colspan="3" class="bx-faint">—</td></tr>{{end}}</tbody>
+        <tbody>{{range .Trace.Webroots}}<tr><td class="mono">{{.Path}}</td><td class="mono">{{.Files}}</td><td class="bx-faint">{{.Source}}</td></tr>{{else}}<tr><td colspan="3" class="bx-faint">No web roots found.</td></tr>{{end}}</tbody>
       </table></div>
     </div>
-    {{if .Trace.Warnings}}<div class="r-warnings">{{range .Trace.Warnings}}<p>! {{.}}</p>{{end}}</div>{{end}}
+    {{range .Trace.Warnings}}<div class="note is-warn r-warn">{{icon "triangle-alert"}}<p>{{.}}</p></div>{{end}}
   </section>
   {{end}}
 
-  <section class="r-method bx-card bx-card-body">
-    <div class="bx-eyebrow">How to read this report</div>
-    <p>Bastion only reads files and process metadata; it changed nothing on this machine. <b>Fixed</b> means a fixed upstream version, a vendor package at or above the vendor's fixed version, a package changelog naming the CVE, or code that only the fix introduces. <b>Likely vulnerable</b> means a build Bastion cannot prove patched (for example an end-of-life branch or a package whose changelog is silent). <b>Unknown</b> means there was not enough information — ask the vendor. Trace findings are indicators, not proof; a clean trace does not prove a clean system.</p>
+  <section class="panel r-method">
+    <div class="panel-head"><span class="title">{{icon "book-open"}}How to read this report</span></div>
+    <div class="panel-body">
+      <p>Bastion only reads files and process metadata; it changed nothing on this machine. <b>Fixed</b> means a fixed upstream version, a vendor package at or above the vendor's fixed version, a dated vendor rebuild, a package changelog naming the CVE, or code only the fix contains. <b>Likely vulnerable</b> means a build Bastion cannot prove patched, for example an end-of-life branch or a package whose vendor database or changelog is silent. <b>Unknown</b> means there was not enough information; ask the vendor. Trace findings are indicators, not proof, and a clean trace does not prove a clean system.</p>
+    </div>
   </section>
 </main>
 
-<footer class="bx-wrap r-foot mono bx-faint">
-  <span>bastion {{.Version}} · {{if .Scan}}{{.Scan.Schema}}{{end}}{{if .Trace}} · {{.Trace.Schema}}{{end}}</span>
-  <span>Contains host details — share with care.</span>
+<footer class="bx-wrap r-foot mono">
+  <span>bastion {{.Version}}{{if .Scan}} · {{.Scan.Schema}}{{end}}{{if .Trace}} · {{.Trace.Schema}}{{end}}</span>
+  <span>{{icon "lock"}} Contains host details. Share with care.</span>
 </footer>
 
 <script type="application/json" id="bastion-data">{{.DataJSON}}</script>
