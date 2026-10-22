@@ -159,7 +159,7 @@ func (a *Advisory) Evaluate(s Subject) Assessment {
 			add("version", "neutral", "could not determine the PHP version")
 			return done(Unknown, "low", "PHP version could not be determined")
 		}
-		if pv, perr := version.ParsePHP(upstreamOf(s.Package.Version)); perr == nil {
+		if pv, perr := version.ParsePHP(UpstreamOf(s.Package.Version)); perr == nil {
 			v, err = pv, nil
 			add("version", "neutral", "version taken from package %s %s", s.Package.Name, s.Package.Version)
 		}
@@ -180,7 +180,11 @@ func (a *Advisory) Evaluate(s Subject) Assessment {
 				return done(Fixed, "high", "running %s, fixed in %s", v.Upstream(), br.Fixed)
 			}
 			upstream = "vulnerable"
-			add("version", "vulnerable", "PHP %s is below the fixed release %s", v.Upstream(), br.Fixed)
+			if s.Package != nil {
+				add("version", "neutral", "PHP %s is below the fixed release %s, but distribution packages often carry backports", v.Upstream(), br.Fixed)
+			} else {
+				add("version", "vulnerable", "PHP %s is below the fixed release %s", v.Upstream(), br.Fixed)
+			}
 		case br != nil:
 			upstream = "no-release"
 			add("version", "vulnerable", "PHP %s has no fixed upstream release (branch status: %s)", v.Branch(), br.Status)
@@ -252,8 +256,8 @@ func (a *Advisory) Evaluate(s Subject) Assessment {
 	return done(Unknown, "low", "not enough information")
 }
 
-// upstreamOf strips epoch and revision from a package version.
-func upstreamOf(pkgVersion string) string {
+// UpstreamOf strips epoch and revision from a package version.
+func UpstreamOf(pkgVersion string) string {
 	s := pkgVersion
 	if i := strings.IndexByte(s, ':'); i >= 0 {
 		s = s[i+1:]

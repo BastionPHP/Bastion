@@ -1,0 +1,20 @@
+{
+  "comment": "Pasted-text vectors shared by internal/check (Go) and site/assets/engine.js. 'expect' lists fields that must match after Parse+Infer; 'status' is the PHP2Shell verdict.",
+  "cases": [
+    {"name": "official docker image fixed", "text": "PHP 8.3.36 (cli) (built: Oct 21 2026 15:57:19) (NTS)\nCopyright (c) The PHP Group\nZend Engine v4.3.36, Copyright (c) Zend Technologies", "expect": {"version": "8.3.36", "sapi": "cli"}, "status": "fixed"},
+    {"name": "upstream vulnerable fpm", "text": "PHP 8.4.26 (fpm-fcgi) (built: Sep 24 2026 10:00:00)", "expect": {"version": "8.4.26", "sapi": "fpm-fcgi"}, "status": "vulnerable"},
+    {"name": "ubuntu noble needs package", "text": "PHP 8.3.6 (cli) (built: Oct  7 2026 18:06:38) (NTS)", "expect": {"version": "8.3.6"}, "status": "vulnerable"},
+    {"name": "ubuntu noble with dpkg -l", "text": "PHP 8.3.6 (cli) (built: Oct 19 2026 15:16:58) (NTS)\nii  php8.3-cli  8.3.6-0ubuntu0.24.04.13  amd64  command-line interpreter for the PHP scripting language\nii  php8.3-common 8.3.6-0ubuntu0.24.04.13 amd64 documentation", "expect": {"version": "8.3.6", "package": "php8.3-cli", "package_version": "8.3.6-0ubuntu0.24.04.13", "os": "ubuntu 24.04"}, "status": "fixed"},
+    {"name": "ubuntu noble dpkg-query old", "text": "PHP 8.3.6 (cli)\nphp8.3-cli\t8.3.6-0ubuntu0.24.04.12\n", "expect": {"package_version": "8.3.6-0ubuntu0.24.04.12", "os": "ubuntu 24.04"}, "status": "vulnerable"},
+    {"name": "ubuntu jammy version embeds package", "text": "PHP 8.1.2-1ubuntu2.28 (cli) (built: Oct 20 2026 12:00:00) (NTS)", "expect": {"version": "8.1.2-1ubuntu2.28", "package_version": "8.1.2-1ubuntu2.28", "os": "ubuntu 22.04"}, "status": "fixed"},
+    {"name": "ubuntu jammy old", "text": "PHP 8.1.2-1ubuntu2.22 (cli) (built: Jul 15 2025 12:00:00) (NTS)", "expect": {"os": "ubuntu 22.04"}, "status": "vulnerable"},
+    {"name": "debian bookworm security", "text": "PHP 8.2.35 (cli) (built: Oct 21 2026)\nii  php8.2-cli 8.2.35-1~deb12u1 amd64 x", "expect": {"os": "debian 12", "package_version": "8.2.35-1~deb12u1"}, "status": "fixed"},
+    {"name": "debian bookworm main", "text": "PHP 8.2.32 (cli) (built: Jul 1 2026)\nii  php8.2-cli 8.2.32-1~deb12u1 amd64 x", "expect": {"os": "debian 12"}, "status": "vulnerable"},
+    {"name": "os-release explicit", "text": "PRETTY_NAME=\"Ubuntu 20.04.6 LTS\"\nID=ubuntu\nVERSION_ID=\"20.04\"\nPHP 7.4.3-4ubuntu2.29 (cli)\nii  php7.4-cli 7.4.3-4ubuntu2.29+esm5 amd64 x", "expect": {"os": "ubuntu 20.04", "package_version": "7.4.3-4ubuntu2.29+esm5"}, "status": "fixed"},
+    {"name": "rhel rpm", "text": "PHP 8.0.30 (cli) (built: Aug  3 2026 00:00:00) ( NTS gcc x86_64 )\nphp-cli-8.0.30-4.el9_6.x86_64", "expect": {"package": "php-cli", "package_version": "8.0.30-4.el9_6"}, "status": "unknown"},
+    {"name": "cpanel ea-php", "text": "ea-php83-php-cli-8.3.36-1.1.1.cpanel.x86_64", "expect": {"package": "ea-php83-php-cli", "package_version": "8.3.36-1.1.1.cpanel"}, "status": "fixed"},
+    {"name": "alpine apk", "text": "PHP 8.3.35 (cli) (built: Sep 25 2026 00:00:00) (NTS)\nphp83-8.3.35-r0 description:", "expect": {"package": "php83", "package_version": "8.3.35-r0"}, "status": "unknown"},
+    {"name": "eol 7.4 source", "text": "PHP 7.4.33 (cli) (built: Nov  4 2022 00:00:00) ( NTS )", "expect": {"version": "7.4.33"}, "status": "likely-vulnerable"},
+    {"name": "8.6 rc", "text": "PHP 8.6.0RC4 (cli) (built: Oct 21 2026 00:00:00) (NTS)", "expect": {"version": "8.6.0RC4"}, "status": "fixed"}
+  ]
+}
