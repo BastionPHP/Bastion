@@ -7,12 +7,10 @@
       "severity": "high",
       "pattern": "(?i)\\b(eval|assert)\\s*\\(\\s*@?\\s*(base64_decode|gzinflate|gzuncompress|gzdecode|str_rot13|strrev|hex2bin|convert_uudecode|rawurldecode)\\s*\\(",
       "title": {
-        "en": "eval/assert of decoded data",
-        "zh": "对解码后的数据执行 eval/assert"
+        "en": "eval/assert of decoded data"
       },
       "why": {
-        "en": "Executing decoded strings is the classic packer used by webshells to hide their payload.",
-        "zh": "执行解码后的字符串是 Webshell 隐藏载荷最常见的手法。"
+        "en": "Executing decoded strings is the classic packer used by webshells to hide their payload."
       },
       "hints": [
         "eval",
@@ -24,12 +22,10 @@
       "severity": "high",
       "pattern": "(?i)\\b(eval|assert|system|exec|shell_exec|passthru|popen|proc_open|pcntl_exec|create_function|call_user_func(_array)?|array_map|register_shutdown_function|ob_start|iterator_apply)\\s*\\(\\s*@?\\s*(\\$_(GET|POST|REQUEST|COOKIE|SERVER|FILES)\\b|getallheaders\\s*\\(|apache_request_headers\\s*\\(|file_get_contents\\s*\\(\\s*['\"]php://input)",
       "title": {
-        "en": "Request input passed to code or command execution",
-        "zh": "请求参数被直接传入代码或命令执行函数"
+        "en": "Request input passed to code or command execution"
       },
       "why": {
-        "en": "One-line webshells (China Chopper, AntSword) execute whatever the request sends.",
-        "zh": "“一句话木马”（中国菜刀、蚁剑等）会执行请求中传来的任意内容。"
+        "en": "One-line webshells (China Chopper, AntSword) execute whatever the request sends."
       },
       "hints": [
         "$_",
@@ -43,12 +39,10 @@
       "severity": "high",
       "pattern": "\\$_(GET|POST|REQUEST|COOKIE|SERVER)\\s*\\[[^\\]]{1,60}\\]\\(",
       "title": {
-        "en": "Function name taken from the request",
-        "zh": "函数名直接取自请求参数"
+        "en": "Function name taken from the request"
       },
       "why": {
-        "en": "$_POST['x']($_POST['y']) lets the attacker call any function.",
-        "zh": "$_POST['x']($_POST['y']) 这种写法允许攻击者调用任意函数。"
+        "en": "$_POST['x']($_POST['y']) lets the attacker call any function."
       },
       "hints": [
         "$_"
@@ -59,12 +53,10 @@
       "severity": "high",
       "pattern": "(?:=|\\becho|\\bprint|\\breturn|\\(|\\.)\\s*`[^`\\n]{0,80}\\$_(GET|POST|REQUEST|COOKIE)[^`\\n]{0,80}`\\s*[;).,]",
       "title": {
-        "en": "Shell backticks with request input",
-        "zh": "反引号执行请求参数中的命令"
+        "en": "Shell backticks with request input"
       },
       "why": {
-        "en": "Backticks run a shell command.",
-        "zh": "反引号会把内容当作 Shell 命令执行。"
+        "en": "Backticks run a shell command."
       },
       "hints": [
         "`"
@@ -75,12 +67,10 @@
       "severity": "high",
       "pattern": "(?i)preg_replace\\s*\\(\\s*['\"][^'\"]{0,200}[/#~|!@%][a-z]*e[a-z]*['\"]\\s*,",
       "title": {
-        "en": "preg_replace with the /e modifier",
-        "zh": "使用 /e 修饰符的 preg_replace"
+        "en": "preg_replace with the /e modifier"
       },
       "why": {
-        "en": "The /e modifier evaluates the replacement as PHP code (removed in PHP 7, still used by old backdoors).",
-        "zh": "/e 修饰符会把替换结果当作 PHP 代码执行（PHP 7 已移除，但老后门仍在使用）。"
+        "en": "The /e modifier evaluates the replacement as PHP code (removed in PHP 7, still used by old backdoors)."
       },
       "hints": [
         "preg_replace"
@@ -91,12 +81,10 @@
       "severity": "high",
       "pattern": "(?i)(c99shell|r57shell|b374k|IndoXploit|AnonymousFox|phpspy|Weevely|\\$default_action\\s*=\\s*['\"]FilesMan|WSO\\s+\\d\\.\\d|Mini\\s*Shell\\s*\\d|alfa\\s*team|AlfaShell|p0wny@shell)",
       "title": {
-        "en": "Known webshell family marker",
-        "zh": "已知 Webshell 家族特征"
+        "en": "Known webshell family marker"
       },
       "why": {
-        "en": "String used by a public webshell kit.",
-        "zh": "公开 Webshell 工具包中使用的特征字符串。"
+        "en": "String used by a public webshell kit."
       },
       "hints": [
         "c99shell",
@@ -118,12 +106,10 @@
       "severity": "high",
       "pattern": "(?i)(\\$key\\s*=\\s*[\"']e45e329feb5d925b[\"']|openssl_decrypt\\s*\\([^;]{0,80}\\$_(POST|REQUEST)|\\$post\\s*=\\s*file_get_contents\\s*\\(\\s*[\"']php://input[\"']\\s*\\)\\s*;[^;]{0,200}(openssl_decrypt|\\^\\s*\\$key))",
       "title": {
-        "en": "Behinder (冰蝎) style encrypted shell",
-        "zh": "冰蝎（Behinder）类加密 Webshell"
+        "en": "Behinder-style encrypted shell"
       },
       "why": {
-        "en": "Behinder decrypts php://input with a static key and evaluates it.",
-        "zh": "冰蝎使用固定密钥解密 php://input 后执行。"
+        "en": "Behinder decrypts php://input with a static key and evaluates it."
       },
       "hints": [
         "e45e329feb5d925b",
@@ -135,12 +121,10 @@
       "severity": "high",
       "pattern": "(?is)(\\$payloadName\\s*=\\s*['\"]|function\\s+encode\\s*\\(\\s*\\$D\\s*,\\s*\\$K\\s*\\))",
       "title": {
-        "en": "Godzilla (哥斯拉) style shell",
-        "zh": "哥斯拉（Godzilla）类 Webshell"
+        "en": "Godzilla-style shell"
       },
       "why": {
-        "en": "Matches the XOR/base64 template Godzilla generates for PHP.",
-        "zh": "匹配哥斯拉为 PHP 生成的 XOR/base64 模板。"
+        "en": "Matches the XOR/base64 template Godzilla generates for PHP."
       },
       "hints": [
         "payloadname",
@@ -152,12 +136,10 @@
       "severity": "high",
       "pattern": "(?i)(/bin/(ba|z|da)?sh\\s+-i|fsockopen\\s*\\([^)]*\\)\\s*;[^;]{0,120}(proc_open|shell_exec|exec|system|passthru)\\s*\\()",
       "title": {
-        "en": "Reverse shell code",
-        "zh": "反弹 Shell 代码"
+        "en": "Reverse shell code"
       },
       "why": {
-        "en": "Connects back to an attacker and attaches a shell.",
-        "zh": "主动回连攻击者并挂上一个 Shell。"
+        "en": "Connects back to an attacker and attaches a shell."
       },
       "hints": [
         "/bin/",
@@ -169,12 +151,10 @@
       "severity": "high",
       "pattern": "(?i)(putenv\\s*\\(\\s*['\"]LD_PRELOAD|imap_open\\s*\\([^)]{0,200}-oProxyCommand|\\bChankro\\b)",
       "title": {
-        "en": "disable_functions bypass technique",
-        "zh": "绕过 disable_functions 的技术"
+        "en": "disable_functions bypass technique"
       },
       "why": {
-        "en": "LD_PRELOAD / imap_open tricks are used to run commands when exec functions are disabled.",
-        "zh": "LD_PRELOAD、imap_open 等技巧用于在执行函数被禁用时仍能执行命令。"
+        "en": "LD_PRELOAD / imap_open tricks are used to run commands when exec functions are disabled."
       },
       "hints": [
         "ld_preload",
@@ -187,12 +167,10 @@
       "severity": "medium",
       "pattern": "(?i)(['\"]as['\"]\\s*\\.\\s*['\"]sert['\"]|['\"]ass['\"]\\s*\\.\\s*['\"]ert['\"]|['\"]e['\"]\\s*\\.\\s*['\"]val['\"]|['\"]ev['\"]\\s*\\.\\s*['\"]al['\"]|['\"]sys['\"]\\s*\\.\\s*['\"]tem['\"]|['\"]base64_['\"]\\s*\\.\\s*['\"]decode['\"]|['\"]shell_['\"]\\s*\\.\\s*['\"]exec['\"])",
       "title": {
-        "en": "Dangerous function name split into pieces",
-        "zh": "危险函数名被拆分拼接"
+        "en": "Dangerous function name split into pieces"
       },
       "why": {
-        "en": "Splitting 'assert' or 'eval' only makes sense to evade signatures.",
-        "zh": "把 assert、eval 拆开拼接，只可能是为了躲避特征检测。"
+        "en": "Splitting 'assert' or 'eval' only makes sense to evade signatures."
       },
       "hints": [
         "."
@@ -203,12 +181,10 @@
       "severity": "medium",
       "pattern": "\\$GLOBALS\\s*\\[[^\\]]{1,60}\\]\\s*\\[[^\\]]{1,20}\\]\\s*\\(|\\$\\{\\s*['\"]_(POST|GET|REQUEST|COOKIE)['\"]\\s*\\}\\s*\\[",
       "title": {
-        "en": "Indirect call through $GLOBALS / variable superglobal",
-        "zh": "通过 $GLOBALS 或变量化超全局变量间接调用"
+        "en": "Indirect call through $GLOBALS / variable superglobal"
       },
       "why": {
-        "en": "Common obfuscation layer in packed shells.",
-        "zh": "打包后的 Webshell 常见的混淆层。"
+        "en": "Common obfuscation layer in packed shells."
       },
       "hints": [
         "$globals",
@@ -221,12 +197,10 @@
       "pattern": "[A-Za-z0-9+/]{1000}[A-Za-z0-9+/]*={0,2}",
       "min_length": 3000,
       "title": {
-        "en": "Very long base64 blob",
-        "zh": "超长 base64 数据块"
+        "en": "Very long base64 blob"
       },
       "why": {
-        "en": "Packed payloads are stored as long encoded strings. Legitimate files sometimes embed images this way.",
-        "zh": "打包的载荷常以超长编码字符串保存；正常文件偶尔也会这样嵌入图片。"
+        "en": "Packed payloads are stored as long encoded strings. Legitimate files sometimes embed images this way."
       }
     },
     {
@@ -234,12 +208,10 @@
       "severity": "low",
       "pattern": "(\\\\x[0-9a-fA-F]{2}){60,}",
       "title": {
-        "en": "Long hex-escaped string",
-        "zh": "超长十六进制转义字符串"
+        "en": "Long hex-escaped string"
       },
       "why": {
-        "en": "Hex escapes hide function names and code from casual review.",
-        "zh": "十六进制转义用于把函数名和代码藏起来。"
+        "en": "Hex escapes hide function names and code from casual review."
       },
       "hints": [
         "\\x"
@@ -250,12 +222,10 @@
       "severity": "low",
       "pattern": "(?i)(chr\\s*\\(\\s*\\d+\\s*\\)\\s*\\.\\s*){8,}",
       "title": {
-        "en": "String assembled from chr() calls",
-        "zh": "用一串 chr() 拼出的字符串"
+        "en": "String assembled from chr() calls"
       },
       "why": {
-        "en": "Builds code or function names character by character to avoid signatures.",
-        "zh": "逐字符拼出代码或函数名以躲避特征检测。"
+        "en": "Builds code or function names character by character to avoid signatures."
       },
       "hints": [
         "chr"
@@ -266,12 +236,10 @@
       "severity": "medium",
       "pattern": "(?i)(file_put_contents|fwrite|fputs)\\s*\\([^;]{0,200}\\$_(GET|POST|REQUEST|COOKIE)\\s*\\[",
       "title": {
-        "en": "Writes request data to a file",
-        "zh": "把请求数据写入文件"
+        "en": "Writes request data to a file"
       },
       "why": {
-        "en": "File droppers write the next stage to disk. Upload handlers do this too, so treat as context.",
-        "zh": "投放器会把下一阶段载荷写到磁盘；正常上传逻辑也会这样做，仅作参考。"
+        "en": "File droppers write the next stage to disk. Upload handlers do this too, so treat as context."
       },
       "hints": [
         "$_"
@@ -282,12 +250,10 @@
       "severity": "medium",
       "pattern": "(?i)unlink\\s*\\(\\s*(__FILE__|\\$_SERVER\\s*\\[\\s*['\"]SCRIPT_FILENAME)",
       "title": {
-        "en": "Script deletes itself",
-        "zh": "脚本自删除"
+        "en": "Script deletes itself"
       },
       "why": {
-        "en": "Droppers remove themselves after installing a backdoor.",
-        "zh": "投放器在植入后门后会删除自身。"
+        "en": "Droppers remove themselves after installing a backdoor."
       },
       "hints": [
         "unlink"
@@ -298,12 +264,10 @@
       "severity": "low",
       "pattern": "(?i)@?error_reporting\\s*\\(\\s*0\\s*\\)\\s*;\\s*@?(set_time_limit|ini_set|ignore_user_abort)\\s*\\(",
       "title": {
-        "en": "Silences errors and removes time limits",
-        "zh": "关闭报错并解除执行时间限制"
+        "en": "Silences errors and removes time limits"
       },
       "why": {
-        "en": "Typical webshell preamble; also seen in legitimate long-running scripts.",
-        "zh": "典型的 Webshell 开头；正常的长时间任务脚本也可能这样写。"
+        "en": "Typical webshell preamble; also seen in legitimate long-running scripts."
       },
       "hints": [
         "error_reporting"

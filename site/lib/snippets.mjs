@@ -18,7 +18,7 @@ export function extractFunc(file, signature) {
 }
 
 // renderAnnotated returns highlighted code split into steps. Each step names
-// an anchor (a substring of the first line of the step) and bilingual notes.
+// an anchor (a substring of the first line of the step) and notes.
 export function renderAnnotated({ file, signature, steps, omitDocComment = false, repoPath }) {
   let { code, startLine } = extractFunc(file, signature);
   let lines = code.split("\n");

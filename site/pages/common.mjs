@@ -20,7 +20,7 @@ export function terminal(ctx, { title, file, cmd }) {
   const raw = demo(file);
   const body = raw
     ? `<span class="fg-240">$</span> ${esc(cmd)}\n${ansiToHtml(raw)}`
-    : `<span class="fg-245">${ctx.t("Recording pending — run scripts/demo/record.sh to generate it.", "录制待补充：运行 scripts/demo/record.sh 生成。")}</span>`;
+    : `<span class="fg-245">Recording pending — run scripts/demo/record.sh to generate it.</span>`;
   return `<div class="bx-term" role="img" aria-label="${esc(title)}"><div class="bx-term-bar"><span class="bx-term-dots"><i></i><i></i><i></i></span><span class="bx-term-title">${esc(title)}</span></div><pre>${body}</pre></div>`;
 }
 

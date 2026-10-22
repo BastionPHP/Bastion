@@ -44,8 +44,8 @@ await (await p.$(".check-grid")).screenshot({ path: `${out}/check.png` });
 await p.close();
 
 p = await page(390, 844);
-await p.goto(base + "zh/", { waitUntil: "networkidle" });
-await p.screenshot({ path: `${out}/mobile-zh.png` });
+await p.goto(base, { waitUntil: "networkidle" });
+await p.screenshot({ path: `${out}/mobile.png` });
 await p.close();
 
 // Social card (1200x630, 1x).

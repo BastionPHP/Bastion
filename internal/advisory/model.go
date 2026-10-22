@@ -5,7 +5,7 @@
 // vulnerability means adding a file, not writing code.
 package advisory
 
-// Text is a small bilingual string.
+// Text is a localisable string keyed by language code; Bastion ships English ("en").
 type Text map[string]string
 
 // Get returns the text in lang, falling back to English.
@@ -58,7 +58,6 @@ type Vulnerability struct {
 type Risk struct {
 	Level string `json:"level"`
 	En    string `json:"en"`
-	Zh    string `json:"zh"`
 }
 
 // Branch describes one upstream release line.

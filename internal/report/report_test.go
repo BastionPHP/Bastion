@@ -18,9 +18,9 @@ func TestRenderIsSelfContained(t *testing.T) {
 	inst.Assessments = []advisory.Assessment{a.Evaluate(advisory.Subject{Version: "8.3.6", Package: inst.Package, OS: advisory.OS{ID: "ubuntu", VersionID: "24.04"}})}
 	sr := &scan.Result{Schema: scan.Schema, Host: scan.Host{Hostname: "web-01<script>"}, Advisories: db.Advisories, Instances: []*scan.Instance{inst}, Targets: []*scan.Target{{Kind: "host", Name: "web-01"}}}
 	tm := time.Date(2026, 10, 21, 10, 0, 0, 0, time.UTC)
-	tr := &trace.Result{Schema: trace.Schema, Verdict: trace.VerdictCompromised, Findings: []trace.Finding{{Rule: "php.eval-decoded", Severity: trace.High, Title: trace.Text{"en": "x", "zh": "y"}, Path: "/var/www/a.php", Snippet: "</script><img src=x onerror=alert(1)>", Time: &tm}},
+	tr := &trace.Result{Schema: trace.Schema, Verdict: trace.VerdictCompromised, Findings: []trace.Finding{{Rule: "php.eval-decoded", Severity: trace.High, Title: trace.Text{"en": "x"}, Path: "/var/www/a.php", Snippet: "</script><img src=x onerror=alert(1)>", Time: &tm}},
 		Timeline: []trace.Event{{Time: tm, Kind: "file", Severity: trace.High, Summary: "flagged", Path: "/var/www/a.php"}}}
-	html, err := Render(Input{Scan: sr, Trace: tr, Lang: "auto", Version: "test", Now: tm})
+	html, err := Render(Input{Scan: sr, Trace: tr, Version: "test", Now: tm})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -30,7 +30,7 @@ func TestRenderIsSelfContained(t *testing.T) {
 			t.Errorf("report contains %q", bad)
 		}
 	}
-	for _, want := range []string{"web-01&lt;script&gt;", "PHP2Shell", "8.3.6-0ubuntu0.24.04.13", "sudo apt update", "php.eval-decoded", "存在漏洞", "--red"} {
+	for _, want := range []string{"web-01&lt;script&gt;", "PHP2Shell", "8.3.6-0ubuntu0.24.04.13", "sudo apt update", "php.eval-decoded", "Vulnerable", "--red"} {
 		if !strings.Contains(s, want) {
 			t.Errorf("report misses %q", want)
 		}

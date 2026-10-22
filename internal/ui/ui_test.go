@@ -10,11 +10,11 @@ func TestWidth(t *testing.T) {
 	if Width(s.Red("abc")) != 3 {
 		t.Fatal("ansi codes must not count")
 	}
-	if Width("宝塔面板") != 8 {
-		t.Fatal("CJK is double width")
+	if Width("🔒🔒🔒🔒") != 8 {
+		t.Fatal("wide runes are double width")
 	}
-	if Pad("宝塔", 6) != "宝塔  " {
-		t.Fatalf("%q", Pad("宝塔", 6))
+	if Pad("🔒🔒", 6) != "🔒🔒  " {
+		t.Fatalf("%q", Pad("🔒🔒", 6))
 	}
 }
 
@@ -27,7 +27,7 @@ func TestTruncateKeepsEnds(t *testing.T) {
 
 func TestTableAligns(t *testing.T) {
 	tb := &Table{Cols: []Column{{Title: "a"}, {Title: "path", Flex: true}, {Title: "z"}}}
-	tb.Add("宝塔", "/www/server/php/74/bin/php", "x")
+	tb.Add("🔒🔒", "/www/server/php/74/bin/php", "x")
 	tb.Add("host", "/usr/bin/php", "y")
 	out := tb.Render(Style{}, 200)
 	lines := strings.Split(strings.TrimRight(out, "\n"), "\n")

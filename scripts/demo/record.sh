@@ -20,7 +20,7 @@ scripts/demo/lab.sh "$LAB" >/dev/null
 "$BIN" trace --sysroot "$LAB" --since 87600h --color always -q > "$OUT/trace.ansi" || true
 "$BIN" trace --sysroot "$LAB" --since 87600h --json -q > "$OUT/trace.json" || true
 printf 'PHP 8.3.6 (cli) (built: Oct  7 2026 18:06:38) (NTS)\nphp8.3-cli\t8.3.6-0ubuntu0.24.04.12\n' | "$BIN" check --color always > "$OUT/check.ansi" || true
-"$BIN" report --scan "$OUT/scan.json" --trace "$OUT/trace.json" --lang auto -o "$OUT/report.html" -q >/dev/null || [ $? -le 2 ]
+"$BIN" report --scan "$OUT/scan.json" --trace "$OUT/trace.json" -o "$OUT/report.html" -q >/dev/null || [ $? -le 2 ]
 rm -f "$OUT/scan.json" "$OUT/trace.json"
 {
   echo "recorded: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
