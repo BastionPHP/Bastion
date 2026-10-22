@@ -1,0 +1,62 @@
+
+  [38;5;117m▲[0m [1m[38;5;255mBASTION[0m[0m  [38;5;240mdev · PHP exposure scan[0m
+  [38;5;240mhost[0m vm[38;5;240m  ·  [0m[38;5;240mos[0m Ubuntu 24.04.5 LTS[38;5;240m  ·  [0m[38;5;240mkernel[0m 6.18.44-fc-v140[38;5;240m  ·  [0m[38;5;240mat[0m 2026-10-22 07:12 UTC
+
+  [1;38;5;232;48;5;117m CRITICAL [0m  [1mPHP2Shell[0m  [38;5;245mCVE-2026-109618 · CVE-2026-109619[0m  [38;5;240mCVSS 4.0 9.2 · published 2026-10-21[0m
+
+  [1m[38;5;255mPHP INSTANCES[0m[0m [38;5;240m──────────────────────────────────────────────────────────────────────────────────────[0m
+
+  [38;5;240mSTATUS      [0m  [38;5;240mTARGET               [0m  [38;5;240mPATH                  [0m  [38;5;240mSAPI   [0m  [38;5;240mVERSION[0m  [38;5;240mSOURCE               [0m
+  [38;5;203m● VULNERABLE[0m  container:bx-fpm-old   /usr/local/bin/php      cli      [38;5;255m8.3.35[0m   Docker official image
+  [38;5;203m● VULNERABLE[0m  container:bx-fpm-old   /usr/loca…sbin/php-fpm  fpm      [38;5;255m8.3.35[0m   Docker official image
+  [38;5;203m● VULNERABLE[0m  vm                     /usr/bin/php8.3         cli      [38;5;255m8.3.6[0m    System package (apt)
+  [38;5;78m● FIXED[0m       container:bx-cli-new   /usr/local/bin/php      cli      [38;5;255m8.3.36[0m   Docker official image
+  [38;5;78m● FIXED[0m       container:bx-cli-new   /usr/local/bin/php-cgi  cgi      [38;5;255m8.3.36[0m   Docker official image
+  [38;5;78m● FIXED[0m       container:bx-cli-new   /usr/loca…3 (replaced)  cli      [38;5;255m8.3.36[0m   Docker official image
+  [38;5;78m● FIXED[0m       containe…buntu-apache  /usr/bin/php8.3         cli      [38;5;255m8.3.6[0m    System package (apt)
+  [38;5;78m● FIXED[0m       containe…buntu-apache  /usr/lib/…libphp8.3.so  mod_php  [38;5;255m8.3.6[0m    System package (apt)
+
+  [1m[38;5;255mDETAILS[0m[0m [38;5;240m────────────────────────────────────────────────────────────────────────────────────────────[0m
+
+  [1;38;5;232;48;5;203m VULNERABLE [0m  [1m/usr/local/bin/php[0m [38;5;240m@ container:bx-fpm-old[0m
+     [38;5;245msapi cli · version 8.3.35 (binary)[0m
+     [38;5;240m┌[0m [38;5;255mPHP2Shell[0m [38;5;245m— PHP 8.3.35 is below 8.3.36 · confidence high[0m
+     [38;5;240m│[0m [38;5;203m✗[0m [38;5;240mversion    [0m PHP 8.3.35 is below the fixed release 8.3.36
+     [38;5;240m│[0m [38;5;117m→[0m [38;5;240mfix        [0m [38;5;117mRebuild on a patched base image: docker pull php:8.3-fpm (needs 8.3.36 or[0m
+     [38;5;240m│[0m               [38;5;117mlater), then rebuild and redeploy. Running containers keep the old binary until[0m
+     [38;5;240m│[0m               [38;5;117mthey are replaced.[0m
+     [38;5;240m└[0m
+
+  [1;38;5;232;48;5;203m VULNERABLE [0m  [1m/usr/local/sbin/php-fpm[0m [38;5;240m@ container:bx-fpm-old[0m
+     [38;5;245msapi fpm · version 8.3.35 (binary) · running pid 11661,11698,11699[0m
+     [38;5;240m┌[0m [38;5;255mPHP2Shell[0m [38;5;245m— PHP 8.3.35 is below 8.3.36 · confidence high[0m
+     [38;5;240m│[0m [38;5;203m✗[0m [38;5;240mversion    [0m PHP 8.3.35 is below the fixed release 8.3.36
+     [38;5;240m│[0m [38;5;117m→[0m [38;5;240mfix        [0m [38;5;117mRebuild on a patched base image: docker pull php:8.3-fpm (needs 8.3.36 or[0m
+     [38;5;240m│[0m               [38;5;117mlater), then rebuild and redeploy. Running containers keep the old binary until[0m
+     [38;5;240m│[0m               [38;5;117mthey are replaced.[0m
+     [38;5;240m└[0m
+
+  [1;38;5;232;48;5;203m VULNERABLE [0m  [1m/usr/bin/php8.3[0m [38;5;240m@ vm[0m
+     [38;5;245msapi cli · version 8.3.6 (binary) · package php8.3-cli 8.3.6-0ubuntu0.24.04.12[0m
+     [38;5;240malso reachable as /bin/php, /bin/php8.3, /usr/bin/php[0m
+     [38;5;240m┌[0m [38;5;255mPHP2Shell[0m [38;5;245m— package 8.3.6-0ubuntu0.24.04.12 is older than the vendor fix 8.3.6-0ubuntu0.24.04.13 · confidence high[0m
+     [38;5;240m│[0m [38;5;245m·[0m [38;5;240mversion    [0m PHP 8.3.6 is below the fixed release 8.3.36, but distribution packages often
+     [38;5;240m│[0m               carry backports
+     [38;5;240m│[0m [38;5;203m✗[0m [38;5;240mvendor     [0m php8.3-cli 8.3.6-0ubuntu0.24.04.12 < 8.3.6-0ubuntu0.24.04.13 (USN-8948-1, ubuntu
+     [38;5;240m│[0m               24.04)
+     [38;5;240m│[0m [38;5;117m→[0m [38;5;240mfix        [0m [38;5;117msudo apt update && sudo apt install --only-upgrade 'php8.3*'[0m
+     [38;5;240m│[0m [38;5;117m→[0m [38;5;240m           [0m [38;5;117mConfirm: dpkg-query -W php8.3-cli → expect 8.3.6-0ubuntu0.24.04.13 or later.[0m
+     [38;5;240m└[0m
+
+  [1;38;5;232;48;5;78m FIXED [0m  [1m/usr/local/bin/php83[0m [38;5;240m@ container:bx-cli-new[0m
+     [38;5;245msapi cli · version 8.3.36 (binary) · running pid 21230[0m
+     [38;5;214m![0m binary was replaced on disk; this process still runs the old build — restart it
+     [38;5;240m┌[0m [38;5;255mPHP2Shell[0m [38;5;245m— running 8.3.36, fixed in 8.3.36 · confidence high[0m
+     [38;5;240m│[0m [38;5;78m✓[0m [38;5;240mversion    [0m PHP 8.3.36 is at or above the fixed release 8.3.36
+     [38;5;240m│[0m [38;5;117m→[0m [38;5;240mfix        [0m [38;5;117mRestart the service that runs this process (e.g. systemctl restart php8.3-fpm /[0m
+     [38;5;240m│[0m               [38;5;117mapache2 / httpd / lsws); the code on disk is newer than the code in memory.[0m
+     [38;5;240m└[0m
+
+  [1mSUMMARY[0m  [38;5;203m3 vulnerable[0m  [38;5;214m0 likely vulnerable[0m  [38;5;245m0 unknown[0m  [38;5;78m5 fixed[0m
+  [38;5;240m8 instances across 4 targets in 720ms · next: bastion trace · bastion report[0m
+

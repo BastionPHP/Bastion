@@ -144,7 +144,7 @@ body {
 ::selection { background: var(--accent-line); }
 a { color: var(--accent); text-decoration: none; }
 a:hover { text-decoration: underline; text-underline-offset: 3px; }
-code, kbd, pre, .mono { font-family: var(--font-mono); font-size: 0.9em; font-variant-ligatures: none; }
+code, kbd, pre, .mono { font-family: var(--font-mono); font-size: 0.9em; font-variant-ligatures: none; font-feature-settings: "liga" 0, "calt" 0; }
 :not(pre) > code { background: var(--bg-3); border: 1px solid var(--line); padding: 0.08em 0.38em; border-radius: 5px; font-size: 0.86em; color: var(--text); word-break: break-word; }
 h1, h2, h3, h4 { line-height: 1.2; letter-spacing: -0.02em; margin: 0; font-weight: 600; }
 img, svg { max-width: 100%; }

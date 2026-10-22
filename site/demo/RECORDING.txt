@@ -1,0 +1,4 @@
+recorded: 2026-10-22T07:12:07Z
+bastion: bastion dev
+host: Ubuntu 24.04.5 LTS / 6.18.44-fc-v140
+containers: php:8.3-cli php:8.3.35-fpm ubuntu:24.04 

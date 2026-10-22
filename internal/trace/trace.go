@@ -137,6 +137,8 @@ type tracer struct {
 	rules []*Rule
 	// flagged maps in-tree file paths to findings, for log correlation.
 	flagged map[string]int
+	// docRoots are all document roots, including nested ones.
+	docRoots []string
 	webUIDs map[int]string
 }
 

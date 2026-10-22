@@ -50,12 +50,6 @@ func (t *tracer) discoverWebroots() []Webroot {
 		if err != nil || !fi.IsDir() {
 			return
 		}
-		// Skip roots nested in one we already have.
-		for _, r := range roots {
-			if strings.HasPrefix(p, r.Path+"/") {
-				return
-			}
-		}
 		seen[p] = true
 		roots = append(roots, Webroot{Path: p, Source: src})
 	}
@@ -113,7 +107,12 @@ func (t *tracer) discoverWebroots() []Webroot {
 		}
 	}
 	sort.SliceStable(roots, func(i, j int) bool { return roots[i].Path < roots[j].Path })
-	// Drop roots nested inside another one discovered later.
+	// Every document root is kept for mapping URLs to files; only the
+	// outermost ones are walked.
+	t.docRoots = nil
+	for _, r := range roots {
+		t.docRoots = append(t.docRoots, r.Path)
+	}
 	var out []Webroot
 	for _, r := range roots {
 		nested := false
