@@ -43,8 +43,10 @@ type Advisory struct {
 	ChangelogMarkers []string       `json:"changelog_markers"`
 	Fingerprints     []Fingerprint  `json:"fingerprints"`
 	Mitigations      []Text         `json:"mitigations"`
-	References       []Reference    `json:"references"`
-	Notes            Text           `json:"notes"`
+	// ConfigChecks are interim mitigations Bastion can read from php.ini.
+	ConfigChecks []ConfigCheck `json:"config_checks,omitempty"`
+	References   []Reference   `json:"references"`
+	Notes        Text          `json:"notes"`
 }
 
 type CVSS struct {
@@ -110,6 +112,17 @@ type BuildDateFix struct {
 	FixedOn     string   `json:"fixed_on"`
 	Source      string   `json:"source"`
 	URL         string   `json:"url"`
+}
+
+// ConfigCheck describes one php.ini directive that reduces exposure.
+// Safe is "off" (boolean false), an exact value such as "-1", or a size
+// bound such as "<=32M". Branches limits the check to some PHP branches.
+type ConfigCheck struct {
+	Setting  string   `json:"setting"`
+	Default  string   `json:"default"`
+	Safe     string   `json:"safe"`
+	Branches []string `json:"branches,omitempty"`
+	Text     Text     `json:"text"`
 }
 
 // Fingerprint is a byte string whose presence in a binary is evidence.

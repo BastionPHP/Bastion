@@ -351,6 +351,44 @@
       "en": "Do not use RLIMIT_AS / RLIMIT_DATA as a memory boundary; they can cause the vulnerable allocation failure. Use cgroup/container limits instead."
     }
   ],
+  "config_checks": [
+    {
+      "setting": "session.upload_progress.enabled",
+      "default": "1",
+      "safe": "off",
+      "text": {
+        "en": "Blocks the confirmed session upload progress path of CVE-2026-109619. Must be set in php.ini or the FPM pool, not .user.ini or ini_set()."
+      }
+    },
+    {
+      "setting": "memory_limit",
+      "default": "128M",
+      "safe": "-1",
+      "text": {
+        "en": "Removes the controllable memory_limit failure behind CVE-2026-109618 (set administratively, e.g. php_admin_value). Real allocation failures can still reach the bug."
+      }
+    },
+    {
+      "setting": "post_max_size",
+      "default": "8M",
+      "safe": "<=32M",
+      "text": {
+        "en": "Smaller request bodies make it harder to push request parsing into out-of-memory. 8M without uploads, 32M with uploads."
+      }
+    },
+    {
+      "setting": "fatal_error_backtraces",
+      "default": "1",
+      "safe": "off",
+      "branches": [
+        "8.5",
+        "8.6"
+      ],
+      "text": {
+        "en": "Blocks the confirmed fatal-error backtrace path on PHP 8.5."
+      }
+    }
+  ],
   "references": [
     {
       "title": "php.net security advisory (21 Oct 2026)",

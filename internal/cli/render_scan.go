@@ -189,6 +189,22 @@ func renderInstance(w io.Writer, s ui.Style, width int, r *scan.Result, i *scan.
 		}
 		fmt.Fprintf(w, "     %s\n", s.Faint("└"))
 	}
+	if len(i.Mitigations) > 0 {
+		fmt.Fprintf(w, "     %s %s %s\n", s.Faint("┌"), s.White("interim mitigations"), s.Gray("— reduce exposure until the update; not a fix"))
+		for _, m := range i.Mitigations {
+			mark := s.Red("✗")
+			if m.OK {
+				mark = s.Green("✓")
+			}
+			src := m.Source
+			if src == "default" {
+				src = "PHP default"
+			}
+			line := fmt.Sprintf("%s = %s", m.Setting, orQ(m.Value))
+			fmt.Fprintf(w, "     %s %s %s %s %s\n", s.Faint("│"), mark, s.Faint(ui.Pad(m.Scope, 11)), ui.Pad(line, 44), s.Faint("want "+m.Want+" · "+src))
+		}
+		fmt.Fprintf(w, "     %s\n", s.Faint("└"))
+	}
 	fmt.Fprintln(w)
 }
 

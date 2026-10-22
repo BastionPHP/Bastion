@@ -80,6 +80,9 @@ type Instance struct {
 	Notes         []string              `json:"notes,omitempty"`
 	OS            sysroot.OSRelease     `json:"os"`
 	Assessments   []advisory.Assessment `json:"assessments"`
+	// Mitigations shows interim mitigation settings for builds that are not
+	// fixed.
+	Mitigations []Mitigation `json:"mitigations,omitempty"`
 }
 
 // Worst returns the worst status across advisories.
@@ -393,6 +396,12 @@ func scanTarget(ctx context.Context, opt Options, t *Target, res *Result) []*Ins
 				as.Reason = "process still runs a replaced build that cannot be verified; restart it"
 			}
 			inst.Assessments = append(inst.Assessments, as)
+		}
+		for i, as := range inst.Assessments {
+			if as.Status != advisory.Fixed {
+				inst.Mitigations = t.mitigations(inst, res.Advisories[i])
+				break
+			}
 		}
 		inst.ID = instanceID(t, inst.Path, inst.Stale)
 		out = append(out, inst)
