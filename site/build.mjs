@@ -25,24 +25,21 @@ rmSync(dist, { recursive: true, force: true });
 mkdirSync(dist, { recursive: true });
 
 let count = 0;
-for (const lang of ["en", "zh"]) {
-  for (const page of pages) {
-    const ctx = makeCtx(lang, page);
-    const html = renderers[page.id].render(ctx, { advisory, advisories });
-    const dir = join(dist, lang === "zh" ? "zh" : "", page.dir);
-    mkdirSync(dir, { recursive: true });
-    writeFileSync(join(dir, "index.html"), html);
-    count++;
-  }
+for (const page of pages) {
+  const ctx = makeCtx(page);
+  const html = renderers[page.id].render(ctx, { advisory, advisories });
+  const dir = join(dist, page.dir);
+  mkdirSync(dir, { recursive: true });
+  writeFileSync(join(dir, "index.html"), html);
+  count++;
 }
 
 // 404 page (GitHub Pages serves /404.html for every missing path).
 {
-  const ctx = makeCtx("en", { id: "404", dir: "", nav: {} });
+  const ctx = makeCtx({ id: "404", dir: "", nav: "" });
   ctx.href = (id, hash = "") => "/bastion/" + (pages.find((p) => p.id === id)?.dir || "") + hash;
   ctx.asset = (p) => "/bastion/assets/" + p;
-  ctx.altHref = () => "/bastion/zh/";
-  writeFileSync(join(dist, "404.html"), layout(ctx, { title: "Not found", description: "Page not found", body: `<header class="phead"><div class="bx-wrap phead-in"><div class="bx-eyebrow">404</div><h1>Not found · 页面不存在</h1><p><a href="/bastion/">← Bastion</a></p></div></header>` }));
+  writeFileSync(join(dist, "404.html"), layout(ctx, { title: "Not found", description: "Page not found", body: `<header class="phead"><div class="bx-wrap phead-in"><div class="bx-eyebrow">404</div><h1>Not found</h1><p><a href="/bastion/">← Bastion</a></p></div></header>` }));
 }
 
 // Assets: shared design system, site assets, advisory data, demo output.

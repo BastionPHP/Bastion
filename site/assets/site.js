@@ -4,7 +4,7 @@
   function store(k, v) { try { if (v === undefined) return localStorage.getItem(k); localStorage.setItem(k, v); } catch (e) { return null; } }
 
   document.addEventListener("click", function (e) {
-    var el = e.target.closest("[data-theme-toggle],[data-lang-switch],[data-copy],[data-tab]");
+    var el = e.target.closest("[data-theme-toggle],[data-copy],[data-tab]");
     if (!el) return;
     if (el.hasAttribute("data-theme-toggle")) {
       var cur = root.getAttribute("data-theme") || (matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark");
@@ -12,7 +12,6 @@
       root.setAttribute("data-theme", next);
       store("bastion-theme", next);
     }
-    if (el.hasAttribute("data-lang-switch")) store("bastion-lang", el.getAttribute("data-lang-switch"));
     if (el.hasAttribute("data-copy")) {
       var src = document.getElementById(el.getAttribute("data-copy"));
       var text = src ? src.innerText.replace(/^\$ /gm, "") : "";

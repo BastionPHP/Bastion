@@ -258,12 +258,12 @@ func (t *tracer) scanFile(j fileJob, since time.Time) []Finding {
 			f := base
 			f.Rule, f.Category, f.Line, f.Snippet = "config.auto-prepend", "config", lineOf(content, m[0]), snippet(content, m[0], m[1])
 			f.Severity = High
-			f.Title = Text{"en": "PHP auto_prepend/append_file set in " + name, "zh": name + " 中设置了 auto_prepend/append_file"}
-			f.Why = Text{"en": "Every request on this directory first runs " + target + ". A favourite way to keep a backdoor loaded.", "zh": "该目录下的每个请求都会先执行 " + target + "，这是常见的后门驻留方式。"}
+			f.Title = Text{"en": "PHP auto_prepend/append_file set in " + name}
+			f.Why = Text{"en": "Every request on this directory first runs " + target + ". A favourite way to keep a backdoor loaded."}
 			for _, a := range allowedPrepend {
 				if strings.Contains(target, a) {
 					f.Severity = Info
-					f.Why = Text{"en": "Points at a known security plugin (" + target + ").", "zh": "指向已知的安全插件（" + target + "）。"}
+					f.Why = Text{"en": "Points at a known security plugin (" + target + ")."}
 				}
 			}
 			out = append(out, f)
@@ -276,8 +276,8 @@ func (t *tracer) scanFile(j fileJob, since time.Time) []Finding {
 				}
 				f := base
 				f.Rule, f.Category, f.Line, f.Snippet, f.Severity = "config.htaccess-php-handler", "config", lineOf(content, m[0]), snippet(content, m[0], m[1]), High
-				f.Title = Text{"en": ".htaccess makes non-PHP files execute as PHP", "zh": ".htaccess 让非 PHP 文件按 PHP 执行"}
-				f.Why = Text{"en": "Lets an uploaded image or text file run as code.", "zh": "这样上传的图片或文本文件就能被当作代码执行。"}
+				f.Title = Text{"en": ".htaccess makes non-PHP files execute as PHP"}
+				f.Why = Text{"en": "Lets an uploaded image or text file run as code."}
 				out = append(out, f)
 			}
 		}
@@ -296,8 +296,8 @@ func (t *tracer) scanFile(j fileJob, since time.Time) []Finding {
 		if len(matches) > 0 {
 			f.Severity = High
 		}
-		f.Title = Text{"en": "PHP code hidden in an image file", "zh": "图片文件中藏有 PHP 代码"}
-		f.Why = Text{"en": "Polyglot images are used with include() or a handler override to run code.", "zh": "这种“图片马”配合 include() 或处理器覆盖即可执行代码。"}
+		f.Title = Text{"en": "PHP code hidden in an image file"}
+		f.Why = Text{"en": "Polyglot images are used with include() or a handler override to run code."}
 		i := bytes.Index(content, []byte("<?"))
 		f.Line, f.Snippet = lineOf(content, i), snippet(content, i, i+60)
 		f.Rules = ruleIDs(matches)
@@ -344,27 +344,27 @@ func (t *tracer) scanFile(j fileJob, since time.Time) []Finding {
 		case strings.Contains(strings.ToLower(j.inner), "/wp-content/uploads/") && ext != ".inc":
 			f := base
 			f.Rule, f.Severity = "file.php-in-uploads", Medium
-			f.Title = Text{"en": "PHP file inside wp-content/uploads", "zh": "wp-content/uploads 目录中出现 PHP 文件"}
-			f.Why = Text{"en": "WordPress never stores PHP in uploads; this is how uploaded webshells usually land.", "zh": "WordPress 不会在 uploads 中存放 PHP，上传型 Webshell 通常落在这里。"}
+			f.Title = Text{"en": "PHP file inside wp-content/uploads"}
+			f.Why = Text{"en": "WordPress never stores PHP in uploads; this is how uploaded webshells usually land."}
 			out = append(out, f)
 		case shellName.MatchString(name):
 			f := base
 			f.Rule, f.Severity = "file.webshell-name", Low
-			f.Title = Text{"en": "File name used by common webshells", "zh": "文件名与常见 Webshell 相同"}
-			f.Why = Text{"en": "Names like " + name + " are the defaults of public shell kits.", "zh": name + " 这类名字是公开 Webshell 的默认文件名。"}
+			f.Title = Text{"en": "File name used by common webshells"}
+			f.Why = Text{"en": "Names like " + name + " are the defaults of public shell kits."}
 			out = append(out, f)
 		case strings.HasPrefix(name, ".") && len(name) > 5 && !devDotfile.MatchString(name):
 			f := base
 			f.Rule, f.Severity = "file.hidden-php", Low
-			f.Title = Text{"en": "Hidden PHP file", "zh": "隐藏的 PHP 文件"}
-			f.Why = Text{"en": "Dot-files are hidden from ls and many file managers.", "zh": "以点开头的文件在 ls 和多数文件管理器中默认不可见。"}
+			f.Title = Text{"en": "Hidden PHP file"}
+			f.Why = Text{"en": "Dot-files are hidden from ls and many file managers."}
 			out = append(out, f)
 		}
 	} else if isDoubleExt(name) && hasPHPTag {
 		f := base
 		f.Rule, f.Severity = "file.double-extension", Medium
-		f.Title = Text{"en": "PHP code in a double-extension file", "zh": "双扩展名文件中含有 PHP 代码"}
-		f.Why = Text{"en": "Names like x.php.jpg bypass upload filters and run as PHP on some servers.", "zh": "x.php.jpg 这类名字可以绕过上传过滤，在部分服务器上会被当作 PHP 执行。"}
+		f.Title = Text{"en": "PHP code in a double-extension file"}
+		f.Why = Text{"en": "Names like x.php.jpg bypass upload filters and run as PHP on some servers."}
 		out = append(out, f)
 	}
 	return out

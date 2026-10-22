@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" data-lang="en" data-initial-lang="{{.Lang}}">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -11,57 +11,56 @@
 <body>
 <header class="r-top no-print-bg">
   <div class="bx-wrap r-top-in">
-    <span class="bx-logo">{{.Logo}} Bastion <span class="bx-faint r-sub"><span lang="en">report</span><span lang="zh">安全报告</span></span></span>
+    <span class="bx-logo">{{.Logo}} Bastion <span class="bx-faint r-sub">report</span></span>
     <div class="r-top-actions no-print">
-      <div class="bx-seg" role="group" aria-label="Language"><button type="button" data-set-lang="en" aria-pressed="true">EN</button><button type="button" data-set-lang="zh" aria-pressed="false">中文</button></div>
       <div class="bx-seg" role="group" aria-label="Theme"><button type="button" data-set-theme="dark" aria-pressed="false" title="Dark">◐</button><button type="button" data-set-theme="light" aria-pressed="false" title="Light">○</button></div>
-      <button type="button" class="bx-btn is-sm" data-print><span lang="en">Print / PDF</span><span lang="zh">打印 / PDF</span></button>
+      <button type="button" class="bx-btn is-sm" data-print>Print / PDF</button>
     </div>
   </div>
 </header>
 
 <main class="bx-wrap r-main">
   <section class="r-hero">
-    <div class="bx-eyebrow"><span lang="en">Local security report</span><span lang="zh">本机安全报告</span></div>
+    <div class="bx-eyebrow">Local security report</div>
     <h1 class="r-host mono">{{if .Scan}}{{.Scan.Host.Hostname}}{{else if .Trace}}{{.Trace.Hostname}}{{end}}</h1>
     <dl class="bx-kv r-meta">
       {{with .Scan}}<dt>os</dt><dd>{{.Host.OS.Pretty}}{{if .Host.Kernel}} <span class="bx-faint">· kernel {{.Host.Kernel}}</span>{{end}}</dd>{{end}}
-      <dt><span lang="en">generated</span><span lang="zh">生成时间</span></dt><dd class="mono">{{.Generated}} · bastion {{.Version}}</dd>
-      {{with .Scan}}<dt><span lang="en">privileges</span><span lang="zh">权限</span></dt><dd>{{if .Host.Root}}root{{else}}<span lang="en">unprivileged — results may be incomplete</span><span lang="zh">非 root，结果可能不完整</span>{{end}}</dd>{{end}}
+      <dt>generated</dt><dd class="mono">{{.Generated}} · bastion {{.Version}}</dd>
+      {{with .Scan}}<dt>privileges</dt><dd>{{if .Host.Root}}root{{else}}unprivileged — results may be incomplete{{end}}</dd>{{end}}
     </dl>
   </section>
 
   <section class="r-verdicts">
     {{if .Scan}}
     <a class="bx-card r-verdict" data-tone="{{.Worst}}" href="#exposure">
-      <div class="bx-eyebrow"><span lang="en">01 · Vulnerability exposure</span><span lang="zh">01 · 漏洞暴露面</span></div>
-      <div class="r-verdict-main"><span class="bx-badge" data-status="{{.Worst}}"><span lang="en">{{.WorstEn}}</span><span lang="zh">{{.WorstZh}}</span></span></div>
+      <div class="bx-eyebrow">01 · Vulnerability exposure</div>
+      <div class="r-verdict-main"><span class="bx-badge" data-status="{{.Worst}}">{{.WorstEn}}</span></div>
       <div class="r-bars">
         {{$total := len .Instances}}
         <div class="r-bar" aria-hidden="true">
           <i style="--w:{{pct (index .Counts "vulnerable") $total}}%" data-status="vulnerable"></i><i style="--w:{{pct (index .Counts "likely-vulnerable") $total}}%" data-status="likely-vulnerable"></i><i style="--w:{{pct (index .Counts "unknown") $total}}%" data-status="unknown"></i><i style="--w:{{pct (index .Counts "fixed") $total}}%" data-status="fixed"></i>
         </div>
         <ul class="r-legend mono">
-          <li data-status="vulnerable"><b>{{index .Counts "vulnerable"}}</b> <span lang="en">vulnerable</span><span lang="zh">存在漏洞</span></li>
-          <li data-status="likely-vulnerable"><b>{{index .Counts "likely-vulnerable"}}</b> <span lang="en">likely</span><span lang="zh">很可能</span></li>
-          <li data-status="unknown"><b>{{index .Counts "unknown"}}</b> <span lang="en">unknown</span><span lang="zh">无法判断</span></li>
-          <li data-status="fixed"><b>{{index .Counts "fixed"}}</b> <span lang="en">fixed</span><span lang="zh">已修复</span></li>
+          <li data-status="vulnerable"><b>{{index .Counts "vulnerable"}}</b> vulnerable</li>
+          <li data-status="likely-vulnerable"><b>{{index .Counts "likely-vulnerable"}}</b> likely</li>
+          <li data-status="unknown"><b>{{index .Counts "unknown"}}</b> unknown</li>
+          <li data-status="fixed"><b>{{index .Counts "fixed"}}</b> fixed</li>
         </ul>
       </div>
-      <p class="bx-muted r-verdict-note">{{len .Instances}} <span lang="en">PHP builds across</span><span lang="zh">个 PHP 构建，分布在</span> {{len .Scan.Targets}} <span lang="en">targets (host, containers, namespaces).</span><span lang="zh">个目标中（主机、容器、命名空间）。</span></p>
+      <p class="bx-muted r-verdict-note">{{len .Instances}} PHP builds across {{len .Scan.Targets}} targets (host, containers, namespaces).</p>
     </a>
     {{end}}
     {{if .Trace}}
     <a class="bx-card r-verdict" data-tone="{{.Trace.Verdict}}" href="#trace">
-      <div class="bx-eyebrow"><span lang="en">02 · Intrusion trace</span><span lang="zh">02 · 入侵溯源</span></div>
-      <div class="r-verdict-main"><span class="bx-badge" data-verdict="{{.Trace.Verdict}}"><span lang="en">{{.VerdictEn}}</span><span lang="zh">{{.VerdictZh}}</span></span></div>
+      <div class="bx-eyebrow">02 · Intrusion trace</div>
+      <div class="r-verdict-main"><span class="bx-badge" data-verdict="{{.Trace.Verdict}}">{{.VerdictEn}}</span></div>
       <ul class="r-legend mono r-legend-sev">
         <li data-sev="high"><b>{{index .TraceCounts "high"}}</b> high</li>
         <li data-sev="medium"><b>{{index .TraceCounts "medium"}}</b> medium</li>
         <li data-sev="low"><b>{{index .TraceCounts "low"}}</b> low</li>
         <li data-sev="info"><b>{{index .TraceCounts "info"}}</b> info</li>
       </ul>
-      <p class="bx-muted r-verdict-note"><span lang="en">{{.VerdictTextEn}}</span><span lang="zh">{{.VerdictTextZh}}</span></p>
+      <p class="bx-muted r-verdict-note">{{.VerdictTextEn}}</p>
     </a>
     {{end}}
   </section>
@@ -69,11 +68,11 @@
   {{with .Scan}}
   <section class="r-section" id="exposure">
     <div class="r-section-head">
-      <h2><span lang="en">Vulnerability exposure</span><span lang="zh">漏洞暴露面</span></h2>
+      <h2>Vulnerability exposure</h2>
       <div class="r-filters no-print" role="group" aria-label="Filter">
-        <button type="button" class="bx-chip" data-filter="all" aria-pressed="true"><span lang="en">all</span><span lang="zh">全部</span></button>
-        <button type="button" class="bx-chip" data-filter="attention" aria-pressed="false"><span lang="en">needs action</span><span lang="zh">需处理</span></button>
-        <button type="button" class="bx-chip" data-filter="fixed" aria-pressed="false"><span lang="en">fixed</span><span lang="zh">已修复</span></button>
+        <button type="button" class="bx-chip" data-filter="all" aria-pressed="true">all</button>
+        <button type="button" class="bx-chip" data-filter="attention" aria-pressed="false">needs action</button>
+        <button type="button" class="bx-chip" data-filter="fixed" aria-pressed="false">fixed</button>
       </div>
     </div>
 
@@ -84,17 +83,17 @@
         <strong class="r-adv-name">{{.Name}}</strong>
         {{range .Vulnerabilities}}<a class="bx-chip" href="{{.URL}}" rel="noreferrer">{{.CVE}}</a>{{end}}
         <span class="bx-chip">CVSS {{.CVSS.Version}} · {{printf "%.1f" .CVSS.Score}}</span>
-        <span class="bx-faint mono r-adv-date"><span lang="en">published</span><span lang="zh">发布于</span> {{.Published}}</span>
+        <span class="bx-faint mono r-adv-date">published {{.Published}}</span>
       </div>
-      <p class="r-adv-summary"><span lang="en">{{index .Summary "en"}}</span><span lang="zh">{{index .Summary "zh"}}</span></p>
+      <p class="r-adv-summary">{{index .Summary "en"}}</p>
       <div class="r-fixed-grid">
-        {{range .Branches}}<div class="r-fixed"><span class="mono bx-faint">PHP {{.Branch}}</span><span class="mono {{if .Fixed}}r-ok{{else}}r-bad{{end}}">{{if .Fixed}}≥ {{.Fixed}}{{else}}<span lang="en">no release</span><span lang="zh">无官方修复</span>{{end}}</span></div>{{end}}
+        {{range .Branches}}<div class="r-fixed"><span class="mono bx-faint">PHP {{.Branch}}</span><span class="mono {{if .Fixed}}r-ok{{else}}r-bad{{end}}">{{if .Fixed}}≥ {{.Fixed}}{{else}}no release{{end}}</span></div>{{end}}
       </div>
     </div>
     {{end}}
 
     {{if not .Instances}}
-    <div class="bx-card bx-card-body bx-muted"><span lang="en">No PHP builds were found on this machine.</span><span lang="zh">本机未发现任何 PHP 构建。</span></div>
+    <div class="bx-card bx-card-body bx-muted">No PHP builds were found on this machine.</div>
     {{end}}
   </section>
   {{end}}
@@ -104,7 +103,7 @@
     {{range .Instances}}
     <details class="r-inst" data-status="{{.Status}}" {{if ne .Status "fixed"}}open{{end}}>
       <summary>
-        <span class="bx-badge" data-status="{{.Status}}"><span lang="en">{{.StatusEn}}</span><span lang="zh">{{.StatusZh}}</span></span>
+        <span class="bx-badge" data-status="{{.Status}}">{{.StatusEn}}</span>
         <span class="r-inst-path mono">{{.Path}}{{if .Stale}} <em class="r-stale">replaced</em>{{end}}</span>
         <span class="r-inst-meta mono"><span class="bx-faint">{{.Where}}</span> · {{.SAPI}} · <b>{{if .Version}}{{.Version}}{{else}}?{{end}}</b></span>
         <span class="r-inst-env">{{.Environment}}</span>
@@ -122,13 +121,13 @@
         {{range .Notes}}<p class="r-note">! {{.}}</p>{{end}}
         {{range .Views}}
         <div class="r-assess">
-          <div class="r-assess-head"><strong>{{.Advisory}}</strong> <span class="bx-faint">— {{.Reason}} · <span lang="en">confidence</span><span lang="zh">置信度</span> {{.Confidence}}</span></div>
+          <div class="r-assess-head"><strong>{{.Advisory}}</strong> <span class="bx-faint">— {{.Reason}} · confidence {{.Confidence}}</span></div>
           <ul class="r-evidence">
             {{range .Evidence}}<li data-verdict="{{.Verdict}}"><span class="r-ev-mark"></span><span class="r-ev-kind mono">{{.Kind}}</span><span class="r-ev-detail">{{.Detail}}</span></li>{{end}}
           </ul>
           {{if .Steps}}
           <div class="r-steps">
-            <div class="bx-eyebrow"><span lang="en">What to do</span><span lang="zh">处理建议</span></div>
+            <div class="bx-eyebrow">What to do</div>
             <ol>{{range .Steps}}<li>{{.}}</li>{{end}}</ol>
           </div>
           {{end}}
@@ -147,31 +146,31 @@
   {{if .Trace}}
   <section class="r-section" id="trace">
     <div class="r-section-head">
-      <h2><span lang="en">Intrusion trace</span><span lang="zh">入侵溯源</span></h2>
+      <h2>Intrusion trace</h2>
       <span class="bx-faint mono">{{.Trace.Stats.FilesScanned}} files · {{.Trace.Stats.LogFiles}} logs · {{.Trace.Stats.LogLines}} lines · since {{.Trace.Since.Format "2006-01-02"}}</span>
     </div>
 
     <div class="r-trace-grid">
       <div class="r-findings">
-        {{if not .Findings}}<div class="bx-card bx-card-body bx-muted"><span lang="en">No findings.</span><span lang="zh">没有发现。</span></div>{{end}}
+        {{if not .Findings}}<div class="bx-card bx-card-body bx-muted">No findings.</div>{{end}}
         {{range .Findings}}
         <article class="bx-card r-finding" data-sev="{{.Severity}}">
           <header>
-            <span class="bx-badge" data-sev="{{.Severity}}"><span lang="en">{{.SevEn}}</span><span lang="zh">{{.SevZh}}</span></span>
-            <h3><span lang="en">{{index .Title "en"}}</span><span lang="zh">{{index .Title "zh"}}</span></h3>
+            <span class="bx-badge" data-sev="{{.Severity}}">{{.SevEn}}</span>
+            <h3>{{index .Title "en"}}</h3>
             <span class="bx-faint mono r-rule">{{.Rule}}</span>
           </header>
           <div class="r-loc mono">{{.Loc}}{{if .Count}} <span class="bx-faint">×{{.Count}}</span>{{end}}{{with .Time}} <span class="bx-faint">· {{fmtTime .}}</span>{{end}}</div>
           {{with .Snippet}}<pre class="bx-code r-snippet">{{.}}</pre>{{end}}
-          {{if .Why}}<p class="bx-muted r-why"><span lang="en">{{index .Why "en"}}</span><span lang="zh">{{index .Why "zh"}}</span></p>{{end}}
+          {{if .Why}}<p class="bx-muted r-why">{{index .Why "en"}}</p>{{end}}
           {{with .Details}}<ul class="r-details mono">{{range .}}<li>{{.}}</li>{{end}}</ul>{{end}}
         </article>
         {{end}}
       </div>
       <aside class="bx-card r-tl">
-        <div class="bx-card-head"><span class="bx-eyebrow"><span lang="en">Timeline</span><span lang="zh">时间线</span></span><span class="bx-faint mono">UTC</span></div>
+        <div class="bx-card-head"><span class="bx-eyebrow">Timeline</span><span class="bx-faint mono">UTC</span></div>
         <div class="bx-card-body">
-          {{if not .Days}}<p class="bx-faint"><span lang="en">No timestamped events.</span><span lang="zh">没有带时间的事件。</span></p>{{end}}
+          {{if not .Days}}<p class="bx-faint">No timestamped events.</p>{{end}}
           <ol class="bx-timeline">
             {{range .Days}}<li class="day">{{.Day}}</li>{{range .Events}}<li class="ev" data-sev="{{.Severity}}"><time>{{clock .Time}}</time><span class="dot"></span><span class="what">{{.Summary}}{{with .Path}}<span class="path">{{.}}</span>{{end}}</span></li>{{end}}{{end}}
           </ol>
@@ -180,9 +179,9 @@
     </div>
 
     <div class="bx-card r-scope">
-      <div class="bx-card-head"><span class="bx-eyebrow"><span lang="en">Scope</span><span lang="zh">检查范围</span></span></div>
+      <div class="bx-card-head"><span class="bx-eyebrow">Scope</span></div>
       <div class="bx-table-wrap"><table class="bx-table">
-        <thead><tr><th><span lang="en">Web root</span><span lang="zh">网站根目录</span></th><th><span lang="en">Files</span><span lang="zh">文件数</span></th><th><span lang="en">Found via</span><span lang="zh">来源</span></th></tr></thead>
+        <thead><tr><th>Web root</th><th>Files</th><th>Found via</th></tr></thead>
         <tbody>{{range .Trace.Webroots}}<tr><td class="mono">{{.Path}}</td><td class="mono">{{.Files}}</td><td class="bx-faint">{{.Source}}</td></tr>{{else}}<tr><td colspan="3" class="bx-faint">—</td></tr>{{end}}</tbody>
       </table></div>
     </div>
@@ -191,15 +190,14 @@
   {{end}}
 
   <section class="r-method bx-card bx-card-body">
-    <div class="bx-eyebrow"><span lang="en">How to read this report</span><span lang="zh">如何阅读本报告</span></div>
-    <p lang="en">Bastion only reads files and process metadata; it changed nothing on this machine. <b>Fixed</b> means a fixed upstream version, a vendor package at or above the vendor's fixed version, a package changelog naming the CVE, or code that only the fix introduces. <b>Likely vulnerable</b> means a build Bastion cannot prove patched (for example an end-of-life branch or a package whose changelog is silent). <b>Unknown</b> means there was not enough information — ask the vendor. Trace findings are indicators, not proof; a clean trace does not prove a clean system.</p>
-    <p lang="zh">Bastion 只读取文件和进程信息，没有改动这台机器上的任何东西。<b>已修复</b>表示：上游版本已修复、发行版软件包不低于官方给出的修复版本、软件包变更日志中写明了该 CVE，或者二进制中含有只有补丁才会引入的代码。<b>很可能存在漏洞</b>表示 Bastion 无法证明它已打补丁（例如已停止维护的分支，或变更日志中没有任何记录的软件包）。<b>无法判断</b>表示信息不足，请向供应商确认。溯源结果只是线索而非定论；没有发现问题也不代表系统一定干净。</p>
+    <div class="bx-eyebrow">How to read this report</div>
+    <p>Bastion only reads files and process metadata; it changed nothing on this machine. <b>Fixed</b> means a fixed upstream version, a vendor package at or above the vendor's fixed version, a package changelog naming the CVE, or code that only the fix introduces. <b>Likely vulnerable</b> means a build Bastion cannot prove patched (for example an end-of-life branch or a package whose changelog is silent). <b>Unknown</b> means there was not enough information — ask the vendor. Trace findings are indicators, not proof; a clean trace does not prove a clean system.</p>
   </section>
 </main>
 
 <footer class="bx-wrap r-foot mono bx-faint">
   <span>bastion {{.Version}} · {{if .Scan}}{{.Scan.Schema}}{{end}}{{if .Trace}} · {{.Trace.Schema}}{{end}}</span>
-  <span><span lang="en">Contains host details — share with care.</span><span lang="zh">包含主机细节，请谨慎分享。</span></span>
+  <span>Contains host details — share with care.</span>
 </footer>
 
 <script type="application/json" id="bastion-data">{{.DataJSON}}</script>

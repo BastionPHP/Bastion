@@ -40,32 +40,32 @@ type logSignal struct {
 
 var errorSignals = []logSignal{
 	{"log.worker-crash", Medium, regexp.MustCompile(`(?i)(exited on signal (11|6|7)\b|exit signal Segmentation fault|php[-\w.]*\[\d+\]: segfault at|lsphp[^\n]*segfault|zend_mm_heap corrupted|child \d+ exited on signal 11)`),
-		Text{"en": "PHP worker crashes (segfault / heap corruption)", "zh": "PHP 工作进程崩溃（段错误或堆损坏）"},
-		Text{"en": "PHP2Shell is a memory-corruption bug; exploitation attempts often crash workers before they succeed. Crashes also happen for benign reasons — check timing against suspicious requests.", "zh": "PHP2Shell 属于内存破坏漏洞，利用尝试在成功前常会让进程崩溃。崩溃也可能有无害的原因，请结合可疑请求的时间判断。"}},
+		Text{"en": "PHP worker crashes (segfault / heap corruption)"},
+		Text{"en": "PHP2Shell is a memory-corruption bug; exploitation attempts often crash workers before they succeed. Crashes also happen for benign reasons — check timing against suspicious requests."}},
 	{"log.early-oom", Medium, regexp.MustCompile(`Allowed memory size of \d+ bytes exhausted[^\n]*in Unknown on line 0`),
-		Text{"en": "Out-of-memory during request start-up", "zh": "请求启动阶段发生内存耗尽"},
-		Text{"en": "'in Unknown on line 0' means memory ran out before any script ran — while PHP was parsing the request. That is the trigger condition of CVE-2026-109618.", "zh": "“in Unknown on line 0”说明内存在任何脚本运行之前、PHP 解析请求时就已耗尽，这正是 CVE-2026-109618 的触发条件。"}},
+		Text{"en": "Out-of-memory during request start-up"},
+		Text{"en": "'in Unknown on line 0' means memory ran out before any script ran — while PHP was parsing the request. That is the trigger condition of CVE-2026-109618."}},
 	{"log.hard-oom", Low, regexp.MustCompile(`Hard memory limit of \d+ bytes exhausted`),
-		Text{"en": "Patched hard memory limit reached", "zh": "触发了补丁引入的硬内存上限"},
-		Text{"en": "Only patched builds log this. Repeated hits suggest someone is pushing requests into OOM.", "zh": "只有已修复的构建才会记录这条日志；频繁出现说明有人在刻意让请求耗尽内存。"}},
+		Text{"en": "Patched hard memory limit reached"},
+		Text{"en": "Only patched builds log this. Repeated hits suggest someone is pushing requests into OOM."}},
 	{"log.multipart-limits", Low, regexp.MustCompile(`(?i)(Maximum number of allowable file uploads has been exceeded|Input variables exceeded|Multipart body parts limit exceeded|POST Content-Length of \d+ bytes exceeds the limit)`),
-		Text{"en": "Request parsing limits hit", "zh": "触发请求解析上限"},
-		Text{"en": "Oversized or over-partitioned multipart bodies are how attackers drive PHP into OOM during parsing.", "zh": "超大或分段过多的 multipart 请求体是让 PHP 在解析时耗尽内存的常见手段。"}},
+		Text{"en": "Request parsing limits hit"},
+		Text{"en": "Oversized or over-partitioned multipart bodies are how attackers drive PHP into OOM during parsing."}},
 }
 
 var accessSignals = []logSignal{
 	{"log.php-cgi-arg-injection", Medium, regexp.MustCompile(`(?i)(%AD[dn]\+|-d\+allow_url_include|allow_url_include%3d1|auto_prepend_file%3dphp://input)`),
-		Text{"en": "PHP-CGI argument injection attempts", "zh": "PHP-CGI 参数注入尝试"},
-		Text{"en": "Probes for php-cgi argument injection (e.g. CVE-2024-4577).", "zh": "针对 php-cgi 参数注入（如 CVE-2024-4577）的探测。"}},
+		Text{"en": "PHP-CGI argument injection attempts"},
+		Text{"en": "Probes for php-cgi argument injection (e.g. CVE-2024-4577)."}},
 	{"log.code-in-request", Medium, regexp.MustCompile(`(?i)(<\?php|%3C%3Fphp|base64_decode\(|eval\(|system\(|passthru\(|shell_exec\(|php://input|php://filter|\$_(GET|POST|REQUEST)\[)`),
-		Text{"en": "PHP code in request URLs", "zh": "请求 URL 中带有 PHP 代码"},
-		Text{"en": "Injection attempts; a 200 response deserves a closer look.", "zh": "属于注入尝试；返回 200 的请求值得仔细排查。"}},
+		Text{"en": "PHP code in request URLs"},
+		Text{"en": "Injection attempts; a 200 response deserves a closer look."}},
 	{"log.command-param", Medium, regexp.MustCompile(`(?i)[?&](cmd|exec|command|shell|c|e|x)=[^&\s]*(whoami|uname|\bid\b|cat%20/etc|cat\+/etc|/etc/passwd|wget|curl|bash|/bin/sh|ifconfig|netstat)`),
-		Text{"en": "Shell commands passed as request parameters", "zh": "请求参数中携带 Shell 命令"},
-		Text{"en": "Typical of interacting with a webshell.", "zh": "这是操作 Webshell 的典型特征。"}},
+		Text{"en": "Shell commands passed as request parameters"},
+		Text{"en": "Typical of interacting with a webshell."}},
 	{"log.webshell-name", Low, regexp.MustCompile(`(?i)/(shell|cmd|c99|r57|wso|b374k|alfa|indoxploit|webshell|x-?shell)\.php\d?\b`),
-		Text{"en": "Requests for common webshell file names", "zh": "请求常见的 Webshell 文件名"},
-		Text{"en": "Usually scanners; a 200 response means the file exists.", "zh": "通常来自扫描器；如果返回 200，说明文件确实存在。"}},
+		Text{"en": "Requests for common webshell file names"},
+		Text{"en": "Usually scanners; a 200 response means the file exists."}},
 }
 
 var reUploadPHP = regexp.MustCompile(`(?i)/(wp-content/uploads|uploads?|upload_files|attachments?|images|cache)/[^?\s]*\.(php\d?|phtml|phar)\b`)
@@ -216,7 +216,7 @@ func (t *tracer) scanLogs(ctx context.Context) {
 				pathOnly = dec
 			}
 			if file, ok := urlToFile[pathOnly]; ok {
-				sig := logSignal{rule: "log.flagged-file-access", sev: High, title: Text{"en": "Requests to a flagged file", "zh": "有请求访问了被标记的文件"}, why: Text{"en": "The file " + file + " was flagged by the file scan and was requested over HTTP.", "zh": "文件扫描标记的 " + file + " 曾被 HTTP 请求访问。"}}
+				sig := logSignal{rule: "log.flagged-file-access", sev: High, title: Text{"en": "Requests to a flagged file"}, why: Text{"en": "The file " + file + " was flagged by the file scan and was requested over HTTP."}}
 				if !strings.HasPrefix(status, "2") {
 					sig.sev = Medium
 				}
@@ -228,7 +228,7 @@ func (t *tracer) scanLogs(ctx context.Context) {
 				}
 			}
 			if method == "POST" && strings.HasPrefix(status, "2") && reUploadPHP.MatchString(pathOnly) {
-				sig := logSignal{rule: "log.post-upload-php", sev: High, title: Text{"en": "Successful POST to a PHP file in an upload directory", "zh": "成功 POST 到上传目录中的 PHP 文件"}, why: Text{"en": "Legitimate applications do not execute PHP from upload directories.", "zh": "正常应用不会执行上传目录中的 PHP 文件。"}}
+				sig := logSignal{rule: "log.post-upload-php", sev: High, title: Text{"en": "Successful POST to a PHP file in an upload directory"}, why: Text{"en": "Legitimate applications do not execute PHP from upload directories."}}
 				get(sig, p).hit(tm, ip, status, line)
 			}
 			for _, sig := range accessSignals {

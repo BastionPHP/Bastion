@@ -11,8 +11,7 @@ against **PHP2Shell** (CVE-2026-109618 / CVE-2026-109619), and traces what an in
 [Website](https://larptard.github.io/bastion/) ·
 [Online check](https://larptard.github.io/bastion/check/) ·
 [How it works](https://larptard.github.io/bastion/how-it-works/) ·
-[Docs](https://larptard.github.io/bastion/docs/) ·
-[中文](README.zh-CN.md)
+[Docs](https://larptard.github.io/bastion/docs/)
 
 [![ci](https://github.com/larptard/bastion/actions/workflows/ci.yml/badge.svg)](https://github.com/larptard/bastion/actions/workflows/ci.yml)
 [![license: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)

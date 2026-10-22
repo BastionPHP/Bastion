@@ -10,59 +10,221 @@
     "score": 9.2,
     "vector": "CVSS:4.0/AV:N/AC:H/AT:P/PR:N/UI:N/VC:H/VI:H/VA:H/SC:N/SI:N/SA:N"
   },
-  "aliases": ["CVE-2026-109618", "CVE-2026-109619", "GHSA-w8hw-w9fx-j79w", "GHSA-6wmf-4rv5-p3rp"],
+  "aliases": [
+    "CVE-2026-109618",
+    "CVE-2026-109619",
+    "GHSA-w8hw-w9fx-j79w",
+    "GHSA-6wmf-4rv5-p3rp"
+  ],
   "vulnerabilities": [
     {
       "cve": "CVE-2026-109618",
       "ghsa": "GHSA-w8hw-w9fx-j79w",
-      "title": {"en": "RCE via OOM corruption", "zh": "内存耗尽（OOM）导致的状态损坏与远程代码执行"},
-      "weaknesses": ["CWE-416", "CWE-755", "CWE-824", "CWE-1325", "CWE-1419"],
+      "title": {
+        "en": "RCE via OOM corruption"
+      },
+      "weaknesses": [
+        "CWE-416",
+        "CWE-755",
+        "CWE-824",
+        "CWE-1325",
+        "CWE-1419"
+      ],
       "url": "https://github.com/php/php-src/security/advisories/GHSA-w8hw-w9fx-j79w"
     },
     {
       "cve": "CVE-2026-109619",
       "ghsa": "GHSA-6wmf-4rv5-p3rp",
-      "title": {"en": "RCE via stale global state", "zh": "残留全局状态导致的释放后使用与远程代码执行"},
-      "weaknesses": ["CWE-416", "CWE-755", "CWE-824", "CWE-1325", "CWE-1419"],
+      "title": {
+        "en": "RCE via stale global state"
+      },
+      "weaknesses": [
+        "CWE-416",
+        "CWE-755",
+        "CWE-824",
+        "CWE-1325",
+        "CWE-1419"
+      ],
       "url": "https://github.com/php/php-src/security/advisories/GHSA-6wmf-4rv5-p3rp"
     }
   ],
   "summary": {
-    "en": "Two memory-safety flaws in the PHP engine let an unauthenticated HTTP request corrupt request state (through out-of-memory bailouts) or reuse freed global state in a later request on the same worker, leading to remote code execution as the web worker account. Apache mod_php is confirmed exploitable; PHP-FPM, FrankenPHP and LiteSpeed are considered likely susceptible.",
-    "zh": "PHP 引擎中的两个内存安全缺陷：未授权的 HTTP 请求可以借助内存耗尽时的异常退出破坏请求状态，或让同一工作进程的后续请求复用已释放的全局状态，最终以 Web 进程账号的权限执行任意代码。Apache mod_php 已被证实可利用，PHP-FPM、FrankenPHP 和 LiteSpeed 被认为同样可能受影响。"
+    "en": "Two memory-safety flaws in the PHP engine let an unauthenticated HTTP request corrupt request state (through out-of-memory bailouts) or reuse freed global state in a later request on the same worker, leading to remote code execution as the web worker account. Apache mod_php is confirmed exploitable; PHP-FPM, FrankenPHP and LiteSpeed are considered likely susceptible."
   },
   "sapi_risk": {
-    "apache2handler": {"level": "confirmed", "en": "Exploit demonstrated against mod_php: the request can trigger the bug before any application code runs.", "zh": "已在 mod_php 上演示利用：请求在任何应用代码执行之前即可触发漏洞。"},
-    "fpm": {"level": "likely", "en": "Likely susceptible per source analysis; the session upload progress path was validated against PHP-FPM.", "zh": "源码分析认为可能受影响；会话上传进度路径已在 PHP-FPM 上验证。"},
-    "litespeed": {"level": "likely", "en": "Considered likely susceptible (LSAPI), not validated.", "zh": "被认为可能受影响（LSAPI），尚未验证。"},
-    "cgi": {"level": "likely", "en": "Serves web requests; treat as exposed.", "zh": "直接处理 Web 请求，应视为暴露面。"},
-    "cli": {"level": "low", "en": "The CLI binary does not serve HTTP itself, but it usually shares a build with the web SAPIs on the same host.", "zh": "CLI 本身不处理 HTTP 请求，但通常与同机的 Web SAPI 来自同一构建。"}
+    "apache2handler": {
+      "level": "confirmed",
+      "en": "Exploit demonstrated against mod_php: the request can trigger the bug before any application code runs."
+    },
+    "fpm": {
+      "level": "likely",
+      "en": "Likely susceptible per source analysis; the session upload progress path was validated against PHP-FPM."
+    },
+    "litespeed": {
+      "level": "likely",
+      "en": "Considered likely susceptible (LSAPI), not validated."
+    },
+    "cgi": {
+      "level": "likely",
+      "en": "Serves web requests; treat as exposed."
+    },
+    "cli": {
+      "level": "low",
+      "en": "The CLI binary does not serve HTTP itself, but it usually shares a build with the web SAPIs on the same host."
+    }
   },
   "branches": [
-    {"branch": "8.6", "fixed": "8.6.0RC4", "status": "prerelease", "note": {"en": "8.6.0RC4 includes the fixes; earlier 8.6 builds are affected.", "zh": "8.6.0RC4 已包含修复，更早的 8.6 构建受影响。"}},
-    {"branch": "8.5", "fixed": "8.5.12", "status": "supported"},
-    {"branch": "8.4", "fixed": "8.4.27", "status": "supported"},
-    {"branch": "8.3", "fixed": "8.3.36", "status": "supported"},
-    {"branch": "8.2", "fixed": "8.2.35", "status": "supported", "note": {"en": "PHP 8.2 reaches end of life on 31 December 2026.", "zh": "PHP 8.2 将于 2026 年 12 月 31 日结束生命周期。"}},
-    {"branch": "8.1", "status": "eol", "source_backport": "https://github.com/php/php-src/tree/PHP-8.1-CVE-2026-109618-109619"},
-    {"branch": "8.0", "status": "eol", "source_backport": "https://github.com/php/php-src/tree/PHP-8.0-CVE-2026-109618-109619"},
-    {"branch": "7.4", "status": "eol", "source_backport": "https://github.com/php/php-src/tree/PHP-7.4-CVE-2026-109618-109619"}
+    {
+      "branch": "8.6",
+      "fixed": "8.6.0RC4",
+      "status": "prerelease",
+      "note": {
+        "en": "8.6.0RC4 includes the fixes; earlier 8.6 builds are affected."
+      }
+    },
+    {
+      "branch": "8.5",
+      "fixed": "8.5.12",
+      "status": "supported"
+    },
+    {
+      "branch": "8.4",
+      "fixed": "8.4.27",
+      "status": "supported"
+    },
+    {
+      "branch": "8.3",
+      "fixed": "8.3.36",
+      "status": "supported"
+    },
+    {
+      "branch": "8.2",
+      "fixed": "8.2.35",
+      "status": "supported",
+      "note": {
+        "en": "PHP 8.2 reaches end of life on 31 December 2026."
+      }
+    },
+    {
+      "branch": "8.1",
+      "status": "eol",
+      "source_backport": "https://github.com/php/php-src/tree/PHP-8.1-CVE-2026-109618-109619"
+    },
+    {
+      "branch": "8.0",
+      "status": "eol",
+      "source_backport": "https://github.com/php/php-src/tree/PHP-8.0-CVE-2026-109618-109619"
+    },
+    {
+      "branch": "7.4",
+      "status": "eol",
+      "source_backport": "https://github.com/php/php-src/tree/PHP-7.4-CVE-2026-109618-109619"
+    }
   ],
   "older_branches": "affected",
   "newer_branches": "fixed",
   "vendor_fixes": [
-    {"distro": "ubuntu", "release": "26.10", "package": "php8.5", "fixed": "8.5.9-0ubuntu2.1", "format": "dpkg", "advisory": "USN-8948-1", "url": "https://ubuntu.com/security/CVE-2026-109618"},
-    {"distro": "ubuntu", "release": "26.04", "package": "php8.5", "fixed": "8.5.4-0ubuntu1.5", "format": "dpkg", "advisory": "USN-8948-1", "url": "https://ubuntu.com/security/CVE-2026-109618"},
-    {"distro": "ubuntu", "release": "24.04", "package": "php8.3", "fixed": "8.3.6-0ubuntu0.24.04.13", "format": "dpkg", "advisory": "USN-8948-1", "url": "https://ubuntu.com/security/CVE-2026-109618"},
-    {"distro": "ubuntu", "release": "22.04", "package": "php8.1", "fixed": "8.1.2-1ubuntu2.28", "format": "dpkg", "advisory": "USN-8948-1", "url": "https://ubuntu.com/security/CVE-2026-109618"},
-    {"distro": "ubuntu", "release": "20.04", "package": "php7.4", "fixed": "7.4.3-4ubuntu2.29+esm5", "format": "dpkg", "advisory": "USN-8948-2", "channel": "Ubuntu Pro (ESM)", "url": "https://ubuntu.com/security/CVE-2026-109618"},
-    {"distro": "ubuntu", "release": "18.04", "package": "php7.2", "fixed": "7.2.24-0ubuntu0.18.04.17+esm14", "format": "dpkg", "advisory": "USN-8948-2", "channel": "Ubuntu Pro (ESM)", "url": "https://ubuntu.com/security/CVE-2026-109618"},
-    {"distro": "ubuntu", "release": "16.04", "package": "php7.0", "fixed": "7.0.33-0ubuntu0.16.04.16+esm22", "format": "dpkg", "advisory": "USN-8948-2", "channel": "Ubuntu Pro Legacy", "url": "https://ubuntu.com/security/CVE-2026-109618"},
-    {"distro": "ubuntu", "release": "14.04", "package": "php5", "fixed": "5.5.9+dfsg-1ubuntu4.29+esm18", "format": "dpkg", "advisory": "USN-8948-2", "channel": "Ubuntu Pro Legacy", "url": "https://ubuntu.com/security/CVE-2026-109618"},
-    {"distro": "debian", "release": "13", "package": "php8.4", "fixed": "8.4.27-1~deb13u1", "format": "dpkg", "advisory": "DSA-6574-1", "url": "https://security-tracker.debian.org/tracker/CVE-2026-109618"},
-    {"distro": "debian", "release": "12", "package": "php8.2", "fixed": "8.2.35-1~deb12u1", "format": "dpkg", "advisory": "DLA-4848-1", "url": "https://security-tracker.debian.org/tracker/CVE-2026-109618"}
+    {
+      "distro": "ubuntu",
+      "release": "26.10",
+      "package": "php8.5",
+      "fixed": "8.5.9-0ubuntu2.1",
+      "format": "dpkg",
+      "advisory": "USN-8948-1",
+      "url": "https://ubuntu.com/security/CVE-2026-109618"
+    },
+    {
+      "distro": "ubuntu",
+      "release": "26.04",
+      "package": "php8.5",
+      "fixed": "8.5.4-0ubuntu1.5",
+      "format": "dpkg",
+      "advisory": "USN-8948-1",
+      "url": "https://ubuntu.com/security/CVE-2026-109618"
+    },
+    {
+      "distro": "ubuntu",
+      "release": "24.04",
+      "package": "php8.3",
+      "fixed": "8.3.6-0ubuntu0.24.04.13",
+      "format": "dpkg",
+      "advisory": "USN-8948-1",
+      "url": "https://ubuntu.com/security/CVE-2026-109618"
+    },
+    {
+      "distro": "ubuntu",
+      "release": "22.04",
+      "package": "php8.1",
+      "fixed": "8.1.2-1ubuntu2.28",
+      "format": "dpkg",
+      "advisory": "USN-8948-1",
+      "url": "https://ubuntu.com/security/CVE-2026-109618"
+    },
+    {
+      "distro": "ubuntu",
+      "release": "20.04",
+      "package": "php7.4",
+      "fixed": "7.4.3-4ubuntu2.29+esm5",
+      "format": "dpkg",
+      "advisory": "USN-8948-2",
+      "channel": "Ubuntu Pro (ESM)",
+      "url": "https://ubuntu.com/security/CVE-2026-109618"
+    },
+    {
+      "distro": "ubuntu",
+      "release": "18.04",
+      "package": "php7.2",
+      "fixed": "7.2.24-0ubuntu0.18.04.17+esm14",
+      "format": "dpkg",
+      "advisory": "USN-8948-2",
+      "channel": "Ubuntu Pro (ESM)",
+      "url": "https://ubuntu.com/security/CVE-2026-109618"
+    },
+    {
+      "distro": "ubuntu",
+      "release": "16.04",
+      "package": "php7.0",
+      "fixed": "7.0.33-0ubuntu0.16.04.16+esm22",
+      "format": "dpkg",
+      "advisory": "USN-8948-2",
+      "channel": "Ubuntu Pro Legacy",
+      "url": "https://ubuntu.com/security/CVE-2026-109618"
+    },
+    {
+      "distro": "ubuntu",
+      "release": "14.04",
+      "package": "php5",
+      "fixed": "5.5.9+dfsg-1ubuntu4.29+esm18",
+      "format": "dpkg",
+      "advisory": "USN-8948-2",
+      "channel": "Ubuntu Pro Legacy",
+      "url": "https://ubuntu.com/security/CVE-2026-109618"
+    },
+    {
+      "distro": "debian",
+      "release": "13",
+      "package": "php8.4",
+      "fixed": "8.4.27-1~deb13u1",
+      "format": "dpkg",
+      "advisory": "DSA-6574-1",
+      "url": "https://security-tracker.debian.org/tracker/CVE-2026-109618"
+    },
+    {
+      "distro": "debian",
+      "release": "12",
+      "package": "php8.2",
+      "fixed": "8.2.35-1~deb12u1",
+      "format": "dpkg",
+      "advisory": "DLA-4848-1",
+      "url": "https://security-tracker.debian.org/tracker/CVE-2026-109618"
+    }
   ],
-  "changelog_markers": ["CVE-2026-109618", "CVE-2026-109619", "GHSA-w8hw-w9fx-j79w", "GHSA-6wmf-4rv5-p3rp"],
+  "changelog_markers": [
+    "CVE-2026-109618",
+    "CVE-2026-109619",
+    "GHSA-w8hw-w9fx-j79w",
+    "GHSA-6wmf-4rv5-p3rp"
+  ],
   "fingerprints": [
     {
       "kind": "binary-string",
@@ -70,29 +232,57 @@
       "indicates": "fixed",
       "min_branch": "8.2",
       "note": {
-        "en": "The fix replaces longjmp-based OOM handling with a soft limit plus a hard limit; the 'Hard memory limit of %zu bytes exhausted' message only exists in patched builds (php-src 8.2.35+ and vendor ports of that patch). The minimal 7.4/8.0/8.1 source backports do not add it, so its absence proves nothing.",
-        "zh": "修复把基于 longjmp 的 OOM 处理换成了软上限加硬上限；只有打过补丁的构建（php-src 8.2.35 及以上，以及移植了该补丁的发行版构建）才包含 “Hard memory limit of %zu bytes exhausted” 这条消息。7.4/8.0/8.1 的最小源码回溯不会加入它，因此找不到它并不能说明任何问题。"
+        "en": "The fix replaces longjmp-based OOM handling with a soft limit plus a hard limit; the 'Hard memory limit of %zu bytes exhausted' message only exists in patched builds (php-src 8.2.35+ and vendor ports of that patch). The minimal 7.4/8.0/8.1 source backports do not add it, so its absence proves nothing."
       }
     }
   ],
   "mitigations": [
-    {"en": "Update to 8.5.12, 8.4.27, 8.3.36 or 8.2.35 (or your vendor's patched package). This is the only complete fix.", "zh": "升级到 8.5.12、8.4.27、8.3.36 或 8.2.35（或发行版的已修复包），这是唯一完整的修复。"},
-    {"en": "Restart every PHP worker after updating (php-fpm, Apache, LiteSpeed). Updated files on disk do nothing for workers that are still running the old code.", "zh": "升级后重启所有 PHP 工作进程（php-fpm、Apache、LiteSpeed）。磁盘上的文件更新了，但仍在运行旧代码的进程并不会因此变安全。"},
-    {"en": "If you cannot update yet: set session.upload_progress.enabled=0 in php.ini or the FPM pool (not via ini_set or .user.ini) and restart workers.", "zh": "暂时无法升级时：在 php.ini 或 FPM 池配置中设置 session.upload_progress.enabled=0（不要用 ini_set 或 .user.ini），然后重启进程。"},
-    {"en": "On PHP 8.5 that cannot be updated, set fatal_error_backtraces=0 and restart workers.", "zh": "无法升级的 PHP 8.5：设置 fatal_error_backtraces=0 并重启进程。"},
-    {"en": "Reduce exposure: enforce memory_limit=-1 administratively (php_admin_value), keep post_max_size low (8M without uploads, 32M with), and cap request size, part count and header count at the web server or proxy. These narrow known paths but do not make an installation safe.", "zh": "降低暴露面：以管理员方式强制 memory_limit=-1（php_admin_value），降低 post_max_size（无上传 8M、有上传 32M），并在 Web 服务器或代理层限制请求体大小、multipart 段数和请求头数量。这些措施只能收窄已知路径，不能让系统变安全。"},
-    {"en": "Do not use RLIMIT_AS / RLIMIT_DATA as a memory boundary; they can cause the vulnerable allocation failure. Use cgroup/container limits instead.", "zh": "不要用 RLIMIT_AS / RLIMIT_DATA 作为内存边界，它们反而可能触发有漏洞的分配失败路径；请改用 cgroup 或容器内存限制。"}
+    {
+      "en": "Update to 8.5.12, 8.4.27, 8.3.36 or 8.2.35 (or your vendor's patched package). This is the only complete fix."
+    },
+    {
+      "en": "Restart every PHP worker after updating (php-fpm, Apache, LiteSpeed). Updated files on disk do nothing for workers that are still running the old code."
+    },
+    {
+      "en": "If you cannot update yet: set session.upload_progress.enabled=0 in php.ini or the FPM pool (not via ini_set or .user.ini) and restart workers."
+    },
+    {
+      "en": "On PHP 8.5 that cannot be updated, set fatal_error_backtraces=0 and restart workers."
+    },
+    {
+      "en": "Reduce exposure: enforce memory_limit=-1 administratively (php_admin_value), keep post_max_size low (8M without uploads, 32M with), and cap request size, part count and header count at the web server or proxy. These narrow known paths but do not make an installation safe."
+    },
+    {
+      "en": "Do not use RLIMIT_AS / RLIMIT_DATA as a memory boundary; they can cause the vulnerable allocation failure. Use cgroup/container limits instead."
+    }
   ],
   "references": [
-    {"title": "php.net security advisory (21 Oct 2026)", "url": "https://www.php.net/"},
-    {"title": "GHSA-w8hw-w9fx-j79w", "url": "https://github.com/php/php-src/security/advisories/GHSA-w8hw-w9fx-j79w"},
-    {"title": "GHSA-6wmf-4rv5-p3rp", "url": "https://github.com/php/php-src/security/advisories/GHSA-6wmf-4rv5-p3rp"},
-    {"title": "Ubuntu CVE tracker", "url": "https://ubuntu.com/security/CVE-2026-109618"},
-    {"title": "Debian security tracker", "url": "https://security-tracker.debian.org/tracker/CVE-2026-109618"},
-    {"title": "Red Hat RHSB-2026-013", "url": "https://access.redhat.com/security/vulnerabilities/RHSB-2026-013"}
+    {
+      "title": "php.net security advisory (21 Oct 2026)",
+      "url": "https://www.php.net/"
+    },
+    {
+      "title": "GHSA-w8hw-w9fx-j79w",
+      "url": "https://github.com/php/php-src/security/advisories/GHSA-w8hw-w9fx-j79w"
+    },
+    {
+      "title": "GHSA-6wmf-4rv5-p3rp",
+      "url": "https://github.com/php/php-src/security/advisories/GHSA-6wmf-4rv5-p3rp"
+    },
+    {
+      "title": "Ubuntu CVE tracker",
+      "url": "https://ubuntu.com/security/CVE-2026-109618"
+    },
+    {
+      "title": "Debian security tracker",
+      "url": "https://security-tracker.debian.org/tracker/CVE-2026-109618"
+    },
+    {
+      "title": "Red Hat RHSB-2026-013",
+      "url": "https://access.redhat.com/security/vulnerabilities/RHSB-2026-013"
+    }
   ],
   "notes": {
-    "en": "The official advisories list every release below 8.2.35 / 8.3.36 / 8.4.27 / 8.5.12 as affected. Branches 8.1 and older receive no official release; the PHP security team published minimal source backport branches for 7.4, 8.0 and 8.1, which do not change the version string. Vendors (Ubuntu also ships fixes for 5.5, 7.0, 7.2 and 7.4 through Ubuntu Pro) backport fixes without bumping the upstream version, which is why Bastion checks package versions and changelogs.",
-    "zh": "官方公告将 8.2.35 / 8.3.36 / 8.4.27 / 8.5.12 以下的所有版本列为受影响。8.1 及更早的分支不会再有官方发布；PHP 安全团队为 7.4、8.0、8.1 提供了最小化的源码回溯分支，但不会改变版本号。发行版（Ubuntu 还通过 Ubuntu Pro 为 5.5、7.0、7.2、7.4 提供修复）会在不提升上游版本号的情况下回溯补丁，这正是 Bastion 要检查软件包版本和变更日志的原因。"
+    "en": "The official advisories list every release below 8.2.35 / 8.3.36 / 8.4.27 / 8.5.12 as affected. Branches 8.1 and older receive no official release; the PHP security team published minimal source backport branches for 7.4, 8.0 and 8.1, which do not change the version string. Vendors (Ubuntu also ships fixes for 5.5, 7.0, 7.2 and 7.4 through Ubuntu Pro) backport fixes without bumping the upstream version, which is why Bastion checks package versions and changelogs."
   }
 }

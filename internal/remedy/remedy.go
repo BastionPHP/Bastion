@@ -88,7 +88,7 @@ func Steps(in Input) []string {
 		}
 		steps = append(steps, fmt.Sprintf("Rebuild on a patched base image: docker pull %s (needs %s or later), then rebuild and redeploy. Running containers keep the old binary until they are replaced.", img, orStr(fixedRelease, "8.4.27")))
 	case env == "BaoTa / aaPanel":
-		steps = append(steps, "宝塔/aaPanel: App Store → PHP-"+branch+" → Update (or reinstall the newest build). Then restart PHP from the panel.")
+		steps = append(steps, "BaoTa/aaPanel: App Store → PHP-"+branch+" → Update (or reinstall the newest build). Then restart PHP from the panel.")
 		if noUpstreamFix {
 			steps = append(steps, "PHP "+branch+" has no upstream fix; switch the site to PHP 8.2+ in Website → PHP version.")
 		}

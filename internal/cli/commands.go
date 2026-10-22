@@ -87,13 +87,12 @@ func (e *env) cmdReport(ctx context.Context, args []string) (int, error) {
 	var tf traceFlags
 	c.register(fs)
 	sf.register(fs)
-	var out, fromScan, fromTrace, lang string
+	var out, fromScan, fromTrace string
 	var noTrace bool
 	fs.StringVar(&out, "o", "", "output file (default bastion-report-<host>-<date>.html)")
 	fs.StringVar(&fromScan, "scan", "", "build the report from a saved `bastion scan --json` file instead of scanning")
 	fs.StringVar(&fromTrace, "trace", "", "build the report from a saved `bastion trace --json` file instead of tracing")
 	fs.BoolVar(&noTrace, "no-trace", false, "only include the vulnerability scan")
-	fs.StringVar(&lang, "lang", "auto", "initial report language: en, zh or auto (follows the viewer's browser)")
 	fs.DurationVar(&tf.since, "since", 30*24*time.Hour, "trace time window")
 	fs.BoolVar(&tf.noLogs, "no-logs", false, "skip log analysis")
 	if err := parse(fs, args); err != nil {
@@ -126,7 +125,7 @@ func (e *env) cmdReport(ctx context.Context, args []string) (int, error) {
 		host := sanitize(sr.Host.Hostname)
 		out = fmt.Sprintf("bastion-report-%s-%s.html", host, sr.StartedAt.Format("20060102-1504"))
 	}
-	html, err := report.Render(report.Input{Scan: sr, Trace: tr, Lang: lang, Version: Version})
+	html, err := report.Render(report.Input{Scan: sr, Trace: tr, Version: Version})
 	if err != nil {
 		return 0, err
 	}
