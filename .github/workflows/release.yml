@@ -1,0 +1,58 @@
+name: release
+
+# Push a tag like v0.1.0 to publish. Artifacts are built with -trimpath,
+# checksummed, signed keylessly with Sigstore (cosign) and get a SLSA build
+# provenance attestation. scripts/install.sh verifies the same signature.
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+  id-token: write
+  attestations: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - run: go test ./...
+      - name: build
+        env:
+          VERSION: ${{ github.ref_name }}
+        run: |
+          mkdir -p dist
+          for t in linux/amd64 linux/arm64 darwin/amd64 darwin/arm64; do
+            os=${t%/*}; arch=${t#*/}; d=$(mktemp -d)
+            GOOS=$os GOARCH=$arch CGO_ENABLED=0 go build -trimpath \
+              -ldflags "-s -w -X github.com/larptard/bastion/internal/cli.Version=$VERSION" \
+              -o "$d/bastion" ./cmd/bastion
+            cp LICENSE README.md "$d/"
+            tar -C "$d" --owner=0 --group=0 --mtime='@0' -czf "dist/bastion_${os}_${arch}.tar.gz" bastion LICENSE README.md
+          done
+          cp scripts/install.sh dist/install.sh
+          (cd dist && sha256sum bastion_*.tar.gz install.sh > SHA256SUMS)
+          cat dist/SHA256SUMS
+      - uses: sigstore/cosign-installer@v3
+      - name: sign checksums (keyless)
+        run: cosign sign-blob --yes --bundle dist/SHA256SUMS.sigstore.json dist/SHA256SUMS
+      - name: verify signature
+        run: |
+          cosign verify-blob --bundle dist/SHA256SUMS.sigstore.json \
+            --certificate-identity "https://github.com/${{ github.repository }}/.github/workflows/release.yml@${{ github.ref }}" \
+            --certificate-oidc-issuer https://token.actions.githubusercontent.com dist/SHA256SUMS
+      - uses: actions/attest-build-provenance@v2
+        with:
+          subject-path: dist/bastion_*.tar.gz
+      - name: publish
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "${{ github.ref_name }}" dist/* \
+            --title "Bastion ${{ github.ref_name }}" --generate-notes --verify-tag

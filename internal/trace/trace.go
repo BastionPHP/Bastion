@@ -139,7 +139,7 @@ type tracer struct {
 	flagged map[string]int
 	// docRoots are all document roots, including nested ones.
 	docRoots []string
-	webUIDs map[int]string
+	webUIDs  map[int]string
 }
 
 func (o Options) progress(f string, a ...any) {

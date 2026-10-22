@@ -7,7 +7,9 @@
 # installed, SHA256SUMS' Sigstore signature must come from this repository's
 # release workflow. Set BASTION_REQUIRE_SIGNATURE=1 to make cosign mandatory.
 #
-# Environment: BASTION_VERSION (default: latest), BASTION_INSTALL_DIR.
+# Environment: BASTION_VERSION (default: latest), BASTION_INSTALL_DIR,
+# BASTION_DOWNLOAD_URL (a mirror holding the same release files; the
+# checksum and signature checks still apply).
 # Nothing is installed besides the single binary.
 set -eu
 
@@ -30,7 +32,7 @@ case "$(uname -m)" in
 esac
 
 if command -v curl >/dev/null 2>&1; then
-  fetch() { curl -fsSL --proto '=https' --tlsv1.2 -o "$2" "$1"; }
+  fetch() { case "$1" in https://*) curl -fsSL --proto '=https' --tlsv1.2 -o "$2" "$1" ;; *) curl -fsSL -o "$2" "$1" ;; esac; }
 elif command -v wget >/dev/null 2>&1; then
   fetch() { wget -q --https-only -O "$2" "$1"; }
 else
@@ -50,6 +52,7 @@ if [ "$VERSION" = "latest" ]; then
 else
   base="https://github.com/$REPO/releases/download/$VERSION"
 fi
+base="${BASTION_DOWNLOAD_URL:-$base}"
 asset="bastion_${os}_${arch}.tar.gz"
 
 tmp="$(mktemp -d)"

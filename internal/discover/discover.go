@@ -148,6 +148,9 @@ func Classify(p, hint string, packaged bool, pkgVersion, manager string, contain
 		{"/opt/plesk/", "Plesk"},
 		{"/opt/remi/", "Remi SCL"},
 		{"/usr/local/lsws/", "LiteSpeed"},
+		{"/opt/homebrew/", "Homebrew"},
+		{"/opt/lampp/", "XAMPP"},
+		{"/opt/bitnami/", "Bitnami"},
 	} {
 		if strings.HasPrefix(p, rule.prefix) {
 			return rule.env
@@ -169,7 +172,7 @@ func Classify(p, hint string, packaged bool, pkgVersion, manager string, contain
 			return "System package (apk)"
 		}
 	}
-	if containerImageEnv && strings.HasPrefix(p, "/usr/local/") {
+	if containerImageEnv {
 		return "Docker official image"
 	}
 	if strings.HasPrefix(p, "/usr/local/") || strings.HasPrefix(p, "/opt/") {

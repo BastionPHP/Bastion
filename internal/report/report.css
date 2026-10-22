@@ -49,7 +49,8 @@
 .r-adv-name { font-size: 15px; margin-right: 4px; }
 .r-adv-date { margin-left: auto; font-size: 12px; }
 .r-adv-summary { color: var(--text-2); font-size: 13.5px; margin: 10px 0 14px; max-width: 900px; }
-.r-fixed-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: var(--radius-sm); overflow: hidden; }
+.r-fixed-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 1px; background: var(--bg-1); border: 1px solid var(--line); border-radius: var(--radius-sm); overflow: hidden; }
+.r-fixed { box-shadow: 0 0 0 1px var(--line); }
 .r-fixed { background: var(--bg-1); padding: 8px 12px; display: flex; flex-direction: column; gap: 2px; font-size: 12.5px; }
 .r-ok { color: var(--green); }
 .r-bad { color: var(--red); }

@@ -87,9 +87,9 @@ func RenderScan(w io.Writer, s ui.Style, width int, r *scan.Result, verbose bool
 	} else {
 		t := &ui.Table{Indent: 2, Cols: []ui.Column{{Title: "status"}, {Title: "target", Flex: true, Min: 10}, {Title: "path", Flex: true, Min: 16}, {Title: "sapi"}, {Title: "version"}, {Title: "source", Flex: true, Min: 12}}}
 		for _, i := range r.Instances {
-			target := i.Target
+			target := "host"
 			if i.TargetKind != "host" {
-				target = i.TargetKind + ":" + i.Target
+				target = i.Target
 			}
 			ver := i.Version
 			if ver == "" {
@@ -99,7 +99,7 @@ func RenderScan(w io.Writer, s ui.Style, width int, r *scan.Result, verbose bool
 			if i.Stale {
 				p += " (replaced)"
 			}
-			t.Add(statusLabel(s, i.Worst()), target, p, sapiShort(i.SAPI), s.White(ver), i.Environment)
+			t.Add(statusShort(s, i.Worst()), target, p, sapiShort(i.SAPI), s.White(ver), i.Environment)
 		}
 		fmt.Fprint(w, t.Render(s, width))
 		fmt.Fprintln(w)
@@ -225,4 +225,12 @@ func sapiShort(s string) string {
 		return "mod_php"
 	}
 	return s
+}
+
+// statusShort is the compact label used in the instance table.
+func statusShort(s ui.Style, st advisory.Status) string {
+	if st == advisory.LikelyVulnerable {
+		return s.Amber("◐ LIKELY")
+	}
+	return statusLabel(s, st)
 }

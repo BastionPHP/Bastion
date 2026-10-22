@@ -1,6 +1,6 @@
 
-  [38;5;117m▲[0m [1m[38;5;255mBASTION[0m[0m  [38;5;240mdev · intrusion trace[0m
-  [38;5;240mhost[0m /tmp/bastion-lab[38;5;240m  ·  [0m[38;5;240mos[0m Debian GNU/Linux 12 (bookworm)[38;5;240m  ·  [0m[38;5;240mwindow[0m since 2016-10-24[38;5;240m  ·  [0m[38;5;240mat[0m 2026-10-22 07:12 UTC
+  [38;5;117m▲[0m [1m[38;5;255mBASTION[0m[0m  [38;5;240mv0.1.0-dev · intrusion trace[0m
+  [38;5;240mhost[0m /tmp/bastion-lab[38;5;240m  ·  [0m[38;5;240mos[0m Debian GNU/Linux 12 (bookworm)[38;5;240m  ·  [0m[38;5;240mwindow[0m since 2016-10-24[38;5;240m  ·  [0m[38;5;240mat[0m 2026-10-22 07:33 UTC
 
   [1;38;5;232;48;5;203m COMPROMISE INDICATORS FOUND [0m
   [38;5;245mStrong indicators of compromise. Treat the server as breached: preserve evidence (copy files and[0m
