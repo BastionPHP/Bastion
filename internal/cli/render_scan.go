@@ -99,7 +99,7 @@ func RenderScan(w io.Writer, s ui.Style, width int, r *scan.Result, verbose bool
 			if i.Stale {
 				p += " (replaced)"
 			}
-			t.Add(statusLabel(s, i.Worst()), target, p, i.SAPI, s.White(ver), i.Environment)
+			t.Add(statusLabel(s, i.Worst()), target, p, sapiShort(i.SAPI), s.White(ver), i.Environment)
 		}
 		fmt.Fprint(w, t.Render(s, width))
 		fmt.Fprintln(w)
@@ -172,7 +172,7 @@ func renderInstance(w io.Writer, s ui.Style, width int, r *scan.Result, i *scan.
 				}
 			}
 		}
-		steps := remedy.Steps(remedy.Input{Environment: i.Environment, SAPI: i.SAPI, Version: i.Version, Package: i.Package, Stale: i.Stale, TargetKind: i.TargetKind, Assessment: a, Advisory: adv})
+		steps := remedy.Steps(remedy.Input{Environment: i.Environment, SAPI: i.SAPI, Version: i.Version, Package: i.Package, Stale: i.Stale, TargetKind: i.TargetKind, Image: i.Image, Assessment: a, Advisory: adv})
 		for si, st := range steps {
 			lines := ui.Wrap(st, max(30, width-24))
 			label := ""
@@ -218,4 +218,11 @@ func pidList(p []int) string {
 		parts = append(parts, strconv.Itoa(x))
 	}
 	return "pid " + strings.Join(parts, ",")
+}
+
+func sapiShort(s string) string {
+	if s == "apache2handler" {
+		return "mod_php"
+	}
+	return s
 }

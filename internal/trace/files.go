@@ -24,6 +24,9 @@ var uploadDir = regexp.MustCompile(`(?i)/(wp-content/uploads|uploads?|upload_fil
 
 var shellName = regexp.MustCompile(`(?i)^(shell|cmd|c99|r57|wso|b374k|alfa|alfashell|indoxploit|webshell|bypass|adminer\d*|phpspy|x-?shell)\.(php\d?|phtml)$`)
 
+// devDotfile matches tool configs that are legitimately hidden PHP files.
+var devDotfile = regexp.MustCompile(`^\.(php[-_]?cs|php-cs-fixer|phpstorm\.meta|phpunit|psalm|rector|phan|php_cs|phpstan|twig-cs|ht\.router|env(\.[a-z]+)*\.php$)`)
+
 var skipDirs = map[string]bool{".git": true, ".svn": true, ".hg": true, "node_modules": true}
 
 var (
@@ -221,7 +224,7 @@ func isDoubleExt(name string) bool { return reDoubleExt.MatchString(name) }
 var reDoubleExt = regexp.MustCompile(`\.ph(p\d?|tml|ar)\.[a-z0-9]{1,5}$`)
 
 var (
-	reAutoPrepend = regexp.MustCompile(`(?mi)^\s*(php_value\s+|php_admin_value\s+)?(auto_prepend_file|auto_append_file)\s*=?\s*["']?([^"'\s;]+)`)
+	reAutoPrepend = regexp.MustCompile(`(?mi)^[ \t]*(?:php_(?:admin_)?value[ \t]+)?(auto_prepend_file|auto_append_file)[ \t]*=?[ \t]*["']?([^"'\s;]*)`)
 	reHtHandler   = regexp.MustCompile(`(?mi)^\s*(AddType|AddHandler|SetHandler|ForceType)\s+[^\n]*(x-httpd-php|php\d?-script|application/x-httpd-php|proxy:unix:[^\n]*php)[^\n]*`)
 	reHtExtList   = regexp.MustCompile(`(?i)\.(jpe?g|png|gif|ico|txt|html?|css|js|bmp|webp)\b`)
 )
@@ -249,7 +252,7 @@ func (t *tracer) scanFile(j fileJob, since time.Time) []Finding {
 	switch {
 	case name == ".user.ini" || name == ".htaccess" || name == "php.ini":
 		for _, m := range reAutoPrepend.FindAllSubmatchIndex(content, -1) {
-			target := string(content[m[6]:m[7]])
+			target := string(content[m[4]:m[5]])
 			if strings.EqualFold(target, "none") || target == "" {
 				continue
 			}
@@ -309,18 +312,16 @@ func (t *tracer) scanFile(j fileJob, since time.Time) []Finding {
 		f := base
 		f.Rule, f.Severity, f.Title, f.Why, f.Line, f.Snippet = top.Rule.ID, top.Rule.Severity, top.Rule.Title, top.Rule.Why, top.Line, top.Snippet
 		f.Rules = ruleIDs(matches)
-		// Several medium signals in one file add up to a strong one.
-		mediums := 0
-		for _, m := range matches {
-			if m.Rule.Severity == Medium {
-				mediums++
+		// Several weak signals in one file add up to a stronger one.
+		if len(matches) >= 3 && f.Severity != High {
+			if f.Severity == Medium {
+				f.Severity = High
+			} else {
+				f.Severity = Medium
 			}
-		}
-		if f.Severity == Medium && mediums >= 3 {
-			f.Severity = High
 			f.Details = append(f.Details, "several independent obfuscation signals in one file")
 		}
-		// A lone low signal is not worth reporting.
+		// A lone weak signal is not worth reporting.
 		if f.Severity == Low && len(matches) == 1 {
 			f.Severity = ""
 		}
@@ -328,7 +329,7 @@ func (t *tracer) scanFile(j fileJob, since time.Time) []Finding {
 			f.Details = append(f.Details, m.Rule.ID+" (line "+itoa(m.Line)+")")
 		}
 		if f.Severity != "" {
-			if uploadDir.MatchString(j.inner) {
+			if uploadDir.MatchString(strings.TrimPrefix(j.inner, t.res.Webroots[j.root].Path)) {
 				f.Details = append(f.Details, "located in an upload/cache directory")
 			}
 			if strings.Contains(j.inner, "/vendor/") {
@@ -349,11 +350,11 @@ func (t *tracer) scanFile(j fileJob, since time.Time) []Finding {
 			out = append(out, f)
 		case shellName.MatchString(name):
 			f := base
-			f.Rule, f.Severity = "file.webshell-name", Medium
+			f.Rule, f.Severity = "file.webshell-name", Low
 			f.Title = Text{"en": "File name used by common webshells", "zh": "文件名与常见 Webshell 相同"}
 			f.Why = Text{"en": "Names like " + name + " are the defaults of public shell kits.", "zh": name + " 这类名字是公开 Webshell 的默认文件名。"}
 			out = append(out, f)
-		case strings.HasPrefix(name, ".") && len(name) > 5:
+		case strings.HasPrefix(name, ".") && len(name) > 5 && !devDotfile.MatchString(name):
 			f := base
 			f.Rule, f.Severity = "file.hidden-php", Low
 			f.Title = Text{"en": "Hidden PHP file", "zh": "隐藏的 PHP 文件"}

@@ -59,6 +59,7 @@ type Instance struct {
 	ID            string                `json:"id"`
 	Target        string                `json:"target"`
 	TargetKind    string                `json:"target_kind"`
+	Image         string                `json:"image,omitempty"`
 	Path          string                `json:"path"`
 	Aliases       []string              `json:"aliases,omitempty"`
 	SAPI          string                `json:"sapi"`
@@ -346,7 +347,7 @@ func scanTarget(ctx context.Context, opt Options, t *Target, res *Result) []*Ins
 	var out []*Instance
 	for _, k := range order {
 		inst := byPath[k]
-		inst.Target, inst.TargetKind, inst.OS = t.Name, t.Kind, t.OS
+		inst.Target, inst.TargetKind, inst.OS, inst.Image = t.Name, t.Kind, t.OS, t.Image
 		inst.PIDs = dedupInts(pidsByPath[k])
 		subj := advisory.Subject{Version: inst.Version, OS: advisory.OS{ID: t.OS.ID, VersionID: t.OS.VersionID, Pretty: t.OS.Pretty}, Fingerprints: inst.Fingerprints}
 		if !inst.Stale {
@@ -393,7 +394,7 @@ func execOnly(ctx context.Context, t *Target, res *Result) []*Instance {
 	if err != nil && !ok {
 		return nil
 	}
-	inst := &Instance{Target: t.Name, TargetKind: t.Kind, Path: "php (container PATH)", SAPI: "cli", Version: info.Version, VersionSource: "exec", OS: t.OS}
+	inst := &Instance{Target: t.Name, TargetKind: t.Kind, Image: t.Image, Path: "php (container PATH)", SAPI: "cli", Version: info.Version, VersionSource: "exec", OS: t.OS}
 	_, imageEnv := t.env["PHP_VERSION"]
 	inst.Environment = discover.Classify("/usr/local/bin/php", "", false, "", "", imageEnv)
 	inst.Notes = append(inst.Notes, "package and changelog checks skipped: container filesystem was not readable")

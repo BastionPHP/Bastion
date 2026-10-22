@@ -82,7 +82,11 @@ func Steps(in Input) []string {
 		if noUpstreamFix {
 			tag = "8.4"
 		}
-		steps = append(steps, fmt.Sprintf("Rebuild on a patched base image: docker pull php:%s-<variant> (needs %s or later), then rebuild and redeploy the container. Running containers keep the old binary until replaced.", tag, orStr(fixedRelease, "8.4.27")))
+		img := "php:" + tag + "-<variant>"
+		if variant := imageVariant(in.Image); variant != "" {
+			img = "php:" + tag + "-" + variant
+		}
+		steps = append(steps, fmt.Sprintf("Rebuild on a patched base image: docker pull %s (needs %s or later), then rebuild and redeploy. Running containers keep the old binary until they are replaced.", img, orStr(fixedRelease, "8.4.27")))
 	case env == "BaoTa / aaPanel":
 		steps = append(steps, "宝塔/aaPanel: App Store → PHP-"+branch+" → Update (or reinstall the newest build). Then restart PHP from the panel.")
 		if noUpstreamFix {
@@ -112,7 +116,7 @@ func Steps(in Input) []string {
 			}
 		}
 	}
-	if !in.Stale && in.SAPI != "cli" {
+	if !in.Stale && in.SAPI != "cli" && env != "Docker official image" {
 		steps = append(steps, "Restart every worker after upgrading (php-fpm, Apache, LiteSpeed); running processes keep the old code.")
 	}
 	if st == advisory.Unknown {
@@ -140,4 +144,18 @@ func orStr(s, d string) string {
 		return d
 	}
 	return s
+}
+
+// imageVariant extracts the variant from an official image reference:
+// "php:8.3.35-fpm-alpine" → "fpm-alpine", "php:8.1-apache" → "apache".
+func imageVariant(image string) string {
+	_, tag, ok := strings.Cut(image, ":")
+	if !ok {
+		return ""
+	}
+	parts := strings.SplitN(tag, "-", 2)
+	if len(parts) != 2 || parts[0] == "" || parts[0][0] < '0' || parts[0][0] > '9' {
+		return ""
+	}
+	return parts[1]
 }

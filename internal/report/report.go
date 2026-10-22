@@ -152,7 +152,7 @@ func Render(in Input) ([]byte, error) {
 					name = adv.Name
 				}
 				av := assessmentView{Advisory: name, Status: string(a.Status), StatusEn: statusText[a.Status].En, StatusZh: statusText[a.Status].Zh, Reason: a.Reason, Confidence: a.Confidence, Evidence: a.Evidence}
-				av.Steps = remedy.Steps(remedy.Input{Environment: inst.Environment, SAPI: inst.SAPI, Version: inst.Version, Package: inst.Package, Stale: inst.Stale, TargetKind: inst.TargetKind, Assessment: a, Advisory: adv})
+				av.Steps = remedy.Steps(remedy.Input{Environment: inst.Environment, SAPI: inst.SAPI, Version: inst.Version, Package: inst.Package, Stale: inst.Stale, TargetKind: inst.TargetKind, Image: inst.Image, Assessment: a, Advisory: adv})
 				iv.Views = append(iv.Views, av)
 			}
 			v.Instances = append(v.Instances, iv)

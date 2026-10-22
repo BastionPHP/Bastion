@@ -261,7 +261,7 @@ func (t *tracer) checkPHPConfig() {
 				mt = &m
 			}
 			for _, m := range reAutoPrepend.FindAllSubmatchIndex(b, -1) {
-				target := string(b[m[6]:m[7]])
+				target := string(b[m[4]:m[5]])
 				if target == "" || strings.EqualFold(target, "none") || strings.HasPrefix(target, ";") {
 					continue
 				}

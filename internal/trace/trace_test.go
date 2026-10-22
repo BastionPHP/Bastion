@@ -97,12 +97,20 @@ func TestCleanTree(t *testing.T) {
 	root := t.TempDir()
 	put(t, root, "var/www/html/index.php", "<?php\nrequire __DIR__.'/vendor/autoload.php';\necho htmlspecialchars($_GET['q'] ?? '');\n", time.Time{})
 	put(t, root, "etc/passwd", "root:x:0:0:root:/root:/bin/bash\n", time.Time{})
+	// Stock php.ini: empty directives followed by commented lines.
+	put(t, root, "etc/php/8.3/fpm/php.ini", "; https://php.net/auto-prepend-file\nauto_prepend_file =\n\n; https://php.net/auto-append-file\nauto_append_file =\n", time.Time{})
+	put(t, root, "var/www/html/.user.ini", "auto_prepend_file = '/var/www/html/wordfence-waf.php'\n", time.Time{})
 	res, err := Run(context.Background(), Options{SysRoot: root}, "test")
 	if err != nil {
 		t.Fatal(err)
 	}
-	if res.Verdict != VerdictClean || len(res.Findings) != 0 {
+	if res.Verdict != VerdictClean {
 		t.Fatalf("%s %+v", res.Verdict, res.Findings)
+	}
+	for _, f := range res.Findings {
+		if f.Severity != Info {
+			t.Errorf("unexpected %s finding %s at %s", f.Severity, f.Rule, f.Path)
+		}
 	}
 }
 

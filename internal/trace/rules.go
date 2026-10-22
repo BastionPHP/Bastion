@@ -1,6 +1,7 @@
 package trace
 
 import (
+	"bytes"
 	"embed"
 	"encoding/json"
 	"fmt"
@@ -20,7 +21,9 @@ type Rule struct {
 	// MinLength requires the match to be at least this long (RE2 caps
 	// repetition counts at 1000).
 	MinLength int `json:"min_length,omitempty"`
-	re        *regexp.Regexp
+	// Hints are lowercase substrings that must appear for the rule to run.
+	Hints []string `json:"hints,omitempty"`
+	re    *regexp.Regexp
 }
 
 // LoadRules returns the built-in content rules, compiled.
@@ -63,7 +66,11 @@ type Match struct {
 // per rule (the first).
 func MatchContent(rules []*Rule, content []byte) []Match {
 	var out []Match
+	lower := bytes.ToLower(content)
 	for _, r := range rules {
+		if !hasHint(lower, r.Hints) {
+			continue
+		}
 		var loc []int
 		if r.MinLength > 0 {
 			for _, l := range r.re.FindAllIndex(content, -1) {
@@ -81,6 +88,18 @@ func MatchContent(rules []*Rule, content []byte) []Match {
 		out = append(out, Match{Rule: r, Line: lineOf(content, loc[0]), Snippet: snippet(content, loc[0], loc[1])})
 	}
 	return out
+}
+
+func hasHint(lower []byte, hints []string) bool {
+	if len(hints) == 0 {
+		return true
+	}
+	for _, h := range hints {
+		if bytes.Contains(lower, []byte(h)) {
+			return true
+		}
+	}
+	return false
 }
 
 func lineOf(b []byte, off int) int {
