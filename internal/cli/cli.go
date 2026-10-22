@@ -174,16 +174,20 @@ func writeJSON(w io.Writer, v any) error {
 }
 
 type scanFlags struct {
-	sysroot  string
-	noDocker bool
-	noExec   bool
-	globs    multiFlag
+	sysroot   string
+	noDocker  bool
+	noExec    bool
+	globs     multiFlag
+	images    multiFlag
+	allImages bool
 }
 
 func (f *scanFlags) register(fs *flag.FlagSet) {
 	fs.StringVar(&f.sysroot, "sysroot", "", "scan a mounted filesystem (image, backup, chroot) instead of the live host")
 	fs.BoolVar(&f.noDocker, "no-containers", false, "skip Docker/Podman containers")
-	fs.BoolVar(&f.noExec, "no-exec", false, "never execute anything (no `php -v`, no `docker exec`); rely on static analysis only")
+	fs.BoolVar(&f.noExec, "no-exec", false, "never execute anything (no php -v, no docker exec); rely on static analysis only")
+	fs.Var(&f.images, "image", "also scan this container image (repeatable); read with docker save, never run")
+	fs.BoolVar(&f.allImages, "images", false, "also scan every local container image (reads each image once; can take a while)")
 	fs.Var(&f.globs, "glob", "extra glob of PHP binaries to inspect (repeatable), e.g. --glob '/srv/*/bin/php'")
 }
 
@@ -192,7 +196,7 @@ func (e *env) runScan(ctx context.Context, c *common, f *scanFlags) (*scan.Resul
 	if err != nil {
 		return nil, err
 	}
-	opt := scan.Options{DB: db, SysRoot: f.sysroot, Containers: !f.noDocker, Exec: !f.noExec, ExtraGlobs: f.globs, Progress: e.progress(c)}
+	opt := scan.Options{DB: db, SysRoot: f.sysroot, Containers: !f.noDocker, Exec: !f.noExec, ExtraGlobs: f.globs, Images: f.images, AllImages: f.allImages, Progress: e.progress(c)}
 	res, err := scan.Run(ctx, opt, Version)
 	e.clearProgress(c)
 	return res, err

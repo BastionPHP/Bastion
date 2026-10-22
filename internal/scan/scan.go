@@ -32,6 +32,10 @@ type Options struct {
 	// Exec allows running `php -v` (on the host or via `docker exec`) when
 	// a binary cannot be identified statically.
 	Exec bool
+	// Images are image references to read with `docker save`; AllImages
+	// adds every local image.
+	Images    []string
+	AllImages bool
 	// ExtraGlobs are additional in-tree globs to inspect.
 	ExtraGlobs []string
 	Progress   func(string)
@@ -52,6 +56,7 @@ type Target struct {
 	procs   []discover.Process  `json:"-"`
 	env     map[string]string   `json:"-"`
 	db      *pkgdb.DB           `json:"-"`
+	tmpDir  string              `json:"-"`
 }
 
 // Instance is one PHP build.
@@ -137,10 +142,16 @@ func Run(ctx context.Context, opt Options, toolVersion string) (*Result, error) 
 	}
 
 	targets := buildTargets(ctx, opt, res)
+	if opt.SysRoot == "" {
+		targets = append(targets, imageTargets(ctx, opt, res)...)
+	}
 	for _, t := range targets {
 		opt.progress("scanning %s %s", t.Kind, t.Name)
 		res.Targets = append(res.Targets, t)
 		res.Instances = append(res.Instances, scanTarget(ctx, opt, t, res)...)
+		if t.tmpDir != "" {
+			os.RemoveAll(t.tmpDir)
+		}
 	}
 	sort.SliceStable(res.Instances, func(i, j int) bool {
 		a, b := res.Instances[i], res.Instances[j]

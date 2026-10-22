@@ -90,8 +90,8 @@ func (e *env) cmdReport(ctx context.Context, args []string) (int, error) {
 	var out, fromScan, fromTrace string
 	var noTrace bool
 	fs.StringVar(&out, "o", "", "output file (default bastion-report-<host>-<date>.html)")
-	fs.StringVar(&fromScan, "scan", "", "build the report from a saved `bastion scan --json` file instead of scanning")
-	fs.StringVar(&fromTrace, "trace", "", "build the report from a saved `bastion trace --json` file instead of tracing")
+	fs.StringVar(&fromScan, "scan", "", "build the report from a saved bastion scan --json file instead of scanning")
+	fs.StringVar(&fromTrace, "trace", "", "build the report from a saved bastion trace --json file instead of tracing")
 	fs.BoolVar(&noTrace, "no-trace", false, "only include the vulnerability scan")
 	fs.DurationVar(&tf.since, "since", 30*24*time.Hour, "trace time window")
 	fs.BoolVar(&tf.noLogs, "no-logs", false, "skip log analysis")
