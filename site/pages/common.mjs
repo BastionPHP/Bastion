@@ -49,5 +49,5 @@ export function sevTag(sev) {
   return `<span class="st" data-sev="${base}">${icon(ic)}${esc(sev)}</span>`;
 }
 
-export const INSTALL = "curl -fsSL https://larptard.github.io/bastion/install.sh | sh";
+export const INSTALL = "curl -fsSL https://www.bastionphp.com/install.sh | sh";
 export { esc, icon };

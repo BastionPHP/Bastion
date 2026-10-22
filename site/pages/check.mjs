@@ -71,7 +71,7 @@ export function render(ctx, { advisories, iconSet }) {
       </div>
     </div>
     <div class="panel" id="result" aria-live="polite">
-      <div class="result-empty">${icon("shield-question")}Paste output on the left, or pick an example.</div>
+      <div class="result-empty">${icon("shield-question")}<strong>Ready when you are.</strong><p>Paste your PHP output or choose an example to see the assessment and its evidence.</p><span>${icon("lock")}Your input stays in this browser.</span></div>
     </div>
   </div>
   <div class="note" style="margin-top:16px">${icon("server")}<p>This page sees only what you paste. A server usually has several PHP builds, and running workers may still use old code. <code>sudo bastion scan</code> checks all of them, including containers and images, and reports which interim mitigations are in place.</p></div>

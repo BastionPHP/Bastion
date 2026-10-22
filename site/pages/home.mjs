@@ -1,5 +1,6 @@
 import { layout, REPO } from "../lib/layout.mjs";
 import { catalog } from "../lib/catalog.mjs";
+import { evidenceMap } from "../lib/evidence-map.mjs";
 import { terminal, recording, codebox, copyBtn, statusTag, sevTag, INSTALL, esc, icon } from "./common.mjs";
 
 // What scan covers, per environment. Every claim here maps to code:
@@ -33,10 +34,11 @@ export function render(ctx, { advisory }) {
   const body = `
 <section class="hero">
   <div class="bx-wrap hero-grid">
+    <div class="hero-intro">
     <div class="hero-text">
       <a class="hero-alert" href="#php2shell">${icon("shield-alert")}PHP2Shell · CVE-2026-109618 · CVE-2026-109619 · CVSS 9.2</a>
       <h1>Find every PHP build on a server and prove which ones are patched.</h1>
-      <p class="hero-sub">Bastion is an open-source command-line tool that runs on your own machine. It inventories PHP from system packages, hosting panels, containers and images, decides whether each build carries the fix (including distribution backports that keep the old version number), and looks for signs of an intrusion that happened before you patched.</p>
+      <p class="hero-sub"><strong>Open-source PHP assessment, on your own machine.</strong> Inventory system packages, hosting panels, containers and images. Verify patches, including distribution backports, and look for signs of intrusion left behind before you patched.</p>
       <div class="cmd"><span class="p">$</span><code id="hero-install">${esc(INSTALL)}</code>${copyBtn("hero-install")}</div>
       <div class="hero-actions">
         <a class="btn is-primary" href="${ctx.href("check")}">${icon("scan-search")}Check php -v in the browser</a>
@@ -50,7 +52,13 @@ export function render(ctx, { advisory }) {
         <li>${icon("scale")}MIT</li>
       </ul>
     </div>
-    <div>
+    ${evidenceMap()}
+    </div>
+    <div class="scan-preview">
+      <div class="scan-preview-head">
+        <span>Command-line preview</span>
+        <a href="${ctx.root}demo/report.html">Sample report ${icon("arrow-up-right")}</a>
+      </div>
       ${terminal(ctx, { title: "sudo bastion scan", file: "scan.ansi", cmd: "sudo bastion scan" })}
       <p class="term-cap">${esc(rec.host)}${rec.containers ? " · containers: " + esc(rec.containers) : ""} · ${esc(rec.version)} · ${esc(rec.at)}</p>
     </div>
@@ -221,10 +229,10 @@ export function render(ctx, { advisory }) {
         ${codebox(INSTALL + "\nsudo bastion scan\nsudo bastion trace\nsudo bastion report")}
       </div>
       <div class="tab-panel" data-panel="i-manual" hidden>
-        ${codebox(`VERSION=v0.1.0   # see ${REPO}/releases\nBASE=${REPO}/releases/download/$VERSION\ncurl -fsSLO $BASE/bastion_linux_amd64.tar.gz -O $BASE/SHA256SUMS -O $BASE/SHA256SUMS.sigstore.json\nsha256sum --ignore-missing -c SHA256SUMS\ncosign verify-blob --bundle SHA256SUMS.sigstore.json \\\n  --certificate-identity-regexp '^https://github.com/larptard/bastion/.github/workflows/release.yml@refs/tags/v' \\\n  --certificate-oidc-issuer https://token.actions.githubusercontent.com SHA256SUMS\ntar xzf bastion_linux_amd64.tar.gz && sudo install -m 0755 bastion /usr/local/bin/`)}
+        ${codebox(`VERSION=v0.1.0   # see ${REPO}/releases\nBASE=${REPO}/releases/download/$VERSION\ncurl -fsSLO $BASE/bastion_linux_amd64.tar.gz -O $BASE/SHA256SUMS -O $BASE/SHA256SUMS.sigstore.json\nsha256sum --ignore-missing -c SHA256SUMS\ncosign verify-blob --bundle SHA256SUMS.sigstore.json \\\n  --certificate-identity-regexp '^https://github.com/BastionPHP/Bastion/.github/workflows/release.yml@refs/tags/v' \\\n  --certificate-oidc-issuer https://token.actions.githubusercontent.com SHA256SUMS\ntar xzf bastion_linux_amd64.tar.gz && sudo install -m 0755 bastion /usr/local/bin/`)}
       </div>
       <div class="tab-panel" data-panel="i-src" hidden>
-        ${codebox("go install github.com/larptard/bastion/cmd/bastion@latest   # Go 1.24+\n# or\ngit clone https://github.com/larptard/bastion && cd bastion && make build")}
+        ${codebox("go install github.com/larptard/bastion/cmd/bastion@latest   # Go 1.24+\n# or\ngit clone https://github.com/BastionPHP/Bastion && cd Bastion && make build")}
       </div>
     </div>
   </div>

@@ -74,7 +74,7 @@ type Region struct {
 	Snippet   *Message `json:"snippet,omitempty"`
 }
 
-const infoURI = "https://larptard.github.io/bastion/"
+const infoURI = "https://www.bastionphp.com/"
 
 func fileURI(p string) string {
 	return "file://" + strings.ReplaceAll(p, " ", "%20")

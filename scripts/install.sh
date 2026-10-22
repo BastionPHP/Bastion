@@ -1,7 +1,7 @@
 #!/bin/sh
 # Bastion installer: downloads a release, verifies it, installs the binary.
 #
-#   curl -fsSL https://larptard.github.io/bastion/install.sh | sh
+#   curl -fsSL https://www.bastionphp.com/install.sh | sh
 #
 # Verification: the archive's SHA-256 must match SHA256SUMS. If cosign is
 # installed, SHA256SUMS' Sigstore signature must come from this repository's
@@ -13,7 +13,7 @@
 # Nothing is installed besides the single binary.
 set -eu
 
-REPO="larptard/bastion"
+REPO="BastionPHP/Bastion"
 VERSION="${BASTION_VERSION:-latest}"
 REQUIRE_SIG="${BASTION_REQUIRE_SIGNATURE:-0}"
 

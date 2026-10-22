@@ -1,11 +1,11 @@
 // Page shell: <head>, navigation, footer. Every link is relative so the site
 // works under any base path (GitHub Pages serves it from /<repo>/).
-import { readFileSync } from "node:fs";
 import { icon } from "./icons.mjs";
 
-const logo = readFileSync(new URL("../../design/logo.svg", import.meta.url), "utf8");
-export const REPO = "https://github.com/larptard/bastion";
-export const SITE = "https://larptard.github.io/bastion/";
+// Keep the supplied artwork intact; CSS frames the mark or the full lockup.
+const brandArt = (ctx, full = false) => `<span class="brand-art${full ? " brand-art-full" : ""}" aria-hidden="true"><img src="${ctx.asset("bastion-logo.jpg")}" alt="" width="1254" height="1254"${full ? ' loading="lazy"' : ""}></span>`;
+export const REPO = "https://github.com/BastionPHP/Bastion";
+export const SITE = (process.env.SITE_URL || "https://www.bastionphp.com/").replace(/\/?$/, "/");
 
 export const pages = [
   { id: "home", dir: "", nav: "Overview" },
@@ -47,7 +47,7 @@ export function layout(ctx, { title, description, body, scripts = [] }) {
 <meta property="og:description" content="${description}">
 <meta property="og:type" content="website">
 <meta property="og:image" content="${SITE}assets/og.png">
-<link rel="icon" href="${ctx.asset("favicon.svg")}" type="image/svg+xml">
+<link rel="icon" href="${ctx.asset("bastion-favicon.svg")}" type="image/svg+xml" sizes="any">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+Condensed:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
@@ -59,7 +59,7 @@ export function layout(ctx, { title, description, body, scripts = [] }) {
 <a class="skip" href="#main">Skip to content</a>
 <header class="hdr">
   <div class="bx-wrap hdr-in">
-    <a class="logo" href="${ctx.href("home")}">${logo}<span>Bastion</span></a>
+    <a class="logo" href="${ctx.href("home")}">${brandArt(ctx)}<span>Bastion</span></a>
     <nav class="hdr-nav" aria-label="Main">${nav}</nav>
     <div class="hdr-tools">
       <button class="hdr-btn" type="button" data-theme-toggle aria-label="Switch between light and dark theme">${icon("sun", "only-dark")}${icon("moon", "only-light")}</button>
@@ -74,7 +74,7 @@ ${body}
 <footer class="ftr">
   <div class="bx-wrap ftr-in">
     <div class="ftr-brand">
-      <a class="logo" href="${ctx.href("home")}">${logo}<span>Bastion</span></a>
+      <a class="logo" href="${ctx.href("home")}" aria-label="Bastion home">${brandArt(ctx, true)}</a>
       <p>Local, read-only PHP exposure and compromise assessment. MIT licensed.</p>
     </div>
     <dl class="ftr-cols">

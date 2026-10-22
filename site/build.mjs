@@ -4,13 +4,14 @@
 import { mkdirSync, rmSync, writeFileSync, readFileSync, readdirSync, copyFileSync, existsSync, statSync } from "node:fs";
 import { createServer } from "node:http";
 import { join, extname } from "node:path";
-import { pages, makeCtx, layout } from "./lib/layout.mjs";
+import { fileURLToPath } from "node:url";
+import { pages, makeCtx, layout, SITE } from "./lib/layout.mjs";
 import * as home from "./pages/home.mjs";
 import * as how from "./pages/how.mjs";
 import * as check from "./pages/check.mjs";
 import * as docs from "./pages/docs.mjs";
 
-const here = new URL(".", import.meta.url).pathname;
+const here = fileURLToPath(new URL(".", import.meta.url));
 const repo = join(here, "..");
 const dist = join(here, "dist");
 
@@ -39,9 +40,10 @@ for (const page of pages) {
 // 404 page (GitHub Pages serves /404.html for every missing path).
 {
   const ctx = makeCtx({ id: "404", dir: "", nav: "" });
-  ctx.href = (id, hash = "") => "/bastion/" + (pages.find((p) => p.id === id)?.dir || "") + hash;
-  ctx.asset = (p) => "/bastion/assets/" + p;
-  writeFileSync(join(dist, "404.html"), layout(ctx, { title: "Not found", description: "Page not found", body: `<header class="phead"><div class="bx-wrap"><div class="crumbs">404</div><h1>Page not found</h1><p><a href="/bastion/">Back to the overview</a></p></div></header>` }));
+  const basePath = new URL(SITE).pathname;
+  ctx.href = (id, hash = "") => basePath + (pages.find((p) => p.id === id)?.dir || "") + hash;
+  ctx.asset = (p) => basePath + "assets/" + p;
+  writeFileSync(join(dist, "404.html"), layout(ctx, { title: "Not found", description: "Page not found", body: `<header class="phead"><div class="bx-wrap"><div class="crumbs">404</div><h1>Page not found</h1><p><a href="${basePath}">Back to the overview</a></p></div></header>` }));
 }
 
 // Assets: shared design system, site assets, advisory data, demo output.
@@ -81,7 +83,7 @@ if (missing.length) {
 console.log(`built ${count} pages into ${dist}`);
 
 if (process.argv.includes("--serve")) {
-  const types = { ".html": "text/html; charset=utf-8", ".css": "text/css", ".js": "text/javascript", ".svg": "image/svg+xml", ".json": "application/json", ".png": "image/png", ".sh": "text/plain" };
+  const types = { ".html": "text/html; charset=utf-8", ".css": "text/css", ".js": "text/javascript", ".svg": "image/svg+xml", ".json": "application/json", ".png": "image/png", ".jpg": "image/jpeg", ".sh": "text/plain" };
   createServer((req, res) => {
     let p = decodeURIComponent(new URL(req.url, "http://x").pathname).replace(/^\/bastion/, "");
     let f = join(dist, p);

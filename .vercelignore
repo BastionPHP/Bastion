@@ -1,0 +1,9 @@
+.git
+.env*
+**/.env*
+**/*keypair*.json
+broadcast
+.anchor
+site/dist
+node_modules
+.vercel

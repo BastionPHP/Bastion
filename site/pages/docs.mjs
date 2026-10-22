@@ -1,10 +1,11 @@
 import { spawnSync } from "node:child_process";
 import { existsSync } from "node:fs";
+import { fileURLToPath } from "node:url";
 import { layout, REPO } from "../lib/layout.mjs";
 import { codebox, esc, icon, statusTag, INSTALL } from "./common.mjs";
 import { highlightJSON } from "../lib/highlight.mjs";
 
-const repoRoot = new URL("../../", import.meta.url).pathname;
+const repoRoot = fileURLToPath(new URL("../../", import.meta.url));
 
 // flagsFor runs the real binary's -h so the tables cannot drift from the code.
 function flagsFor(cmd) {
@@ -26,12 +27,19 @@ function flagsFor(cmd) {
     if (d) { def = d[1]; desc = desc.slice(0, d.index); }
     rows.push({ flag: "--" + m[1], type: m[2] === "value" ? "string" : m[2] || "", desc: desc.trim(), def });
   }
-  if (!rows.length) throw new Error(`docs: could not read flags for "${cmd}"; build ./bastion or install Go`);
+  if (!rows.length) {
+    if (process.argv.includes("--preview")) {
+      console.warn(`preview: flags for "${cmd}" unavailable; build ./bastion or install Go for the full command reference`);
+      return [];
+    }
+    throw new Error(`docs: could not read flags for "${cmd}"; build ./bastion or install Go`);
+  }
   return rows;
 }
 
 function flagTable(cmd) {
   const rows = flagsFor(cmd);
+  if (!rows.length) return '<p class="note">The command reference is unavailable in this local preview.</p>';
   return `<div class="panel tbl-wrap"><table class="tbl"><thead><tr><th>Flag</th><th>Description</th><th>Default</th></tr></thead><tbody>${rows
     .map((r) => `<tr><td class="mono" style="white-space:nowrap">${esc(r.flag)}${r.type ? ` <span class="bx-faint">${esc(r.type)}</span>` : ""}</td><td>${esc(r.desc)}</td><td class="mono bx-faint">${esc(r.def)}</td></tr>`)
     .join("")}</tbody></table></div>`;
@@ -117,9 +125,9 @@ export function render(ctx) {
         <tr><td class="mono">BASTION_DOWNLOAD_URL</td><td>A mirror with the same release files. Checksum and signature checks still apply.</td></tr>
       </tbody></table></div>
       <h3>Verify by hand</h3>
-      ${codebox(`VERSION=v0.1.0\nBASE=${REPO}/releases/download/$VERSION\ncurl -fsSLO $BASE/bastion_linux_amd64.tar.gz -O $BASE/SHA256SUMS -O $BASE/SHA256SUMS.sigstore.json\nsha256sum --ignore-missing -c SHA256SUMS\ncosign verify-blob --bundle SHA256SUMS.sigstore.json \\\n  --certificate-identity-regexp '^https://github.com/larptard/bastion/.github/workflows/release.yml@refs/tags/v' \\\n  --certificate-oidc-issuer https://token.actions.githubusercontent.com SHA256SUMS\ngh attestation verify bastion_linux_amd64.tar.gz --repo larptard/bastion   # build provenance`)}
+      ${codebox(`VERSION=v0.1.0\nBASE=${REPO}/releases/download/$VERSION\ncurl -fsSLO $BASE/bastion_linux_amd64.tar.gz -O $BASE/SHA256SUMS -O $BASE/SHA256SUMS.sigstore.json\nsha256sum --ignore-missing -c SHA256SUMS\ncosign verify-blob --bundle SHA256SUMS.sigstore.json \\\n  --certificate-identity-regexp '^https://github.com/BastionPHP/Bastion/.github/workflows/release.yml@refs/tags/v' \\\n  --certificate-oidc-issuer https://token.actions.githubusercontent.com SHA256SUMS\ngh attestation verify bastion_linux_amd64.tar.gz --repo BastionPHP/Bastion   # build provenance`)}
       <h3>From source</h3>
-      ${codebox("go install github.com/larptard/bastion/cmd/bastion@latest   # Go 1.24+\n# or\ngit clone https://github.com/larptard/bastion && cd bastion && make build")}
+      ${codebox("go install github.com/larptard/bastion/cmd/bastion@latest   # Go 1.24+\n# or\ngit clone https://github.com/BastionPHP/Bastion && cd Bastion && make build")}
     </section>
 
     <section id="quickstart">

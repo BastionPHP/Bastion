@@ -10,7 +10,7 @@ Evidence-based PHP security assessment for operators and incident responders.
 [![License: MIT](https://img.shields.io/badge/license-MIT-64748b)](LICENSE)
 [![Go](https://img.shields.io/badge/Go-1.24%2B-00ADD8?logo=go&logoColor=white)](go.mod)
 
-[Website](https://bastion-bay-xi.vercel.app/) · [Online check](https://bastion-bay-xi.vercel.app/check/) · [Documentation](https://bastion-bay-xi.vercel.app/docs/) · [Sample report](https://bastion-bay-xi.vercel.app/demo/report.html)
+[Website](https://www.bastionphp.com/) · [Online check](https://www.bastionphp.com/check/) · [Documentation](https://www.bastionphp.com/docs/) · [Sample report](https://www.bastionphp.com/demo/report.html)
 
 <a href="docs/assets/scan.png"><img src="docs/assets/readme-scan.png" alt="Recorded Bastion scan inventory and summary showing affected and fixed PHP builds on an Ubuntu host with containers" width="960"></a>
 
@@ -52,7 +52,7 @@ sudo ./bastion report -o bastion-report.html
 
 Start without `sudo` if you only need to inspect files your account can read. Elevated access improves coverage of other users' processes, container filesystems and system logs. Use `scan --no-exec` to disable the `php -v` and container-exec fallbacks; image export still uses the container runtime CLI.
 
-For a quick version or package assessment, use the [browser-based check](https://bastion-bay-xi.vercel.app/check/). Input is evaluated in the browser; it does not inventory your server. Windows users can use this check without installing the CLI.
+For a quick version or package assessment, use the [browser-based check](https://www.bastionphp.com/check/). Input is evaluated in the browser; it does not inventory your server. Windows users can use this check without installing the CLI.
 
 ## Four commands, one investigation
 

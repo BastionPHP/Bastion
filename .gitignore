@@ -4,3 +4,8 @@
 *.test
 /coverage.out
 node_modules/
+.vercel/
+.env*
+*keypair*.json
+broadcast/
+.anchor/

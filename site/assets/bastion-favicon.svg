@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="408 324 440 440">
+  <title>Bastion</title>
+  <style>
+    .background { fill: #fff; }
+    .mark { fill: #111; }
+    @media (prefers-color-scheme: dark) {
+      .background { fill: #0c0f13; }
+      .mark { fill: #fff; }
+    }
+  </style>
+  <rect class="background" x="408" y="324" width="440" height="440" rx="48"/>
+  <g class="mark">
+    <path d="M431 366 Q480 355 531 351 V394 L579 390 V348 Q628 346 678 349 V391 L725 395 V351 Q775 357 823 366 V490 Q627 464 431 490 Z"/>
+    <path d="M431 513 Q581 494 731 504 V609 Q581 600 431 613 Z"/>
+    <path d="M431 634 Q529 627 627 630 V737 H431 Z"/>
+  </g>
+</svg>
