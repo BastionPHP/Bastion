@@ -57,6 +57,10 @@ type Subject struct {
 	ChangelogHits    []string
 	// Fingerprints lists the advisory fingerprint values found in the binary.
 	Fingerprints []string
+	// Environment is the installer that provided the build ("Plesk", …).
+	Environment string
+	// BuildDate is the compile date embedded in the binary (YYYY-MM-DD).
+	BuildDate string
 }
 
 // Evidence is one observation that fed the verdict.
@@ -113,13 +117,35 @@ func (a *Advisory) VendorFixFor(os OS, pkg *Package) *VendorFix {
 	if pkg == nil {
 		return nil
 	}
+	branch := ""
+	if v, err := version.ParsePHP(UpstreamOf(pkg.Version)); err == nil {
+		branch = v.Branch()
+	}
 	for i := range a.VendorFixes {
 		f := &a.VendorFixes[i]
-		if f.Distro != os.ID || f.Release != os.VersionID || f.Format != pkg.Manager {
+		if f.Distro != os.ID || !releaseMatches(f.Release, os.VersionID) || f.Format != pkg.Manager {
+			continue
+		}
+		if f.Branch != "" && f.Branch != branch {
 			continue
 		}
 		if f.Package == pkg.Source || f.Package == pkg.Name {
 			return f
+		}
+	}
+	return nil
+}
+
+// releaseMatches compares a vendor release with VERSION_ID. A release
+// without a dot ("9") covers all minor releases ("9.8").
+func releaseMatches(release, versionID string) bool {
+	return release == versionID || (!strings.Contains(release, ".") && strings.HasPrefix(versionID, release+"."))
+}
+
+func (a *Advisory) policyFor(os OS) *VendorPolicy {
+	for i := range a.VendorPolicies {
+		if a.VendorPolicies[i].Distro == os.ID {
+			return &a.VendorPolicies[i]
 		}
 	}
 	return nil
@@ -213,6 +239,20 @@ func (a *Advisory) Evaluate(s Subject) Assessment {
 		return done(Vulnerable, "high", "package %s is older than the vendor fix %s", s.Package.Version, f.Fixed)
 	}
 
+	if err == nil && s.BuildDate != "" {
+		for _, r := range a.BuildDateFixes {
+			if r.Environment != s.Environment || !contains(r.Branches, v.Branch()) {
+				continue
+			}
+			if s.BuildDate >= r.FixedOn {
+				add("build-date", "fixed", "%s builds of PHP %s dated %s or later carry the fix; this one was built %s (%s)", r.Environment, v.Branch(), r.FixedOn, s.BuildDate, r.Source)
+				return done(Fixed, "high", "%s rebuild dated %s", r.Environment, s.BuildDate)
+			}
+			add("build-date", "vulnerable", "%s builds of PHP %s before %s are vulnerable; this one was built %s (%s)", r.Environment, v.Branch(), r.FixedOn, s.BuildDate, r.Source)
+			return done(Vulnerable, "high", "%s build from %s predates the fixed rebuild", r.Environment, s.BuildDate)
+		}
+	}
+
 	if len(s.ChangelogHits) > 0 {
 		add("changelog", "fixed", "package changelog mentions %s", strings.Join(s.ChangelogHits, ", "))
 		return done(Fixed, "high", "vendor changelog records the fix")
@@ -234,6 +274,10 @@ func (a *Advisory) Evaluate(s Subject) Assessment {
 	if s.Package != nil {
 		if upstream == "" {
 			return done(Unknown, "low", "packaged build with an unrecognised version")
+		}
+		if p := a.policyFor(s.OS); p != nil {
+			add("vendor", "vulnerable", "%s (checked %s) records no backport below the upstream fix", p.Source, p.Checked)
+			return done(LikelyVulnerable, "medium", "%s ships upstream releases; no backport recorded", s.OS.ID)
 		}
 		if s.ChangelogChecked {
 			add("changelog", "vulnerable", "%s changelog does not mention %s", s.Package.Name, strings.Join(a.ChangelogMarkers[:min(2, len(a.ChangelogMarkers))], " / "))

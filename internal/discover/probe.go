@@ -23,6 +23,21 @@ type StaticResult struct {
 	IsBinary bool
 	Version  string
 	Found    []string
+	// BuildDate is the compile date (YYYY-MM-DD) from the __DATE__/__TIME__
+	// literals PHP prints in `php -v`, when present.
+	BuildDate string
+}
+
+// buildStamp matches the adjacent __DATE__ "\0" __TIME__ literals.
+var buildStamp = regexp.MustCompile(`(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) ([ 0-9][0-9]) (20[0-9]{2})[ \x00][0-2][0-9]:[0-5][0-9]:[0-5][0-9]\x00`)
+
+// BuildDate converts "Oct  7 2026" style dates to "2026-10-07".
+func BuildDate(month, day, year string) string {
+	t, err := time.Parse("Jan 2 2006", month+" "+strings.TrimSpace(day)+" "+year)
+	if err != nil {
+		return ""
+	}
+	return t.Format("2006-01-02")
 }
 
 // magic numbers of executable formats we accept.
@@ -70,6 +85,11 @@ func StaticProbe(path string, needles []string) (StaticResult, error) {
 				if v := versionChars.Find(rest); v != nil && len(rest) > len(v) {
 					res.Version = string(v)
 				}
+			}
+		}
+		if res.BuildDate == "" {
+			if m := buildStamp.FindSubmatch(chunk); m != nil {
+				res.BuildDate = BuildDate(string(m[1]), string(m[2]), string(m[3]))
 			}
 		}
 		for _, nd := range needles {

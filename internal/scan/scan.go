@@ -69,6 +69,7 @@ type Instance struct {
 	Package       *advisory.Package     `json:"package,omitempty"`
 	Changelog     string                `json:"changelog,omitempty"`
 	Fingerprints  []string              `json:"fingerprints,omitempty"`
+	BuildDate     string                `json:"build_date,omitempty"`
 	PIDs          []int                 `json:"pids,omitempty"`
 	Stale         bool                  `json:"stale,omitempty"`
 	Notes         []string              `json:"notes,omitempty"`
@@ -325,7 +326,7 @@ func scanTarget(ctx context.Context, opt Options, t *Target, res *Result) []*Ins
 		if err != nil || !st.IsBinary {
 			continue
 		}
-		inst := &Instance{Path: resolved, SAPI: discover.SAPIFor(path.Base(resolved)), Version: st.Version, VersionSource: "binary", Fingerprints: st.Found, Stale: c.Deleted}
+		inst := &Instance{Path: resolved, SAPI: discover.SAPIFor(path.Base(resolved)), Version: st.Version, VersionSource: "binary", Fingerprints: st.Found, BuildDate: st.BuildDate, Stale: c.Deleted}
 		if c.Env != "" {
 			inst.Environment = c.Env
 		}
@@ -373,6 +374,7 @@ func scanTarget(ctx context.Context, opt Options, t *Target, res *Result) []*Ins
 		}
 		_, imageEnv := t.env["PHP_VERSION"]
 		inst.Environment = discover.Classify(inst.Path, inst.Environment, inst.Package != nil, pkgVer, mgr, imageEnv)
+		subj.Environment, subj.BuildDate = inst.Environment, inst.BuildDate
 		for _, a := range res.Advisories {
 			as := a.Evaluate(subj)
 			if inst.Stale && as.Status != advisory.Fixed && (staleDistro || as.Status != advisory.Vulnerable) {

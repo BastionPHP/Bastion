@@ -152,14 +152,25 @@
     });
     return older ? -1 : newer ? 1 : 0;
   }
+  function releaseMatches(release, versionID) {
+    return release === versionID || (release.indexOf(".") < 0 && String(versionID || "").indexOf(release + ".") === 0);
+  }
   function vendorFixFor(adv, os, pkg) {
     if (!pkg) return null;
+    var pv = parsePHP(upstreamOf(pkg.version));
+    var br = pv ? branch(pv) : "";
     var list = adv.vendor_fixes || [];
     for (var i = 0; i < list.length; i++) {
       var f = list[i];
-      if (f.distro !== os.id || f.release !== os.version_id || f.format !== pkg.manager) continue;
+      if (f.distro !== os.id || !releaseMatches(f.release, os.version_id) || f.format !== pkg.manager) continue;
+      if (f.branch && f.branch !== br) continue;
       if (f.package === pkg.source || f.package === pkg.name) return f;
     }
+    return null;
+  }
+  function policyFor(adv, os) {
+    var list = adv.vendor_policies || [];
+    for (var i = 0; i < list.length; i++) if (list[i].distro === os.id) return list[i];
     return null;
   }
 
@@ -214,6 +225,20 @@
       return done("vulnerable", "high", "package " + s.package.version + " is older than the vendor fix " + f.fixed);
     }
 
+    if (v && s.build_date) {
+      var rules = adv.build_date_fixes || [];
+      for (var r = 0; r < rules.length; r++) {
+        var rule = rules[r];
+        if (rule.environment !== s.environment || rule.branches.indexOf(branch(v)) < 0) continue;
+        if (s.build_date >= rule.fixed_on) {
+          add("build-date", "fixed", rule.environment + " builds of PHP " + branch(v) + " dated " + rule.fixed_on + " or later carry the fix; this one was built " + s.build_date + " (" + rule.source + ")");
+          return done("fixed", "high", rule.environment + " rebuild dated " + s.build_date);
+        }
+        add("build-date", "vulnerable", rule.environment + " builds of PHP " + branch(v) + " before " + rule.fixed_on + " are vulnerable; this one was built " + s.build_date + " (" + rule.source + ")");
+        return done("vulnerable", "high", rule.environment + " build from " + s.build_date + " predates the fixed rebuild");
+      }
+    }
+
     if (s.changelog_hits && s.changelog_hits.length) {
       add("changelog", "fixed", "package changelog mentions " + s.changelog_hits.join(", "));
       return done("fixed", "high", "vendor changelog records the fix");
@@ -230,6 +255,11 @@
 
     if (s.package) {
       if (!up) return done("unknown", "low", "packaged build with an unrecognised version");
+      var pol = policyFor(adv, os);
+      if (pol) {
+        add("vendor", "vulnerable", pol.source + " (checked " + pol.checked + ") records no backport below the upstream fix");
+        return done("likely-vulnerable", "medium", os.id + " ships upstream releases; no backport recorded");
+      }
       if (s.changelog_checked) {
         add("changelog", "vulnerable", s.package.name + " changelog does not mention " + adv.changelog_markers.slice(0, 2).join(" / "));
         return done("likely-vulnerable", "medium", "distribution package without a recorded backport");
@@ -261,6 +291,14 @@
   var reUbuRel = /ubuntu[0-9.]*?\b(1[4-9]|2[0-9])\.(04|10)\b/;
   var reDebRel = /~deb([0-9]{2})u/;
 
+  var MONTHS = { Jan: "01", Feb: "02", Mar: "03", Apr: "04", May: "05", Jun: "06", Jul: "07", Aug: "08", Sep: "09", Oct: "10", Nov: "11", Dec: "12" };
+  // buildDate turns "Oct  7 2026 18:06:38" into "2026-10-07".
+  function buildDate(built) {
+    var m = /^([A-Z][a-z]{2}) +(\d{1,2}) (\d{4})/.exec(built || "");
+    if (!m || !MONTHS[m[1]]) return "";
+    return m[3] + "-" + MONTHS[m[1]] + "-" + (m[2].length === 1 ? "0" + m[2] : m[2]);
+  }
+
   function preferred(name) {
     if (/-cli$/.test(name)) return 3;
     if (/-fpm$/.test(name) || name.indexOf("mod-php") >= 0) return 2;
@@ -276,9 +314,10 @@
 
   function parse(text) {
     text = String(text).replace(/\r\n/g, "\n");
-    var p = { version: "", sapi: "", built: "", package: null, os: { id: "", version_id: "" }, inferred: [] };
+    var p = { version: "", sapi: "", built: "", build_date: "", environment: "", package: null, os: { id: "", version_id: "" }, inferred: [] };
     var m = rePHPv.exec(text);
-    if (m) { p.version = m[1]; p.sapi = m[2]; p.built = m[3] || ""; }
+    if (m) { p.version = m[1]; p.sapi = m[2]; p.built = m[3] || ""; p.build_date = buildDate(p.built); }
+    if (text.indexOf("/opt/plesk/php/") >= 0) p.environment = "Plesk";
     var best = -1;
     function consider(pkg) {
       if (pkg.manager === "dpkg" && debSource(pkg.name).indexOf("php") !== 0) return;
@@ -341,7 +380,7 @@
     return p;
   }
 
-  function subject(p) { return { version: p.version, package: p.package, os: p.os }; }
+  function subject(p) { return { version: p.version, package: p.package, os: p.os, environment: p.environment, build_date: p.build_date }; }
 
   return {
     parsePHP: parsePHP, comparePHP: comparePHP, compareDpkg: compareDpkg, compareRPM: compareRPM,

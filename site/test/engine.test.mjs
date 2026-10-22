@@ -16,7 +16,7 @@ test("engine vectors match Go", () => {
   const a = adv(vf.advisory);
   for (const c of vf.cases) {
     const s = c.subject;
-    const got = E.evaluate(a, { version: s.version, package: s.package || null, os: s.os || {}, changelog_checked: !!s.changelog_checked, changelog_hits: s.changelog_hits || [], fingerprints: s.fingerprints || [] });
+    const got = E.evaluate(a, { version: s.version, package: s.package || null, os: s.os || {}, changelog_checked: !!s.changelog_checked, changelog_hits: s.changelog_hits || [], fingerprints: s.fingerprints || [], environment: s.environment || "", build_date: s.build_date || "" });
     assert.equal(got.status, c.status, `${c.name}: ${got.reason}`);
     assert.ok(got.evidence.length > 0, c.name);
   }

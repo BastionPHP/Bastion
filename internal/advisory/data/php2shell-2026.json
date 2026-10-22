@@ -217,6 +217,101 @@
       "format": "dpkg",
       "advisory": "DLA-4848-1",
       "url": "https://security-tracker.debian.org/tracker/CVE-2026-109618"
+    },
+    {
+      "distro": "rhel",
+      "release": "10",
+      "branch": "8.3",
+      "package": "php",
+      "fixed": "8.3.36-1.el10_2",
+      "format": "rpm",
+      "advisory": "RHSA-2026:87070",
+      "url": "https://access.redhat.com/errata/RHSA-2026:87070"
+    },
+    {
+      "distro": "rhel",
+      "release": "10",
+      "branch": "8.4",
+      "package": "php8.4",
+      "fixed": "8.4.27-1.el10_2",
+      "format": "rpm",
+      "advisory": "RHSA-2026:87071",
+      "url": "https://access.redhat.com/errata/RHSA-2026:87071"
+    },
+    {
+      "distro": "rhel",
+      "release": "9",
+      "branch": "8.0",
+      "package": "php",
+      "fixed": "8.0.30-8.el9_8.1",
+      "format": "rpm",
+      "advisory": "RHSA-2026:87151",
+      "url": "https://access.redhat.com/errata/RHSA-2026:87151"
+    },
+    {
+      "distro": "rhel",
+      "release": "9",
+      "branch": "8.2",
+      "package": "php",
+      "fixed": "8.2.35-1.module+el9.8.0+25111+a1450321",
+      "format": "rpm",
+      "advisory": "RHSA-2026:87072",
+      "channel": "php:8.2 module",
+      "url": "https://access.redhat.com/errata/RHSA-2026:87072"
+    },
+    {
+      "distro": "rhel",
+      "release": "9",
+      "branch": "8.3",
+      "package": "php",
+      "fixed": "8.3.36-1.module+el9.8.0+25109+6886e21a",
+      "format": "rpm",
+      "advisory": "RHSA-2026:87079",
+      "channel": "php:8.3 module",
+      "url": "https://access.redhat.com/errata/RHSA-2026:87079"
+    },
+    {
+      "distro": "rhel",
+      "release": "8",
+      "branch": "7.4",
+      "package": "php",
+      "fixed": "7.4.33-8.module+el8.10.0+25117+30337cca",
+      "format": "rpm",
+      "advisory": "RHSA-2026:87080",
+      "channel": "php:7.4 module",
+      "url": "https://access.redhat.com/errata/RHSA-2026:87080"
+    },
+    {
+      "distro": "rhel",
+      "release": "8",
+      "branch": "8.2",
+      "package": "php",
+      "fixed": "8.2.35-1.module+el8.10.0+25110+f67151d2",
+      "format": "rpm",
+      "advisory": "RHSA-2026:87073",
+      "channel": "php:8.2 module",
+      "url": "https://access.redhat.com/errata/RHSA-2026:87073"
+    }
+  ],
+  "vendor_policies": [
+    {
+      "distro": "alpine",
+      "source": "Alpine secdb",
+      "checked": "2026-10-22",
+      "url": "https://secdb.alpinelinux.org/"
+    }
+  ],
+  "build_date_fixes": [
+    {
+      "environment": "Plesk",
+      "branches": [
+        "7.4",
+        "8.0",
+        "8.1"
+      ],
+      "fixed_on": "2026-10-21",
+      "source": "Plesk KB 44397729587351",
+      "url": "https://support.plesk.com/hc/en-us/articles/44397729587351"
     }
   ],
   "changelog_markers": [
@@ -280,9 +375,21 @@
     {
       "title": "Red Hat RHSB-2026-013",
       "url": "https://access.redhat.com/security/vulnerabilities/RHSB-2026-013"
+    },
+    {
+      "title": "Red Hat errata RHSA-2026:87070/87071/87072/87073/87079/87080/87151",
+      "url": "https://access.redhat.com/errata/RHSA-2026:87151"
+    },
+    {
+      "title": "Plesk: PHP shipped with Plesk",
+      "url": "https://support.plesk.com/hc/en-us/articles/44397729587351"
+    },
+    {
+      "title": "Alpine secdb",
+      "url": "https://secdb.alpinelinux.org/"
     }
   ],
   "notes": {
-    "en": "The official advisories list every release below 8.2.35 / 8.3.36 / 8.4.27 / 8.5.12 as affected. Branches 8.1 and older receive no official release; the PHP security team published minimal source backport branches for 7.4, 8.0 and 8.1, which do not change the version string. Vendors (Ubuntu also ships fixes for 5.5, 7.0, 7.2 and 7.4 through Ubuntu Pro) backport fixes without bumping the upstream version, which is why Bastion checks package versions and changelogs."
+    "en": "The official advisories list every release below 8.2.35 / 8.3.36 / 8.4.27 / 8.5.12 as affected. Branches 8.1 and older receive no official release; the PHP security team published minimal source backport branches for 7.4, 8.0 and 8.1, which do not change the version string. Vendors (Ubuntu also ships fixes for 5.5, 7.0, 7.2 and 7.4 through Ubuntu Pro) backport fixes without bumping the upstream version, which is why Bastion checks package versions and changelogs. Red Hat backports the fix into RHEL 8 php:7.4 and RHEL 9 php 8.0 without changing the upstream version. Alpine's security database records the fix only for edge (upstream releases), so stable-branch packages below the upstream fix have no backport. Plesk rebuilt 7.4.33, 8.0.30 and 8.1.34 on 21 October 2026 with unchanged version numbers; only the build date tells them apart."
   }
 }
