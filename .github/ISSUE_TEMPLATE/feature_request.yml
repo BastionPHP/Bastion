@@ -1,0 +1,30 @@
+name: Feature proposal
+description: Propose a capability with a concrete operator workflow and acceptance criteria.
+title: "[Proposal] "
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Operator problem
+      description: Who encounters this, in what environment, and what cannot be done today?
+    validations:
+      required: true
+  - type: textarea
+    id: workflow
+    attributes:
+      label: Proposed workflow
+      description: Show the command or interaction, available evidence and expected output.
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      description: What fixture or observable result would demonstrate that this works?
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives and scope
+      description: Existing workarounds, platform constraints, compatibility concerns and anything that would modify the inspected system.

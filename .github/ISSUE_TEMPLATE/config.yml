@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Security vulnerability or false-safe verdict
+    url: https://github.com/BastionPHP/Bastion/security/advisories/new
+    about: Report vulnerabilities and affected builds incorrectly marked fixed privately.
+  - name: Usage and command reference
+    url: https://bastion-bay-xi.vercel.app/docs/
+    about: Installation, command flags, output formats and known limitations.

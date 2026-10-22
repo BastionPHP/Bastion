@@ -2,121 +2,166 @@
 
 # Bastion
 
-**Is your PHP still exposed? Has someone already got in?**
+### Know what is patched. See what was left behind.
 
-Open-source, local, **read-only** PHP security tool. Finds every PHP build on a server —
-distro packages, BaoTa, cPanel, containers — tells you which ones are *really* patched
-against **PHP2Shell** (CVE-2026-109618 / CVE-2026-109619), and traces what an intruder left behind.
+Evidence-based PHP security assessment for operators and incident responders.
 
-[Website](https://larptard.github.io/bastion/) ·
-[Online check](https://larptard.github.io/bastion/check/) ·
-[How it works](https://larptard.github.io/bastion/how-it-works/) ·
-[Docs](https://larptard.github.io/bastion/docs/)
+[![CI](https://github.com/BastionPHP/Bastion/actions/workflows/ci.yml/badge.svg)](https://github.com/BastionPHP/Bastion/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/license-MIT-64748b)](LICENSE)
+[![Go](https://img.shields.io/badge/Go-1.24%2B-00ADD8?logo=go&logoColor=white)](go.mod)
 
-[![ci](https://github.com/larptard/bastion/actions/workflows/ci.yml/badge.svg)](https://github.com/larptard/bastion/actions/workflows/ci.yml)
-[![license: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[Website](https://bastion-bay-xi.vercel.app/) · [Online check](https://bastion-bay-xi.vercel.app/check/) · [Documentation](https://bastion-bay-xi.vercel.app/docs/) · [Sample report](https://bastion-bay-xi.vercel.app/demo/report.html)
 
-<img src="docs/assets/scan.png" alt="bastion scan: real output on an Ubuntu 24.04 host with four PHP containers" width="860">
+<a href="docs/assets/scan.png"><img src="docs/assets/readme-scan.png" alt="Recorded Bastion scan inventory and summary showing affected and fixed PHP builds on an Ubuntu host with containers" width="960"></a>
 
-<sub>Real output of <code>bastion scan</code> on an Ubuntu 24.04 host running four official PHP containers, recorded with <code>scripts/demo/record.sh</code>.</sub>
+<sub>Recorded CLI output, condensed for readability. <a href="docs/assets/scan.png">Full evidence</a> · <a href="site/demo/RECORDING.txt">Recording details</a> · <a href="scripts/demo/readme-preview.mjs">Reproduce this image</a></sub>
 
 </div>
 
-## Why
+## Why Bastion exists
 
-On **21 October 2026** PHP shipped emergency releases (**8.5.12, 8.4.27, 8.3.36, 8.2.35**) for two
-engine bugs rated **CVSS v4 9.2**: unauthenticated remote code execution, demonstrated against
-Apache mod_php before any application code runs. PHP ≤ 8.1 gets no release at all — only
-source backport branches.
+`php -v` cannot tell you whether every PHP build on a host is safe. A distribution may backport a fix without changing the upstream version. A hosting panel may carry a second installation. A worker may still be running code that was replaced on disk.
 
-Knowing whether *your* server is safe is harder than it sounds:
+Bastion connects **discovery, patch evidence and intrusion indicators** in one local workflow. It reports the reason behind each assessment and preserves `unknown` when the available evidence is insufficient.
 
-- **Version numbers lie.** Ubuntu 24.04's fixed PHP still reports `8.3.6` (upstream fix: 8.3.36).
-  Distributions backport fixes without changing the version — a version-only check gets it wrong
-  in both directions.
-- **There is more than one PHP.** System package, two panel versions, a container built last month.
-- **Patched files ≠ patched processes.** php-fpm and Apache keep running the old code until restarted.
-- **A patch doesn't evict an attacker** who got in first.
+The current bundled advisory database covers **PHP2Shell**, tracked as CVE-2026-109618 and CVE-2026-109619. See the [advisory data and its primary sources](internal/advisory/data/php2shell-2026.json) for the exact coverage. Bastion is not a general-purpose PHP dependency scanner.
 
-## Install
+## Start here
+
+**Current status: pre-release.** There is no published binary release yet. Build from source on Linux or macOS with [Go 1.24 or later](https://go.dev/dl/) and Make:
 
 ```sh
-curl -fsSL https://larptard.github.io/bastion/install.sh | sh
+git clone https://github.com/BastionPHP/Bastion.git
+cd Bastion
+make build
+./bastion version
 ```
 
-Linux & macOS, amd64 & arm64. The script verifies the SHA-256 checksum and, when `cosign` is
-installed, the Sigstore signature of the release (`BASTION_REQUIRE_SIGNATURE=1` makes that
-mandatory). Prefer to read it first? It's [scripts/install.sh](scripts/install.sh).
-Other options: [manual download + verify](https://larptard.github.io/bastion/docs/#install),
-`go install github.com/larptard/bastion/cmd/bastion@latest`, or `make build`.
-
-## Use
+Choose the workflow you need:
 
 ```sh
-sudo bastion scan                 # every PHP build, and whether it is really fixed
-sudo bastion scan --images        # also every local container image (read, never run)
-sudo bastion trace                # webshells, persistence, log traces + timeline
-sudo bastion report               # both, as one self-contained offline HTML file
-sudo bastion scan --format sarif  # for GitHub code scanning and security dashboards
-php -v | bastion check            # assess pasted output (same engine as the website)
+# Discover PHP builds and assess their patch state.
+sudo ./bastion scan
+
+# Inspect web roots, persistence locations and logs for intrusion indicators.
+sudo ./bastion trace
+
+# Combine both into an offline HTML report.
+sudo ./bastion report -o bastion-report.html
 ```
 
-| | |
-|---|---|
-| **`scan`** finds PHP in distro paths, BaoTa/aaPanel, cPanel EA4, CloudLinux, Plesk, Remi, LiteSpeed, Homebrew, source builds, running processes (php-fpm, mod_php, lsphp, FrankenPHP), **Docker/Podman containers, Kubernetes pods and container images**, and processes still running a **replaced binary**. For builds that are not fixed it audits the **interim mitigations** in php.ini and PHP-FPM pools. | **`trace`** checks web roots (found from nginx/Apache/LiteSpeed/Caddy config) for webshell signatures, PHP in uploads/images, `.user.ini`/`.htaccess` tricks; cron, systemd, `ld.so.preload`, SSH keys, UID 0; and logs: requests to flagged files, worker segfaults, start-up OOM. |
-| <img src="docs/assets/trace.png" alt="bastion trace output" width="420"> | <img src="docs/assets/report.png" alt="HTML report" width="420"> |
+Start without `sudo` if you only need to inspect files your account can read. Elevated access improves coverage of other users' processes, container filesystems and system logs. Use `scan --no-exec` to disable the `php -v` and container-exec fallbacks; image export still uses the container runtime CLI.
 
-Exit codes make it scriptable: `0` clean · `1` vulnerable/compromised · `2` unknown/suspicious.
-`--format json` gives versioned output (`bastion.scan/v1`, `bastion.trace/v1`); `--format sarif` gives SARIF 2.1.0.
-[Sample report →](https://larptard.github.io/bastion/demo/report.html)
+For a quick version or package assessment, use the [browser-based check](https://bastion-bay-xi.vercel.app/check/). Input is evaluated in the browser; it does not inventory your server. Windows users can use this check without installing the CLI.
 
-## How it decides
+## Four commands, one investigation
 
-For each binary Bastion reads the version **without executing it** (every PHP SAPI embeds
-`X-Powered-By: PHP/<version>`), then goes down a ladder and stops at the first proof:
+| Command | What it answers | What you get |
+| :--- | :--- | :--- |
+| `scan` | Which PHP builds are present, and what proves their patch state? | Paths, versions, package evidence, running processes, mitigation checks |
+| `trace` | Are there observable signs of an intrusion? | File signatures, persistence findings, log indicators and a timeline |
+| `report` | How can I review or hand off the investigation? | One self-contained HTML file combining scan and trace |
+| `check` | What can be inferred from pasted version or package output? | A focused assessment using the same advisory rules |
 
-1. **Upstream version** ≥ the branch's fixed release → fixed.
-2. **Vendor fix table** — exact fixed package versions from the Ubuntu, Debian and Red Hat (RHEL 8/9/10) trackers, compared with dpkg's or rpm's ordering.
-3. **Dated vendor rebuilds** — Plesk's 7.4/8.0/8.1 rebuilds keep their version; the compile date read from the binary decides.
-4. **Package changelog** names CVE-2026-109618/109619 (`changelog.Debian.gz`, `rpm -q --changelog`).
-5. **Fix fingerprint** — code only the patch adds (the new hard memory-limit message) is in the binary.
-6. Otherwise: *likely vulnerable* if evidence was expected but absent (for example Alpine, whose secdb records no stable-branch backport), or **unknown**, never a guess.
-
-The same engine runs in the browser on the [online check](https://larptard.github.io/bastion/check/);
-Go and JS are tested against one shared set of vectors ([testdata/](testdata/)).
-Vulnerabilities are **data**: [`internal/advisory/data/*.json`](internal/advisory/data/) — the next
-PHP bug is a JSON file (or `--db <dir>` at run time), not new code.
-Full explanation with annotated source: [How it works](https://larptard.github.io/bastion/how-it-works/).
-
-## Principles
-
-- **Read-only.** Never writes, restarts, quarantines or deletes. Fixes are printed, not run. `--no-exec` disables even `php -v`/`docker exec`.
-- **Local.** No telemetry, no network calls, no account.
-- **Honest.** Every verdict shows its evidence; what can't be proven is `unknown`.
-- **Tested on real things.** Integration tests run against real PHP images (official, Ubuntu, Debian, Alpine, mod_php); trace signatures are checked in CI against WordPress, Drupal, Laravel and phpseclib for false positives.
-
-## Roadmap
-
-| Module | | Status |
-|---|---|---|
-| **Sense** · perception | inventory, exposure, image scanning, mitigation audit (`scan`, `check`, `report`) | ✅ available |
-| **Trace** · intrusion forensics | indicators + timeline (`trace`) | ✅ available |
-| **Forge** · patch forging | reproducible patched packages for EOL PHP from official backport branches | 🗺 roadmap |
-| **Shift** · safe migration | compatibility checks and rehearsed upgrades to supported branches | 🗺 roadmap |
-| **Guard** · runtime protection | detect exploitation attempts as they happen | 🗺 roadmap |
-
-## Develop
+<details>
+<summary><strong>More workflows: images, offline filesystems and machine-readable output</strong></summary>
 
 ```sh
-make test          # go vet, go test -race, JS engine parity tests
-make integration   # real PHP images; needs Docker + root/sudo
-make site-serve    # website on http://localhost:4321/bastion/
-make demo          # re-record terminal demos and the sample report
+# Inspect locally available container images without starting them.
+sudo ./bastion scan --images
+
+# Inspect a mounted filesystem instead of the running host.
+sudo ./bastion scan --sysroot /mnt/server
+
+# Export evidence for scripts and security tooling.
+sudo ./bastion scan --format json > scan.json
+sudo ./bastion scan --format sarif > scan.sarif
+
+# Assess one pasted version string.
+printf '%s\n' 'PHP 8.3.6' | ./bastion check
+
+# Inspect the flags supported by your build.
+./bastion scan -h
 ```
 
-Layout: `cmd/bastion` CLI · `internal/advisory` data + decision engine · `internal/discover`
-finding PHP · `internal/pkgdb` dpkg/rpm/apk · `internal/scan` · `internal/trace` (+ `rules/`) ·
-`internal/imagefs` image extraction · `internal/phpini` config reading · `internal/sarif` ·
-`internal/report` · `design/` shared CSS and icons (Lucide, ISC) · `site/` website (zero-dependency Node build).
+JSON reports use versioned schemas: `bastion.scan/v1` and `bastion.trace/v1`. SARIF output uses version 2.1.0. Exported reports can include hostnames, paths and matching snippets.
 
-Security issues: see [SECURITY.md](SECURITY.md). License: [MIT](LICENSE).
+</details>
+
+## Evidence before verdicts
+
+The engine evaluates upstream releases, distribution package versions, vendor rebuild dates, changelog markers and patch fingerprints. Findings include the evidence that contributed to the decision. The [decision engine](internal/advisory/evaluate.go) and [architecture guide](docs/ARCHITECTURE.md) are available for inspection.
+
+| Verdict | Interpretation |
+| :--- | :--- |
+| `fixed` | The available evidence satisfies the advisory's fix criteria. |
+| `vulnerable` | The build matches an affected version or package range. |
+| `likely-vulnerable` | The build appears affected, with incomplete evidence about a possible fix. |
+| `unknown` | The available evidence does not support a reliable determination. |
+
+A patched build is not evidence that an earlier intrusion did not occur. A trace with no findings is not proof that a host is clean. Coverage depends on privileges, readable files, available package metadata and the bundled advisory database.
+
+## Coverage
+
+| Surface | Discovery and evidence |
+| :--- | :--- |
+| System packages | Debian/Ubuntu, RPM-based distributions and Alpine package metadata; vendor-specific fix data where available |
+| Hosting panels | BaoTa/aaPanel, cPanel, CloudLinux and Plesk installation paths |
+| Other installations | Remi, LiteSpeed, Homebrew, XAMPP, Bitnami and common source-build locations |
+| Containers and images | Docker/Podman containers, readable process namespaces and exported local images |
+| Running code | PHP workers, Apache modules and replaced binaries still mapped by a process |
+| Intrusion indicators | Webshell patterns, PHP in upload/image files, configuration hooks, persistence locations and logs |
+
+Discovery support and patch-proof coverage are different. Finding a build does not imply that vendor evidence exists for it. Linux provides the broadest coverage; process namespaces and `/proc` inspection are Linux-specific. macOS builds do not provide those Linux-only checks.
+
+<details>
+<summary><strong>Inspect the trace and report output</strong></summary>
+
+### Intrusion trace
+
+<img src="docs/assets/trace.png" alt="Bastion trace output with findings and an investigation timeline" width="960" loading="lazy">
+
+### Offline report
+
+<img src="docs/assets/report.png" alt="Bastion self-contained HTML report with scan evidence and intrusion findings" width="960" loading="lazy">
+
+The trace demo uses controlled fixtures. The [recording script](scripts/demo/record.sh) documents how the example output is produced.
+
+</details>
+
+## Operational contract
+
+- **Inspection, not remediation.** Bastion does not patch packages, restart services, remove files or quarantine findings. `report` writes the output file you request; image scanning uses temporary files.
+- **Local analysis.** There is no account, telemetry service or hosted analysis backend. Container commands use your configured Docker/Podman context.
+- **Explicit uncertainty.** Missing evidence remains visible instead of becoming a clean bill of health.
+- **Reviewable rules.** Advisory data and trace signatures are checked into the repository. Go and browser implementations share test vectors.
+
+Exit codes are part of the CLI interface:
+
+| Code | Meaning |
+| :--- | :--- |
+| `0` | No affected builds or reportable intrusion indicators |
+| `1` | A vulnerable/likely-vulnerable build or high-severity intrusion indicators |
+| `2` | Unresolved patch state or suspicious indicators |
+| `64` | Invalid command or arguments |
+| `70` | Operational failure |
+
+## Development
+
+```sh
+make test          # go vet, race-enabled unit tests and browser-engine tests
+make integration   # real PHP/container tests; Docker + root or passwordless sudo
+make site-serve    # build the CLI and serve the website locally
+```
+
+[CI](https://github.com/BastionPHP/Bastion/actions/workflows/ci.yml) checks Linux/macOS unit tests, cross-compilation, browser parity, website links, installer checks and container integration. It also checks trace rules against a corpus of legitimate PHP projects. See workflow runs for current results; these checks are not an independent security audit.
+
+Start with the [architecture guide](docs/ARCHITECTURE.md) and [contribution guide](CONTRIBUTING.md). Changes to advisory logic need matching Go/browser fixtures; new trace rules need both positive fixtures and false-positive checks.
+
+## Project direction
+
+Current work centers on coverage, evidence quality and reproducible investigations. Patch-package generation, migration assistance and runtime protection remain proposals, not supported features or delivery commitments. See the [roadmap](docs/ROADMAP.md).
+
+**Found a bug?** [Open an issue](https://github.com/BastionPHP/Bastion/issues/new/choose). **Found a security vulnerability or a false-safe verdict?** [Report privately](https://github.com/BastionPHP/Bastion/security/advisories/new).
+
+Released under the [MIT license](LICENSE).

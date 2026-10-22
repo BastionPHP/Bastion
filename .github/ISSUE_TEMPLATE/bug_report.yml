@@ -1,0 +1,43 @@
+name: Bug report
+description: Report a reproducible problem with discovery, tracing, output or the website.
+title: "[Bug] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        If an affected build is incorrectly reported as **fixed**, use [private vulnerability reporting](https://github.com/BastionPHP/Bastion/security/advisories/new).
+        Remove secrets, private hostnames and customer data from public reports.
+  - type: input
+    id: version
+    attributes:
+      label: Version or commit
+      description: Output of bastion version and the source commit, if built locally.
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: OS/version, architecture, PHP installation method, privileges and container runtime if relevant. For website issues, include browser and viewport.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Reproduction
+      description: Exact command or steps, with a minimal fixture when possible.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected and actual behavior
+      description: Explain what you expected and what happened instead.
+    validations:
+      required: true
+  - type: textarea
+    id: output
+    attributes:
+      label: Sanitized output
+      description: Include stderr, exit code and relevant JSON fields. Do not attach an entire private investigation report.
+      render: text

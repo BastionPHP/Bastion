@@ -1,0 +1,37 @@
+name: Advisory or vendor coverage
+description: Add or correct evidence for a PHP advisory, distribution or package.
+title: "[Data] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        A false-safe verdict belongs in [private vulnerability reporting](https://github.com/BastionPHP/Bastion/security/advisories/new).
+        This form is for missing coverage, unresolved verdicts or non-sensitive data corrections.
+  - type: input
+    id: advisory
+    attributes:
+      label: Advisory identifier
+      description: CVE, GHSA or vendor advisory identifier.
+    validations:
+      required: true
+  - type: textarea
+    id: package
+    attributes:
+      label: Distribution and package scope
+      description: Distribution/release, source and binary package names, exact package version, PHP branch and repository channel.
+    validations:
+      required: true
+  - type: textarea
+    id: source
+    attributes:
+      label: Primary-source evidence
+      description: Link to the upstream advisory or vendor tracker and identify the entry supporting this change.
+    validations:
+      required: true
+  - type: textarea
+    id: observation
+    attributes:
+      label: Observed and proposed assessment
+      description: Include the Bastion commit, sanitized result and exact expected verdict. Distinguish a verified backport from an assumption.
+    validations:
+      required: true
